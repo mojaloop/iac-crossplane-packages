@@ -226,7 +226,7 @@ _Secret = {
     }
 }
 
-_items += [_Object, _Secret]
+_items += [_Object, _Secret, _Service]
 dxr = {
     **oxr
 }
