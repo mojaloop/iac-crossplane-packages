@@ -6,6 +6,7 @@ metadata:
 spec:
   parameters:
     zitadelProjectId: 123455
+    accountId: "123455"
     groupNames:
       admin: techops-admin
       externalAccess: techops-users

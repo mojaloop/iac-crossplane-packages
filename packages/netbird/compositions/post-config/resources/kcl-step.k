@@ -19,6 +19,7 @@ _account = {
     name = "{}-nb-account".format(oxr.metadata.name)
     annotations = {
       "krm.kcl.dev/composition-resource-name": "nb-account"
+      "crossplane.io/external-name": parameters.accountId
     }
   }
   spec = {
@@ -42,7 +43,29 @@ _account = {
       }
     }
     providerConfigRef = spec?.providerConfigRef
-    managementPolicies = spec?.managementPolicies
+    managementPolicies = [
+      "Update",
+      "LateInitialize"
+    ]
+  }
+}
+
+# Observe All Group
+_all_group = {
+  apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+  kind = "NbGroup"
+  metadata = {
+    name = "{}-all-group".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "all-group"
+    }
+  }
+  spec = {
+    forProvider = {
+      name = "All"
+    }
+    providerConfigRef = spec?.providerConfigRef
+    managementPolicies = ["Observe"]
   }
 }
 
@@ -59,16 +82,40 @@ _dns = {
   spec = {
     forProvider = {
       disabled_management_groups = [
-        parameters.allPeerGroupId
+        ocds["all-group"]?.Resource?.status?.atProvider?.manifest?.id or ""
       ]
     }
     providerConfigRef = spec?.providerConfigRef
-    managementPolicies = spec?.managementPolicies
+    managementPolicies = [
+      "Update",
+      "LateInitialize"
+    ]
   }
 }
 
+# Admin Group
+_admin_group = {
+  apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+  kind = "NbGroup"
+  metadata = {
+    name = "{}-admin-group".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "admin-group"
+    }
+  }
+  spec = {
+    forProvider = {
+      name = parameters.groupNames.admin
+    }
+    providerConfigRef = spec?.providerConfigRef
+    managementPolicies = ["Observe"]
+  }
+}
+
+## TOOD Zitadel User Role Syncer
+
 # Add the resources to the items list
-_items += [_account, _dns]
+_items += [_all_group, _admin_group, _account, _dns]
 
 dxr = {
   **oxr

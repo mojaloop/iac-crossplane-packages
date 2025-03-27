@@ -94,6 +94,9 @@ spec:
                   zitadelProjectId:
                     type: number
                     description: The ID of the Zitadel project to use for the post-config.
+                  accountId:
+                    type: string
+                    description: The ID of the Netbird account to use for the post-config.
                   groupNames:
                     type: object
                     properties:
@@ -103,6 +106,3 @@ spec:
                       externalAccess:
                         type: string
                         description: The name of the external access group to use for the post-config.
-                  allPeerGroupId:
-                    type: string
-                    description: The ID of the all peer group to use for the post-config.
