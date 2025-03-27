@@ -1,16 +1,16 @@
 # Ignore rendered directories in any package
-*/compositions/*/rendered
-*/compositions/*/rendered/**
+packages/*/compositions/*/rendered
+packages/*/compositions/*/rendered/**
 
 # Ignore all configuration directories and files
-*/configuration/*
-*/configuration/**/*
+packages/*/configuration/*
+packages/*/configuration/**/*
 
 # Keep the crossplane.yaml file if it exists
-!*/configuration/
-!*/configuration/crossplane.yaml
+!packages/*/configuration/
+!packages/*/configuration/crossplane.yaml
 
 # Ignore crossplane cache directories
 .crossplane
-*/.crossplane
-*/compositions/*/.crossplane
+packages/*/.crossplane
+packages/*/compositions/*/.crossplane
