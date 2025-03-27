@@ -112,9 +112,6 @@ if parameters?.dbType == "postgres":
                                 image = "percona/percona-postgresql-operator:2.5.0-ppg16.4-pgbouncer1.23.1"
                                 replicas = 1
                                 port = 5432
-                                expose = {
-                                    type = "LoadBalancer"
-                                }
                                 affinity = {
                                     podAntiAffinity = {
                                         preferredDuringSchedulingIgnoredDuringExecution = [
@@ -151,6 +148,56 @@ if parameters?.dbType == "postgres":
             }
         }
     }
+
+_Service = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-ss".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "percona-db-lb-svc"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Service"
+                metadata = {
+                    name = "{}-db".format(oxr.metadata.name)
+                    namespace = parameters?.dbNamespace
+                }
+                spec = {
+                    allocateLoadBalancerNodePorts = True
+                    externalTrafficPolicy = "Cluster"
+                    internalTrafficPolicy = "Cluster"
+                    ipFamilies = [
+                        "IPv4"
+                    ]
+                    ipFamilyPolicy = "SingleStack"
+                    ports = [
+                        {
+                            name = "pgbouncer"
+                            port = 5432
+                            protocol = "TCP"
+                            targetPort = "pgbouncer"
+                        }
+                    ]
+                    selector = {
+                        "postgres-operator.crunchydata.com/cluster" = "{}-db".format(oxr.metadata.name)
+                        "postgres-operator.crunchydata.com/role" = "pgbouncer"
+                    }
+                    sessionAffinity = "None"
+                    type = "LoadBalancer"
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.scK8sProviderName
+        }
+    }
+}
 
 _Secret = {
     apiVersion = "infitx.org/v1alpha1"
