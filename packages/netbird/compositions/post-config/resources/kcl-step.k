@@ -11,6 +11,9 @@ _items = []
 admin_group_name = "{}:{}".format(parameters.zitadelProjectId, parameters.groupNames.admin)
 external_access_group_name = "{}:{}".format(parameters.zitadelProjectId, parameters.groupNames.externalAccess)
 
+# Get Netbird Account ID
+## HTTP Provider call to get account id
+
 # Update Netbird Account
 _account = {
   apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
@@ -19,7 +22,7 @@ _account = {
     name = "{}-nb-account".format(oxr.metadata.name)
     annotations = {
       "krm.kcl.dev/composition-resource-name": "nb-account"
-      "crossplane.io/external-name": parameters.accountId
+      "crossplane.io/external-name": parameters.accountId ## TODO: Replace with api call to get account id
     }
   }
   spec = {

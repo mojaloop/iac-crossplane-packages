@@ -94,7 +94,7 @@ spec:
                   zitadelProjectId:
                     type: number
                     description: The ID of the Zitadel project to use for the post-config.
-                  accountId:
+                  accountId: ## TODO: Replace with api call to get account id
                     type: string
                     description: The ID of the Netbird account to use for the post-config.
                   groupNames:
