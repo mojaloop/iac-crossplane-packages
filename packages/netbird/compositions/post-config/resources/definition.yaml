@@ -49,48 +49,48 @@ spec:
                     - "*"
                   type: string
                 type: array
-              providerConfigRef:
-                  default:
-                    name: provider-config-aws
-                  description: |-
-                    ProviderConfigReference specifies how the provider that will be used to
-                    create, observe, update, and delete this managed resource should be
-                    configured.
-                  properties:
-                    name:
-                      description: Name of the referenced object.
-                      type: string
-                    policy:
-                      description: Policies for referencing.
-                      properties:
-                        resolution:
-                          default: Required
-                          description: |-
-                            Resolution specifies whether resolution of this reference is required.
-                            The default is 'Required', which means the reconcile will fail if the
-                            reference cannot be resolved. 'Optional' means this reference will be
-                            a no-op if it cannot be resolved.
-                          enum:
-                            - Required
-                            - Optional
-                          type: string
-                        resolve:
-                          description: |-
-                            Resolve specifies when this reference should be resolved. The default
-                            is 'IfNotPresent', which will attempt to resolve the reference only when
-                            the corresponding field is not present. Use 'Always' to resolve the
-                            reference on every reconcile.
-                          enum:
-                            - Always
-                            - IfNotPresent
-                          type: string
-                      type: object
-                  required:
-                    - name
-                  type: object
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the source and destination k8s providers.
+                required:
+                  - netbirdProviderConfigName
+                  - k8sProviderConfigName
+                properties:
+                  k8sProviderConfigName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the source k8s provider.
+                  netbirdProviderConfigName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the destination k8s provider.
               parameters:
                 type: object
                 properties:
+                  ccClusterName:
+                    type: string
+                    description: The name of the CC cluster to use for the post-config.
+                  environments:
+                    type: array
+                    items:
+                      type: string
+                    description: The environments to use for the post-config.
+                  setupKey:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: The name of the setup key to use for the post-config.
+                      namespace:
+                        type: string
+                        description: The namespace of the setup key to use for the post-config.
+                      gwSetupKeySecretKey:
+                        type: string
+                        description: The key of the gateway setup key to use for the post-config.
+                      buildSetupKeySecretKey:
+                        type: string
+                        description: The key of the build setup key to use for the post-config.
                   zitadelProjectId:
                     type: number
                     description: The ID of the Zitadel project to use for the post-config.
