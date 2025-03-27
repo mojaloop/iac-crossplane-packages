@@ -153,7 +153,7 @@ _Service = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "{}-ss".format(oxr.metadata.name)
+        name = "{}-svc".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "percona-db-lb-svc"
         }
