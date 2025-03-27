@@ -1,14 +1,17 @@
 apiVersion: netbird.infitx.org/v1alpha1
-kind: PostConfig
+kind: ZitadelUserRoleSyncer
 metadata:
-  name: example-post-config
+  name: example-zitadel-user-role-syncer
   namespace: testa
 spec:
   parameters:
-    zitadelProjectId: 123455
-    groupNames:
-      admin: techops-admin
-      externalAccess: techops-users
+    zitadelUrl: https://zitadel.ccinfra.drpp-onprem.global
+    zitadelAuth:
+      patSecret:
+        name: zitadel-provider-secret
+        namespace: zitadel-test
+        key: token
+    zitadelProjectName: Netbird
   providerConfigRef:
     name: provider-config-aws
   managementPolicies:

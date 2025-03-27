@@ -91,6 +91,21 @@ spec:
               parameters:
                 type: object
                 properties:
-                  zitadelProjectId:
-                    type: number
-                    description: The ID of the Zitadel project to use for the zitadel user role syncer.
+                  zitadelUrl:
+                    type: string
+                    description: The URL of the Zitadel instance to use for the zitadel user role syncer.
+                  zitadelAuth:
+                    type: object
+                    properties:
+                      patSecret:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          namespace:
+                            type: string
+                          key:
+                            type: string
+                  zitadelProjectName:
+                    type: string
+                    description: The name of the Zitadel project to use for the zitadel user role syncer.
