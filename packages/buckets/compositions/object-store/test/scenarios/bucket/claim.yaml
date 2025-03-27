@@ -1,0 +1,14 @@
+apiVersion: infitx.org/v1alpha1
+kind: XObjectStore
+metadata:
+  name: my-example-bucket
+spec:
+  objectStoreProvider: "aws"
+  parameters:
+    bucketName: "my-example-bucket"
+    Namespace: temp
+    bucketRegion: "us-east-1"
+    maxSize: "20Gi"
+    eso_pushsecret: false
+    vault_secrestore_name: "vault-backend"
+    vault_secret_path: "objectstore/my_example_bucket"

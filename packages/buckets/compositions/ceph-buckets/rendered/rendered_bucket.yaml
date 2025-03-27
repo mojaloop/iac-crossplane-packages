@@ -1,0 +1,117 @@
+---
+apiVersion: infitx.org/v1alpha1
+kind: XCephBucket
+metadata:
+  name: my-example-bucket
+spec:
+  parameters:
+    bucket:
+      bucketName: my-example-bucket
+      maxSize: 20Gi
+      storageClassName: ceph-bucket
+    secret:
+      cc_namespace: temp
+      name: my-example-bucket
+      sc_namespace: rook-ceph
+      vault_secrestore_name: vault-backend
+      vault_secret_path: mutai/my_example_bucket2
+  providerConfigsRef:
+    ccK8sProviderName: kubernetes-provider
+    scK8sProviderName: sc-kubernetes-provider
+status:
+  conditions:
+  - lastTransitionTime: "2024-01-01T00:00:00Z"
+    message: 'Unready resources: ceph-bucket, destination-secret, and source-secret'
+    reason: Creating
+    status: "False"
+    type: Ready
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: ceph-bucket
+  generateName: my-example-bucket-
+  labels:
+    crossplane.io/composite: my-example-bucket
+  name: my-example-bucket-bucket
+  ownerReferences:
+  - apiVersion: infitx.org/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: XCephBucket
+    name: my-example-bucket
+    uid: ""
+spec:
+  forProvider:
+    manifest:
+      apiVersion: objectbucket.io/v1alpha1
+      kind: ObjectBucketClaim
+      metadata:
+        name: my-example-bucket
+        namespace: rook-ceph
+      spec:
+        additionalConfig:
+          maxSize: 20Gi
+        bucketName: my-example-bucket
+        storageClassName: ceph-bucket
+  providerConfigRef:
+    name: sc-kubernetes-provider
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: destination-secret
+  generateName: my-example-bucket-
+  labels:
+    crossplane.io/composite: my-example-bucket
+  name: my-example-bucket-ds
+  ownerReferences:
+  - apiVersion: infitx.org/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: XCephBucket
+    name: my-example-bucket
+    uid: ""
+spec:
+  forProvider:
+    manifest:
+      apiVersion: v1
+      data: null
+      kind: Secret
+      metadata:
+        name: my-example-bucket
+        namespace: temp
+      type: null
+  providerConfigRef:
+    name: kubernetes-provider
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: source-secret
+  generateName: my-example-bucket-
+  labels:
+    crossplane.io/composite: my-example-bucket
+  name: my-example-bucket-ss
+  ownerReferences:
+  - apiVersion: infitx.org/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: XCephBucket
+    name: my-example-bucket
+    uid: ""
+spec:
+  forProvider:
+    manifest:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: my-example-bucket
+        namespace: rook-ceph
+  managementPolicies:
+  - Observe
+  providerConfigRef:
+    name: sc-kubernetes-provider

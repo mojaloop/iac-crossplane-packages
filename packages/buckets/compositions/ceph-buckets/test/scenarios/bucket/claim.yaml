@@ -1,0 +1,21 @@
+apiVersion: infitx.org/v1alpha1
+kind: XCephBucket
+metadata:
+  name: my-example-bucket
+spec:
+  providerConfigsRef:
+    scK8sProviderName: sc-kubernetes-provider
+    ccK8sProviderName: kubernetes-provider
+  parameters:
+    bucket:
+      bucketName: "my-example-bucket"
+      storageClassName: "ceph-bucket"
+      maxSize: "20Gi"
+      # maxObjects: "5000"
+    secret:
+      sc_namespace: "rook-ceph"
+      name: "my-example-bucket"
+      cc_namespace: "temp"
+      eso_pushsecret: true
+      vault_secrestore_name: "vault-backend"
+      vault_secret_path: "mutai/my_example_bucket2"
