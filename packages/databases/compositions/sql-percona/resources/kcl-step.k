@@ -219,13 +219,13 @@ _ExternalNameService = {
                 spec = {
                     type = "ExternalName"
                     externalName = _ip
-                    ports = {
-                      port = [
-                        3306
-                      ]
-                      protocol = "TCP"
-                      targetPort = 3306
-                    }
+                    ports = [
+                        {
+                            port: 5432
+                            protocol: "TCP"
+                            targetPort: 5432
+                        }
+                    ]
                 }
             }
         }
