@@ -214,7 +214,7 @@ _ExternalNameService = {
                 kind = "Service"
                 metadata = {
                     name = "{}-db".format(oxr.metadata.name)
-                    namespace = parameters?.dbNamespace
+                    namespace =  parameters?.secretNamespace
                 }
                 spec = {
                   type = "ExternalName"
