@@ -8,7 +8,7 @@ parameters = spec.parameters
 _items = []
 ## Adding resources
 if parameters?.dbType == "postgres":
-    _Object = {
+    _PGCluster = {
         apiVersion = "kubernetes.crossplane.io/v1alpha2"
         kind = "Object"
         metadata = {
@@ -82,7 +82,6 @@ if parameters?.dbType == "postgres":
                                     type = "ASCII"
                                 }
                                 secretName = "{}-secret".format(oxr.metadata.name)
-                                #secretName = "db-secret"
                             }
                         ]
                         backups = {
@@ -149,7 +148,7 @@ if parameters?.dbType == "postgres":
         }
     }
 
-_Service = {
+_LBService = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
@@ -198,6 +197,38 @@ _Service = {
         }
     }
 }
+_ip = ocds["percona-db-lb-svc"]?.status?.atProvider?.manifest?.status?.loadBalancer?.ingress[0]?.ip if ocds["percona-db-lb-svc"]?.status?.atProvider?.manifest?.status?.loadBalancer?.ingress else ""
+_ExternalNameService = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-svc".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "percona-db-en-svc"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Service"
+                metadata = {
+                    name = "{}-db".format(oxr.metadata.name)
+                    namespace = parameters?.dbNamespace
+                }
+                spec = {
+                  type = "ExternalName"
+                  externalName = _ip
+
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.ccK8sProviderName
+        }
+    }
+}
 
 _Secret = {
     apiVersion = "infitx.org/v1alpha1"
@@ -210,7 +241,6 @@ _Secret = {
             objectType = "Secret"
             source = {
                 name = "{}-secret".format(oxr.metadata.name)
-                #name = "db-secret"
                 namespace = parameters?.dbNamespace
             }
             destination = {
@@ -226,7 +256,50 @@ _Secret = {
     }
 }
 
-_items += [_Object, _Secret, _Service]
+# _PushSecret = {
+#     apiVersion = "kubernetes.crossplane.io/v1alpha2"
+#     kind = "Object"
+#     metadata = {
+#         name = "{}-push-secret".format(oxr.metadata.name)
+#         annotations = {
+#             "krm.kcl.dev/composition-resource-name": "push-secret"
+#         }
+#     }
+#     spec = {
+#         forProvider = {
+#             manifest = {
+#                 apiVersion = "external-secrets.io/v1alpha1"
+#                 kind = "PushSecret"
+#                 metadata = {
+#                     name = "{}-pushsecret".format(oxr.metadata.name)
+#                     namespace = parameters?.secretNamespace
+#                 }
+#                 spec = {
+#                     secretStoreRefs = [
+#                         {
+#                             name = "vault-secret-store"
+#                             kind = "ClusterSecretStore"
+#                         }
+#                     ]
+#                     selector = {
+#                         secret = {
+#                             name = "{}-secret".format(oxr.metadata.name)
+#                         }
+#                     }
+#                     data = [
+
+#                     ]
+#                 }
+#             }
+#         }
+#         managementPolicies = spec.managementPolicies
+#         providerConfigRef = {
+#             name = spec.providerConfigsRef.ccK8sProviderName
+#         }
+#     }
+# }
+
+_items += [_PGCluster, _Secret, _LBService, _ExternalNameService]
 dxr = {
     **oxr
 }
