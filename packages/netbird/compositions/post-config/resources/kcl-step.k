@@ -48,7 +48,9 @@ _account = {
       name = spec?.providerConfigsRef?.netbirdProviderConfigName
     }
     managementPolicies = [
+      "Observe",
       "Update",
+      "Create",
       "LateInitialize"
     ]
   }
@@ -89,14 +91,16 @@ _dns = {
   spec = {
     forProvider = {
       disabled_management_groups = [
-        ocds["all-group"]?.Resource?.status?.atProvider?.manifest?.id or ""
+        ocds["all-group"]?.Resource?.status?.atProvider?.id or ""
       ]
     }
     providerConfigRef = {
       name = spec?.providerConfigsRef?.netbirdProviderConfigName
     }
     managementPolicies = [
+      "Observe",
       "Update",
+      "Create",
       "LateInitialize"
     ]
   }
@@ -163,7 +167,7 @@ _cc_gateway_setup_key = {
       name = "cc bastion gateway setup key"
       type = "reusable"
       auto_groups = [
-        ocds["cc-gateway-group"]?.Resource?.status?.atProvider?.manifest?.id or ""
+        ocds["cc-gateway-group"]?.Resource?.status?.atProvider?.id or ""
       ]
       ephemeral = False
       usage_limit = 0
@@ -205,13 +209,13 @@ _environment_groups += [{
 _setup_keys_groups = []
 
 _setup_keys_groups += [
-  ocds["admin-group"]?.Resource?.status?.atProvider?.manifest?.id or "",
-  ocds["all-group"]?.Resource?.status?.atProvider?.manifest?.id or ""
+  ocds["admin-group"]?.Resource?.status?.atProvider?.id or "",
+  ocds["all-group"]?.Resource?.status?.atProvider?.id or ""
 ]
 
 _environment_groups_ids = []
 _environment_groups_ids += [
-  ocds["{}-env-gateway-group".format(env)]?.Resource?.status?.atProvider?.manifest?.id or ""
+  ocds["{}-env-gateway-group".format(env)]?.Resource?.status?.atProvider?.id or ""
   for env in parameters.environments
 ]
 
@@ -243,7 +247,7 @@ _build_server_setup_key = {
     managementPolicies = spec?.managementPolicies
   }
 }
-
+#need to remove
 _build_server_setup_key_secret = {
   apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
@@ -263,8 +267,8 @@ _build_server_setup_key_secret = {
                     namespace = parameters.setupKey.namespace
                 }
                 data = {
-                  parameters?.setupKey?.buildSetupKeySecretKey = ocds["build-server-setup-key"]?.Resource?.status?.atProvider?.manifest?.key or ""
-                  parameters?.setupKey?.gwSetupKeySecretKey = ocds["cc-gw-setup-key"]?.Resource?.status?.atProvider?.manifest?.key or ""
+                  parameters?.setupKey?.buildSetupKeySecretKey = ocds["build-server-setup-key"]?.Resource?.status?.atProvider?.key or ""
+                  parameters?.setupKey?.gwSetupKeySecretKey = ocds["cc-gw-setup-key"]?.Resource?.status?.atProvider?.key or ""
                 }
                 type = "Opaque"
             }
@@ -285,7 +289,6 @@ _items += [
   _cc_gateway_group,
   _cc_gateway_setup_key,
   _build_server_setup_key,
-  _build_server_setup_key_secret,
   *_environment_groups
 ]
 
