@@ -197,7 +197,7 @@ _LBService = {
         }
     }
 }
-_ip = ocds["percona-db-lb-svc"]?.status?.atProvider?.manifest?.status?.loadBalancer?.ingress[0]?.ip if ocds["percona-db-lb-svc"]?.status?.atProvider?.manifest?.status?.loadBalancer?.ingress else ""
+_ip = ocds["percona-db-lb-svc"]?.Resource?.status?.atProvider?.manifest?.status?.loadBalancer?.ingress[0]?.ip if ocds["percona-db-lb-svc"]?.Resource?.status?.atProvider?.manifest?.status?.loadBalancer?.ingress else ""
 _ExternalNameService = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
@@ -214,12 +214,11 @@ _ExternalNameService = {
                 kind = "Service"
                 metadata = {
                     name = "{}-db".format(oxr.metadata.name)
-                    namespace =  parameters?.secretNamespace
+                    namespace = parameters?.secretNamespace
                 }
                 spec = {
-                  type = "ExternalName"
-                  externalName = _ip
-
+                    type = "ExternalName"
+                    externalName = _ip
                 }
             }
         }
@@ -255,7 +254,6 @@ _Secret = {
         managementPolicies = spec?.managementPolicies
     }
 }
-
 # _PushSecret = {
 #     apiVersion = "kubernetes.crossplane.io/v1alpha2"
 #     kind = "Object"
@@ -287,7 +285,6 @@ _Secret = {
 #                         }
 #                     }
 #                     data = [
-
 #                     ]
 #                 }
 #             }
@@ -298,7 +295,6 @@ _Secret = {
 #         }
 #     }
 # }
-
 _items += [_PGCluster, _Secret, _LBService, _ExternalNameService]
 dxr = {
     **oxr
