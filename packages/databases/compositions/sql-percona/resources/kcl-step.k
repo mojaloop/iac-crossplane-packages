@@ -152,7 +152,7 @@ _LBService = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "{}-svc".format(oxr.metadata.name)
+        name = "{}-lb-svc".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "percona-db-lb-svc"
         }
@@ -202,7 +202,7 @@ _ExternalNameService = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "{}-svc".format(oxr.metadata.name)
+        name = "{}-en-svc".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "percona-db-en-svc"
         }
