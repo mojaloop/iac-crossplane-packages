@@ -22,7 +22,6 @@ _account = {
     name = "{}-nb-account".format(oxr.metadata.name)
     annotations = {
       "krm.kcl.dev/composition-resource-name": "nb-account"
-      "crossplane.io/external-name": parameters.accountId ## TODO: Replace with api call to get account id
     }
   }
   spec = {
@@ -63,6 +62,7 @@ _all_group = {
     name = "{}-all-group".format(oxr.metadata.name)
     annotations = {
       "krm.kcl.dev/composition-resource-name": "all-group"
+      "crossplane.io/external-name": "All"
     }
   }
   spec = {
@@ -110,11 +110,12 @@ _admin_group = {
     name = "{}-admin-group".format(oxr.metadata.name)
     annotations = {
       "krm.kcl.dev/composition-resource-name": "admin-group"
+      "crossplane.io/external-name": admin_group_name
     }
   }
   spec = {
     forProvider = {
-      name = parameters.groupNames.admin
+      name = admin_group_name
     }
     providerConfigRef = {
       name = spec?.providerConfigsRef?.netbirdProviderConfigName

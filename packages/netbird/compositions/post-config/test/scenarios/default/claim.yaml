@@ -1,5 +1,5 @@
 apiVersion: netbird.infitx.org/v1alpha1
-kind: PostConfig
+kind: XPostConfig
 metadata:
   name: example-post-config
   namespace: testa
@@ -15,13 +15,12 @@ spec:
       namespace: "setup-key-namespace"
       gwSetupKeySecretKey: "gw-setup-key-secret-key"
       buildSetupKeySecretKey: "build-setup-key-secret-key"
-    accountId: "123455" ## TODO: Replace with api call to get account id
     zitadelProjectId: 123455
     groupNames:
       admin: techops-admin
       externalAccess: techops-users
   providerConfigsRef:
-    netbirdProviderConfigName: "netbird-provider-config-name"
-    k8sProviderConfigName: "k8s-provider-config-name"
+    netbirdProviderConfigName: "netbird-provider-config"
+    k8sProviderConfigName: "kubernetes-provider"
   managementPolicies:
     - "*"
