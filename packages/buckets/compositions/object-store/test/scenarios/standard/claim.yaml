@@ -8,7 +8,7 @@ spec:
     bucketName: "my-example-bucket"
     Namespace: default
     bucketRegion: "us-east-1"
-    maxSize: "20Gi"
+    maxSize: "10Gi"
     eso_pushsecret: false
     vault_secrestore_name: "vault-backend"
     vault_secret_path: "objectstore/my_example_bucket"
