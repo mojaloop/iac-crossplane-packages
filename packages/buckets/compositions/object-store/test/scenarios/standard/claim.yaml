@@ -3,10 +3,10 @@ kind: XObjectStore
 metadata:
   name: example-object-store
 spec:
-  objectStoreProvider: "aws"
+  objectStoreProvider: "ceph"
   parameters:
     bucketName: "my-example-bucket"
-    Namespace: default
+    Namespace: temp
     bucketRegion: "us-east-1"
     maxSize: "10Gi"
     eso_pushsecret: false
