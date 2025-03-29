@@ -90,7 +90,11 @@ _destinationSecret = {
           namespace = parameters.secret.cc_namespace
         }
         # Get data and type from the source secret's status
-        data = ocds["source-secret"]?.Resource?.status?.atProvider?.manifest?.data
+        data = {
+          "username"     = ocds["source-secret"]?.Resource?.status?.atProvider?.manifest?.data?.AWS_ACCESS_KEY_ID
+          "password"     = ocds["source-secret"]?.Resource?.status?.atProvider?.manifest?.data?.AWS_SECRET_ACCESS_KEY
+        }
+
         type = ocds["source-secret"]?.Resource?.status?.atProvider?.manifest?.type
       }
     }
@@ -138,19 +142,19 @@ if parameters?.secret?.eso_pushsecret:
               data = [
                 {
                   match = {
-                    secretKey = "AWS_ACCESS_KEY_ID"
+                    secretKey = "username"
                     remoteRef = {
                       remoteKey = parameters.secret.vault_secret_path
-                      property = "AWS_ACCESS_KEY_ID"
+                      property = "username"
                     }
                   }
                 },
                 {
                   match = {
-                    secretKey = "AWS_SECRET_ACCESS_KEY"
+                    secretKey = "password"
                     remoteRef = {
                       remoteKey = parameters.secret.vault_secret_path
-                      property = "AWS_SECRET_ACCESS_KEY"
+                      property = "password"
                     }
                   }
                 }
