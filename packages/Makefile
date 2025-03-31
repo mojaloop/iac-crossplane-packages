@@ -18,7 +18,7 @@ DEFINITION_OUTPUT := $(RENDERED_DIR)/definition.yaml
 FUNCTIONS_FILE := $(TEST_DIR)/functions.yaml
 OBSERVED_FILE := $(TESTSCENARIOS_DIR)/observed.yaml
 EXTRA_RESOURCES_FILE := $(TESTSCENARIOS_DIR)/extra.yaml
-LOCAL_COMPOSITIONS_FILE := $(TESTSCENARIOS_DIR)/local-compositions.yaml
+LOCAL_COMPOSITIONS_FILE := $(TEST_DIR)/local-compositions.yaml
 
 TESTSCENARIO ?=
 CLAIM_FILE ?=
@@ -180,16 +180,24 @@ validate: render
 	@# Process local compositions if available
 	@if [ -f $(LOCAL_COMPOSITIONS_FILE) ] && command -v yq >/dev/null 2>&1; then \
 		echo "🔗 Incorporating dependencies..."; \
-		compositions=$$(yq e '.compositionFolders[]' $(LOCAL_COMPOSITIONS_FILE) 2>/dev/null); \
-		for comp in $$compositions; do \
-			comp_def="$(COMPOSITION_DIR)/$$comp/resources/definition.yaml"; \
-			if [ -f "$$comp_def" ]; then \
-				cp "$$comp_def" "$(EXTENSIONS_DIR)/$${comp}_definition.yaml"; \
-				echo "✓ Registered dependency: $$comp"; \
-			else \
-				echo "⚠️  Advisory: Dependency specification not found at $$comp_def"; \
-			fi; \
-		done; \
+		compositions=$$(yq '.compositionFolders[]' $(LOCAL_COMPOSITIONS_FILE) 2>/dev/null || echo ""); \
+		if [ -n "$$compositions" ]; then \
+			for comp in $$compositions; do \
+				comp_def="$(COMPOSITION_DIR)/$$comp/resources/definition.yaml"; \
+				if [ -f "$$comp_def" ]; then \
+					mkdir -p "$(EXTENSIONS_DIR)"; \
+					cp "$$comp_def" "$(EXTENSIONS_DIR)/$${comp}_definition.yaml"; \
+					echo "✓ Registered dependency: $$comp"; \
+				else \
+					echo "⚠️  Warning: Dependency specification not found at $$comp_def"; \
+					exit 1; \
+				fi; \
+			done; \
+		else \
+			echo "ℹ️  No compositions found in $(LOCAL_COMPOSITIONS_FILE)"; \
+		fi; \
+	else \
+		echo "ℹ️  $(LOCAL_COMPOSITIONS_FILE) not found or yq not installed"; \
 	fi
 
 	@# Copy additional configuration files if they exist
