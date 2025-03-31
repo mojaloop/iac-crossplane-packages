@@ -9,7 +9,7 @@ parameters: any = spec.parameters
 _items: [any] = []
 
 ## Adding resources
-if spec?.objectStoreProvider == "ceph":
+if parameters?.objectStoreProvider == "ceph":
     _objectStore = {
       apiVersion = "mojaloop.io/v1alpha1"
       kind = "XCephBucket"
@@ -18,28 +18,27 @@ if spec?.objectStoreProvider == "ceph":
       }
       spec = {
         providerConfigsRef = {
-          scK8sProviderName = spec?.providerConfigsRef?.scK8sProviderName
-          ccK8sProviderName = spec?.providerConfigsRef?.ccK8sProviderName
+          scK8sProviderName = parameters?.ceph?.scK8sProviderName
+          ccK8sProviderName = parameters?.ceph?.ccK8sProviderName
         }
         parameters = {
           bucket = {
             bucketName               = parameters?.bucketName
-            storageClassName         = parameters?.storageClassName
-            maxSize                  = parameters?.maxSize
-            objectStore_ext_svc_name = parameters?.objectStore_ext_svc_name
+            storageClassName         = parameters?.ceph?.storageClassName
+            maxSize                  = parameters?.ceph?.maxSize
           }
           secret = {
-            name                  = parameters?.bucketName
-            eso_pushsecret        = parameters?.eso_pushsecret
+            name                  = parameters?.ceph?.bucketName
+            eso_pushsecret        = parameters?.ceph?.eso_pushsecret
             sc_namespace          = parameters?.Namespace
             cc_namespace          = parameters?.Namespace
-            vault_secrestore_name = parameters?.vault_secrestore_name
-            vault_secret_path     = parameters?.vault_secret_path
+            vault_secrestore_name = parameters?.ceph?.vault_secrestore_name
+            vault_secret_path     = parameters?.ceph?.vault_secret_path
           }
         }
       }
     }
-if spec?.objectStoreProvider == "aws":
+if parameters?.objectStoreProvider == "s3":
     _objectStore = {
       apiVersion = "mojaloop.io/v1alpha1"
       kind = "S3Bucket"
@@ -49,11 +48,11 @@ if spec?.objectStoreProvider == "aws":
       spec = {
         parameters = {
           bucketName           = parameters?.bucketName
-          bucketRegion         = parameters?.bucketRegion
-          forceDestroy         = parameters?.forceDestroy
-          deletionPolicy       = parameters?.deletionPolicy
+          bucketRegion         = parameters?.s3?.bucketRegion
+          forceDestroy         = parameters?.s3?.forceDestroy
+          deletionPolicy       = parameters?.s3?.deletionPolicy
+          providerConfigName   = parameters?.s3?.awsProviderName
           destinationNamespace = parameters?.Namespace
-          providerConfigName   = spec?.providerConfigsRef?.awsProviderName
           }
         }
     }

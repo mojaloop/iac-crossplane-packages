@@ -233,7 +233,7 @@ if parameters?.secret?.eso_pushsecret:
       }
     }
 
-_items += [_cephBucket,_rgw_lbIP,_rgw_External_Service,_sourceSecret,_destinationSecret,_pushSecret]
+_items += [_cephBucket,_sourceSecret,_destinationSecret,_pushSecret]
 
 dxr = {
     **oxr
