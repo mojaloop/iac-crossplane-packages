@@ -28,7 +28,7 @@ if parameters?.objectStoreProvider == "ceph":
             maxSize                  = parameters?.ceph?.maxSize
           }
           secret = {
-            name                  = parameters?.ceph?.bucketName
+            name                  = parameters?.bucketName
             eso_pushsecret        = parameters?.ceph?.eso_pushsecret
             sc_namespace          = parameters?.Namespace
             cc_namespace          = parameters?.Namespace
