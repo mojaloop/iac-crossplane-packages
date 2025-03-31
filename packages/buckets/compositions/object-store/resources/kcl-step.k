@@ -23,9 +23,10 @@ if spec?.objectStoreProvider == "ceph":
         }
         parameters = {
           bucket = {
-            bucketName           = parameters?.bucketName
-            storageClassName     = parameters?.storageClassName
-            maxSize              = parameters?.maxSize
+            bucketName               = parameters?.bucketName
+            storageClassName         = parameters?.storageClassName
+            maxSize                  = parameters?.maxSize
+            objectStore_ext_svc_name = parameters?.objectStore_ext_svc_name
           }
           secret = {
             name                  = parameters?.bucketName

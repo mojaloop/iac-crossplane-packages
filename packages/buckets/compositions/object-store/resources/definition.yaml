@@ -82,6 +82,10 @@ spec:
                     type: string
                     description: Maximum number of objects in the bucket
                     default: "1000"
+                  objectStore_ext_svc_name:
+                    type: string
+                    description: Name of the external service to use for the bucket creation.
+                    default: "object-store-external-svc"
                   Namespace:
                     type: string
                     description: Namespace of the bucket claim to create
