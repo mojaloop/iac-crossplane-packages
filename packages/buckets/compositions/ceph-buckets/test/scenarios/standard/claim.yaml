@@ -1,4 +1,4 @@
-apiVersion: infitx.org/v1alpha1
+apiVersion: mojaloop.io/v1alpha1
 kind: XCephBucket
 metadata:
   name: my-example-bucket

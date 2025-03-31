@@ -11,7 +11,7 @@ _items: [any] = []
 ## Adding resources
 if spec?.objectStoreProvider == "ceph":
     _objectStore = {
-      apiVersion = "infitx.org/v1alpha1"
+      apiVersion = "mojaloop.io/v1alpha1"
       kind = "XCephBucket"
       metadata = {
         name = parameters?.bucketName
@@ -41,7 +41,7 @@ if spec?.objectStoreProvider == "ceph":
     }
 if spec?.objectStoreProvider == "aws":
     _objectStore = {
-      apiVersion = "infitx.org/v1alpha1"
+      apiVersion = "mojaloop.io/v1alpha1"
       kind = "S3Bucket"
       metadata = {
         name        = parameters?.bucketName

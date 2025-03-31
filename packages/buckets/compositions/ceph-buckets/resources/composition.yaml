@@ -3,10 +3,10 @@ kind: Composition
 metadata:
   name: cephbucket
   labels:
-    crossplane.io/xrd: xcephbucket.infitx.org
+    crossplane.io/xrd: xcephbucket.mojaloop.io
 spec:
   compositeTypeRef:
-    apiVersion: infitx.org/v1alpha1
+    apiVersion: mojaloop.io/v1alpha1
     kind: XCephBucket
   mode: Pipeline
   pipeline:

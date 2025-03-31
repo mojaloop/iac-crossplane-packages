@@ -1,4 +1,4 @@
-apiVersion: infitx.org/v1alpha1
+apiVersion: mojaloop.io/v1alpha1
 kind: ObjectSyncer
 metadata:
   name: example-configmap-syncer-claim

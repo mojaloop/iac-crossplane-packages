@@ -3,10 +3,10 @@ kind: Composition
 metadata:
   name: objectstore
   labels:
-    crossplane.io/xrd: xobjectstore.infitx.org
+    crossplane.io/xrd: xobjectstore.mojaloop.io
 spec:
   compositeTypeRef:
-    apiVersion: infitx.org/v1alpha1
+    apiVersion: mojaloop.io/v1alpha1
     kind: XObjectStore
   mode: Pipeline
   pipeline:
