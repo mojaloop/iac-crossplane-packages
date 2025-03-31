@@ -1,5 +1,5 @@
 apiVersion: database.mojaloop.io/v1alpha1
-kind: SqlPercona
+kind: XSqlPercona
 metadata:
   name: example-sql
   namespace: gitlab
