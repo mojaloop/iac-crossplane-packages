@@ -19,7 +19,7 @@ spec:
 
 This package includes the following compositions:
 
-1. [ObjectSyncer.utils.mojaloop.io](compositions/object-syncer/README.md)
+1. [ObjectSyncer](compositions/object-syncer/README.md)
 
 ## Usage
 
