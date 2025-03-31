@@ -1,10 +1,10 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xsqlpercona.database.infitx.org
+  name: xsqlpercona.database.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
-  group: database.infitx.org
+  group: database.mojaloop.io
   names:
     kind: XSqlPercona
     plural: xsqlpercona

@@ -3,10 +3,10 @@ kind: Composition
 metadata:
   name: objectsyncer
   labels:
-    crossplane.io/xrd: xobjectsyncer.infitx.org
+    crossplane.io/xrd: xobjectsyncer.mojaloop.io
 spec:
   compositeTypeRef:
-    apiVersion: infitx.org/v1alpha1
+    apiVersion: mojaloop.io/v1alpha1
     kind: XObjectSyncer
   mode: Pipeline
   pipeline:

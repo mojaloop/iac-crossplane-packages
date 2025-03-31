@@ -237,7 +237,7 @@ _ExternalNameService = {
 }
 
 _Secret = {
-    apiVersion = "infitx.org/v1alpha1"
+    apiVersion = "mojaloop.io/v1alpha1"
     kind = "XObjectSyncer"
     metadata = {
         name = "{}-secret".format(oxr.metadata.name)

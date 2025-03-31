@@ -1,5 +1,5 @@
-apiVersion: database.infitx.org/v1alpha1
-kind: XSqlPercona
+apiVersion: database.mojaloop.io/v1alpha1
+kind: SqlPercona
 metadata:
   name: example-sql
   namespace: gitlab
@@ -18,9 +18,6 @@ spec:
       dbSecret: db-secret
       replicas: 1
       storageSize: 10Gi
-      expose:
-        enable: false
-        type: LoadBalancer
 
     pgBackRest:
       backupReponame: repo1
