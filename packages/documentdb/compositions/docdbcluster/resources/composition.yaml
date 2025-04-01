@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: objectsyncer
+  name: docdbcluster
   labels:
-    crossplane.io/xrd: xobjectsyncer.infitx.org
+    crossplane.io/xrd: xdocdbcluster.database.mojaloop.io
 spec:
   compositeTypeRef:
-    apiVersion: infitx.org/v1alpha1
-    kind: ObjectSyncer
+    apiVersion: database.mojaloop.io/v1alpha1
+    kind: XDocDbCluster
   mode: Pipeline
   pipeline:
 
