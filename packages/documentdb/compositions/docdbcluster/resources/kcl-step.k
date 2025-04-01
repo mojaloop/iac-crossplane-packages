@@ -24,6 +24,25 @@ if parameters?.dbType == "documentdb":
         }
     }
 
+    _SecurityGroupRule = {
+        apiVersion = "ec2.aws.upbound.io/v1beta1"
+        kind = "SecurityGroupRule"
+        metadata = {
+            name = "{}-sgrule".format(oxr.metadata.name)
+        }
+        spec = {
+            forProvider = {
+                description = "Security Group Rule for Doc db access {}".format(oxr.metadata.name)
+                fromPort = parameters?.documentdb?.port
+                protocol = "tcp"
+                region = parameters?.documentdb?.region
+                securityGroupIdSelector = { matchControllerRef = True }
+                toPort = parameters?.documentdb?.port
+                type = "ingress"
+            }
+        }
+    }
+
     _SubnetGroup = {
         apiVersion = "docdb.aws.upbound.io/v1beta1"
         kind = "SubnetGroup"
@@ -96,8 +115,33 @@ if parameters?.dbType == "documentdb":
         }
     }
 
+    instance_count = parameters?.documentdb?.instanceCount
 
-_items += [_SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster]
+    _ClusterInstances += {
+        apiVersion = "docdb.aws.upbound.io/v1beta1"
+        kind = "ClusterInstance"
+        metadata = {
+            name = "{}-cluster-instance-{}".format(oxr.metadata.name, i)
+        }
+        spec = {
+            forProvider = {
+                applyImmediately = parameters?.documentdb?.applyImmediately
+                autoMinorVersionUpgrade = parameters?.documentdb?.autoMinorVersionUpgrade
+                availabilityZone = parameters?.documentdb?.availabilityZone
+                clusterIdentifierSelector = { matchControllerRef = True }
+                copyTagsToSnapshot = parameters?.documentdb?.copyTagsToSnapshot
+                enablePerformanceInsights = parameters?.documentdb?.enablePerformanceInsights
+                engine = parameters?.documentdb?.engine
+                instanceClass = parameters?.documentdb?.dbClusterInstanceClass
+                preferredMaintenanceWindow = parameters?.documentdb?.preferredMaintenanceWindow
+                region = parameters?.documentdb?.region
+             }
+        }
+    }  for i in range(instance_count)
+
+
+
+_items += [_SecurityGroupRule, _SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster, _ClusterInstances]
 
 print(_items)
 

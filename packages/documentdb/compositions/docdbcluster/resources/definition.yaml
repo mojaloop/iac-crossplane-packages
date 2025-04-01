@@ -80,6 +80,9 @@ spec:
                       dbClusterInstanceClass:
                         description: "Db instance class"
                         type: string
+                      copyTagsToSnapshot:
+                        description: Indicates that tags should be copied to snapshots
+                        type: boolean
                       deletionProtection:
                         description: Indicates that deletion protection is enabled
                         type: boolean
@@ -95,6 +98,12 @@ spec:
                       finalSnapshotIdentifier:
                         description: The final snapshot identifier
                         type: string
+                      enablePerformanceInsights:
+                        description: Indicates that performance insights are enabled
+                        type: boolean
+                      instanceCount:
+                        description: The number of instances in the cluster
+                        type: integer
                       parameter:
                         description: The parameter group
                         type: array

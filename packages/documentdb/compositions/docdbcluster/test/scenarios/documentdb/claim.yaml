@@ -12,36 +12,37 @@ spec:
     dbName: "exampledb"
     dbNamespace: "default"
     documentdb:
-      region: "us-east-1"
+      allowMajorVersionUpgrade: false
+      applyImmediately: false
+      availabilityZones:
+      - "eu-west-1a"
+      - "eu-west-1b"
+      - "eu-west-1c"
+      backupRetentionPeriod: 7
+      dbClusterInstanceClass: "db.r5.large"
+      deletionProtection: false
       engine: "docdb"
       engineVersion: "4.0"
-      dbClusterInstanceClass: "db.r5.large"
+      family: "docdb5.0"
+      instanceCount: 3
+      parameter:
+      - name: "example-db-param"
+        value: "example-db-value"
+      passwordSecret:
+      key: "password"
+      name: "example-db-secret"
+      namespace: "default"
       port: 27017
-      vpcId: "vpc-0271a5e44676a5443"
-      vpcCidr: "10.0.0.0/16"
-      subnets:
-        - "subnet-069e236a1ed7dc46e"
-        - "subnet-0ea1f4922f23fd864"
-        - "subnet-0ec26f852579a3c5c"
-      availabilityZones:
-        - "eu-west-1a"
-        - "eu-west-1b"
-        - "eu-west-1c"
-      username: "admin"
-      storageEncrypted: true
-      storageType: "gp2"
-      backupRetentionPeriod: 7
       preferredBackupWindow: "00:00-02:00"
       preferredMaintenanceWindow: "00:00-02:00"
-      allowMajorVersionUpgrade: true
-      applyImmediately: false
+      region: "us-east-1"
       skipFinalSnapshot: false
-      deletionProtection: false
-      family: "docdb5.0"
-      parameter:
-       - name: "example-db-param"
-         value: "example-db-value"
-      passwordSecret:
-        name: "example-db-secret"
-        key: "password"
-        namespace: "default"
+      storageEncrypted: true
+      storageType: "gp2"
+      subnets:
+      - "subnet-069e236a1ed7dc46e"
+      - "subnet-0ea1f4922f23fd864"
+      - "subnet-0ec26f852579a3c5c"
+      username: "admin"
+      vpcCidr: "10.0.0.0/16"
+      vpcId: "vpc-0271a5e44676a5443"
