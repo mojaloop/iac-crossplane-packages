@@ -78,7 +78,6 @@ if parameters?.dbType == "documentdb":
                 dbClusterParameterGroupNameSelector = { matchControllerRef = True }
                 dbSubnetGroupName = "{}-sng".format(oxr.metadata.name)
                 deletionProtection = parameters?.documentdb?.deletionProtection
-                enabledCloudwatchLogsExports = parameters?.documentdb?.enabledCloudwatchLogsExports
                 engine = parameters?.documentdb?.engine
                 engineVersion = parameters?.documentdb?.engineVersion
                 finalSnapshotIdentifier = parameters?.documentdb?.finalSnapshotIdentifier
@@ -96,6 +95,7 @@ if parameters?.dbType == "documentdb":
                 masterPasswordSecretRef = {
                                 key = parameters?.documentdb?.passwordSecret?.key
                                 name = parameters?.documentdb?.passwordSecret?.name
+                                namespace = parameters?.documentdb?.passwordSecret?.namespace
                             }
 
              }

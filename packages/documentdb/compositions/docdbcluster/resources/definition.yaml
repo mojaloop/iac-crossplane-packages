@@ -60,9 +60,6 @@ spec:
                   dbNamespace:
                     type: string
                     description: Target namespace to deploy the DB in
-                  secretNamespace:
-                    type: string
-                    description: Target namespace to Sync the DB in
                   documentdb:
                     type: object
                     properties:
@@ -85,9 +82,6 @@ spec:
                         type: string
                       deletionProtection:
                         description: Indicates that deletion protection is enabled
-                        type: boolean
-                      enabledCloudwatchLogsExports:
-                        description: Indicates that cloudwatch logs are enabled
                         type: boolean
                       engine:
                         description: The DB engine i.e mysql/postgres
@@ -125,6 +119,9 @@ spec:
                             type: string
                           key:
                             description: The key in the secret.
+                            type: string
+                          namespace:
+                            description: The namespace of the secret.
                             type: string
                       port:
                         description: "Port at which db server listens"
