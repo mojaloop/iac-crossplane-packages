@@ -24,16 +24,24 @@ spec:
       subnets:
         - "subnet-11111111"
         - "subnet-22222222"
+      availabilityZones:
+       - "us-east-1a"
+       - "us-east-1b"
       username: "admin"
       storageEncrypted: true
       storageType: "gp2"
-      storageIops: 3000
       backupRetentionPeriod: 7
       preferredBackupWindow: "00:00-02:00"
+      preferredMaintenanceWindow: "00:00-02:00"
       allowMajorVersionUpgrade: true
-      autoMinorVersionUpgrade: true
       applyImmediately: false
       skipFinalSnapshot: false
+      deletionProtection: false
+      enabledCloudwatchLogsExports: false
+      family: "docdb5.0"
+      parameter:
+       - name: "example-db-param"
+         value: "example-db-value"
       passwordSecret:
         name: "example-db-secret"
         key: "password"

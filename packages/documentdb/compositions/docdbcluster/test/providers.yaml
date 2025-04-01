@@ -11,3 +11,10 @@ metadata:
   name: provider-aws-docdb
 spec:
   package: xpkg.upbound.io/upbound/provider-aws-docdb:v1.21.0
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-aws-ec2
+spec:
+  package: xpkg.upbound.io/upbound/provider-aws-ec2:v1.21.0
