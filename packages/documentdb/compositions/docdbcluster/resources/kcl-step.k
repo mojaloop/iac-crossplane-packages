@@ -117,7 +117,7 @@ if parameters?.dbType == "documentdb":
 
     instance_count = parameters?.documentdb?.instanceCount
 
-    _ClusterInstances += {
+    _ClusterInstances = [{
         apiVersion = "docdb.aws.upbound.io/v1beta1"
         kind = "ClusterInstance"
         metadata = {
@@ -137,11 +137,11 @@ if parameters?.dbType == "documentdb":
                 region = parameters?.documentdb?.region
              }
         }
-    }  for i in range(instance_count)
+    }  for i in range(instance_count)] if instance_count > 0 else []
 
 
 
-_items += [_SecurityGroupRule, _SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster, _ClusterInstances]
+_items += [_SecurityGroupRule, _SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster] + _ClusterInstances
 
 print(_items)
 

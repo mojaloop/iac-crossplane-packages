@@ -1,5 +1,5 @@
 apiVersion: database.mojaloop.io/v1alpha1
-kind: DocDbCluster
+kind: XDocDbCluster
 metadata:
   name: example-docdb-cluster
   namespace: default
