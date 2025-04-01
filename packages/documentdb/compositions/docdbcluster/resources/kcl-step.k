@@ -13,7 +13,6 @@ if parameters?.dbType == "documentdb":
         kind = "SecurityGroup"
         metadata = {
             name = "{}-sg".format(oxr.metadata.name)
-            namespace = parameters?.dbNamespace
         }
         spec = {
             forProvider = {
@@ -30,11 +29,9 @@ if parameters?.dbType == "documentdb":
         kind = "SubnetGroup"
         metadata = {
             name = "{}-sng".format(oxr.metadata.name)
-            namespace = parameters?.dbNamespace
         }
         spec = {
             forProvider = {
-                name   = "{}-sng".format(oxr.metadata.name)
                 description = "Subnet Group for Doc db {}".format(oxr.metadata.name)
                 region = parameters?.documentdb?.region
                 subnetIds  = parameters?.documentdb?.subnets
@@ -48,11 +45,9 @@ if parameters?.dbType == "documentdb":
         kind = "ClusterParameterGroup"
         metadata = {
             name = "{}-cpg".format(oxr.metadata.name)
-            namespace = parameters?.dbNamespace
         }
         spec = {
             forProvider = {
-                name   = "{}-cpg".format(oxr.metadata.name)
                 description = "Cluster Parameter Group for Doc db {}".format(oxr.metadata.name)
                 region = parameters?.documentdb?.region
                 family = parameters?.documentdb?.family
@@ -67,7 +62,6 @@ if parameters?.dbType == "documentdb":
         kind = "Cluster"
         metadata = {
             name = "{}-cluster".format(oxr.metadata.name)
-            namespace = parameters?.dbNamespace
         }
         spec = {
             forProvider = {
