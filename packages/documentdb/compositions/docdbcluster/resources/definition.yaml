@@ -1,0 +1,140 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xdocdbcluster.database.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: database.mojaloop.io
+  names:
+    kind: XDocDbCluster
+    plural: xdocdbcluster
+  claimNames:
+    kind: DocDbCluster
+    plural: docdbcluster
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: string
+                description: provider config name
+              parameters:
+                type: object
+                properties:
+                  dbType:
+                    type: string
+                    description: Type of object to be synced
+                    enum:
+                      - postgres
+                      - mysql
+                      - documentdb
+                  dbName:
+                    type: string
+                    description: Name for the created DB
+                  dbNamespace:
+                    type: string
+                    description: Target namespace to deploy the DB in
+                  secretNamespace:
+                    type: string
+                    description: Target namespace to Sync the DB in
+                  documentdb:
+                    type: object
+                    properties:
+                      region:
+                        description: Region
+                        type: string
+                      engine:
+                        description: The DB engine i.e mysql/postgres
+                        type: string
+                      engineVersion:
+                        description: The DB version depends on the DB type and versions available in the selected provider.
+                        type: string
+                      dbClusterInstanceClass:
+                        description: "Db instance class"
+                        type: string
+                      storageGB:
+                        description: "Storage size"
+                        type: integer
+                      port:
+                        description: "Port at which db server listens"
+                        type: integer
+                        default: 5432
+                      vpcId:
+                        description: Vpc id
+                        type: string
+                      vpcCidr:
+                        description: Vpc CIDR
+                        type: string
+                      subnets:
+                        description: The list of subnet-ids to create the subnetgroup
+                        type: array
+                        items:
+                          type: string
+                      username:
+                        description: The name of master user
+                        type: string
+                      storageEncrypted:
+                        description: The type of storage
+                        type: boolean
+                        default: true
+                      storageType:
+                        description: The type of storage
+                        type: string
+                      storageIops:
+                        description: The IOPS for storage
+                        type: integer
+                      backupRetentionPeriod:
+                        description: The number of days to retain backups for
+                        type: integer
+                      preferredBackupWindow:
+                        description: The daily time range during which automated backups are created
+                        type: string
+                      allowMajorVersionUpgrade:
+                        description: Indicates that major version upgrades are allowed
+                        type: boolean
+                      autoMinorVersionUpgrade:
+                        description: Indicates that minor version upgrades are applied automatically
+                        type: boolean
+                      applyImmediately:
+                        description: Indicates that changes should be applied immediately
+                        type: boolean
+                      skipFinalSnapshot:
+                        description: Indicates that final snapshot should be skipped before destroy
+                        type: boolean
+                        default: false
+                      passwordSecret:
+                        description: The secret reference to the password of the master user.
+                        type: object
+                        properties:
+                          name:
+                            description: The name of the secret.
+                            type: string
+                          key:
+                            description: The key in the secret.
+                            type: string

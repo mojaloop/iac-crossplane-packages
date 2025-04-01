@@ -1,0 +1,39 @@
+apiVersion: database.mojaloop.io/v1alpha1
+kind: DocDbCluster
+metadata:
+  name: example-docdb-cluster
+  namespace: default
+spec:
+  managementPolicies:
+    - "*"
+  providerConfigsRef: "example-provider-config"
+  parameters:
+    dbType: "documentdb"
+    dbName: "exampledb"
+    dbNamespace: "default"
+    secretNamespace: "default"
+    documentdb:
+      region: "us-east-1"
+      engine: "docdb"
+      engineVersion: "4.0"
+      dbClusterInstanceClass: "db.r5.large"
+      storageGB: 100
+      port: 27017
+      vpcId: "vpc-12345678"
+      vpcCidr: "10.0.0.0/16"
+      subnets:
+        - "subnet-11111111"
+        - "subnet-22222222"
+      username: "admin"
+      storageEncrypted: true
+      storageType: "gp2"
+      storageIops: 3000
+      backupRetentionPeriod: 7
+      preferredBackupWindow: "00:00-02:00"
+      allowMajorVersionUpgrade: true
+      autoMinorVersionUpgrade: true
+      applyImmediately: false
+      skipFinalSnapshot: false
+      passwordSecret:
+        name: "example-db-secret"
+        key: "password"
