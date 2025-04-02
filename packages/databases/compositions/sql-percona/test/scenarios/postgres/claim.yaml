@@ -8,6 +8,7 @@ spec:
     consumeClusterType: controlcenter
     clusterName: cluster_name #TODO
     externalServiceName: externalservice_name
+    appNamespace: foo
     postgres:
       crVersion: "2.5.0"
       pgVersion: 16

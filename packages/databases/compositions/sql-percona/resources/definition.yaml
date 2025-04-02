@@ -72,6 +72,9 @@ spec:
                   externalServiceName:
                     type: string
                     description: Name for the external service object created
+                  appNamespace:
+                    type: string
+                    description: Namespace for the consumer application
                   postgres:
                     type: object
                     properties:

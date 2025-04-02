@@ -215,7 +215,7 @@ if parameters?.consumerClusterType == "controlcenter":
                     kind = "Service"
                     metadata = {
                         name = parameters?.externalServiceName
-                        namespace = oxr.metadata.namespace
+                        namespace = parameters?.appNamespace
                     }
                     spec = {
                         type = "ExternalName"
@@ -293,7 +293,7 @@ if parameters?.consumerClusterType == "environment":
   #                 kind = "PushSecret"
   #                 metadata = {
   #                     name = "{}-pushsecret".format(oxr.metadata.name)
-  #                     namespace = oxr.metadata.namespace
+  #                     namespace = parameters?.appNamespace
   #                 }
   #                 spec = {
   #                     secretStoreRefs = [
@@ -334,7 +334,7 @@ _Secret = {
             }
             destination = {
                 name = parameters?.postgres?.dbSecret
-                namespace = oxr.metadata.namespace
+                namespace = parameters?.appNamespace
             }
         }
         providerConfigsRef = {
