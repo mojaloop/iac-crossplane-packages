@@ -11,4 +11,4 @@ kind: Configuration
 metadata:
   name: utils
 spec:
-  package: ghcr.io/mojaloop/iac-modules/xplane-packages/utils:feat-cc-eks-env-obj-63
+  package: ghcr.io/mojaloop/iac-crossplane-packages/utils:v7-14195643214-1
