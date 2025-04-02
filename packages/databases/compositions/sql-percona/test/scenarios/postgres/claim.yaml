@@ -1,19 +1,19 @@
 apiVersion: database.mojaloop.io/v1alpha1
 kind: XSqlPercona
 metadata:
-  name: ARGOCD_ENV_db_name
-  namespace: ARGOCD_ENV_namespace
+  name: db_name
+  namespace: namespace
 spec:
   parameters:
     consumeClusterType: controlcenter
-    clusterName: ARGOCD_ENV_cluster_name #TODO
-    externalServiceName: ARGOCD_ENV_externalservice_name
+    clusterName: cluster_name #TODO
+    externalServiceName: externalservice_name
     postgres:
       crVersion: "2.5.0"
       pgVersion: 16
-      dbSecret: ARGOCD_ENV_db_secret
+      dbSecret: db_secret
       replicas: 1
-      storageSize: ARGOCD_ENV_postgres_storage_size
+      storageSize: postgres_storage_size
 
   providerConfigsRef:
     scK8sProviderName: sc-kubernetes-provider
