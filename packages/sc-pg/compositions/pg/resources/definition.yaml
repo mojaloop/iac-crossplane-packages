@@ -1,16 +1,16 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xsqlpercona.database.mojaloop.io
+  name: xpg.sc.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
-  group: database.mojaloop.io
+  group: sc.mojaloop.io
   names:
-    kind: XSqlPercona
-    plural: xsqlpercona
+    kind: XPG
+    plural: xpg
   claimNames:
-    kind: SqlPercona
-    plural: sqlpercona
+    kind: PG
+    plural: pg
   versions:
   - name: v1alpha1
     served: true

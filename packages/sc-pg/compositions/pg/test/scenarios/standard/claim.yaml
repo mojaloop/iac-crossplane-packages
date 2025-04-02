@@ -1,5 +1,5 @@
-apiVersion: database.mojaloop.io/v1alpha1
-kind: XSqlPercona
+apiVersion: sc.mojaloop.io/v1alpha1
+kind: XPG
 metadata:
   name: db_name
   namespace: namespace

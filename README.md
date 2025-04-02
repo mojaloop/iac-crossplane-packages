@@ -9,6 +9,7 @@ This project provides a collection of Crossplane composition packages designed t
 ## Packages
 
 - [Utils](packages/utils/README.md) - Common utility compositions
+- [StorageCluster PG](packages/sc-pg/README.md) - StorageCluster PostrgresDB composition
 - Additional packages coming soon...
 
 ## Getting Started

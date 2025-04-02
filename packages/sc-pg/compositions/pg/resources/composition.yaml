@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: sqlpercona
+  name: pg
   labels:
-    crossplane.io/xrd: xsqlpercona.database.mojaloop.io
+    crossplane.io/xrd: xpg.sc.mojaloop.io
 spec:
   compositeTypeRef:
-    apiVersion: database.mojaloop.io/v1alpha1
-    kind: XSqlPercona
+    apiVersion: sc.mojaloop.io/v1alpha1
+    kind: XPG
   mode: Pipeline
   pipeline:
 
