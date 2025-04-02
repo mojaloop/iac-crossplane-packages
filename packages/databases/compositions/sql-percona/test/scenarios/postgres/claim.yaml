@@ -1,41 +1,19 @@
 apiVersion: database.mojaloop.io/v1alpha1
 kind: XSqlPercona
 metadata:
-  name: example-sql
-  namespace: gitlab
+  name: db_name
+  namespace: namespace
 spec:
   parameters:
-    dbType: postgres
-    dbNamespace: testdb
-    secretNamespace: gitlab
+    consumeClusterType: controlcenter
+    clusterName: cluster_name #TODO
+    externalServiceName: externalservice_name
     postgres:
       crVersion: "2.5.0"
       pgVersion: 16
-      image: percona/percona-postgresql-operator:2.5.0-ppg16.4-postgres
-      imagePullPolicy: Always
-      dbDeployPrefix: mydb
-      dbUsername: admin
-      dbSecret: db-secret
+      dbSecret: db_secret
       replicas: 1
-      storageSize: 10Gi
-
-    pgBackRest:
-      backupReponame: repo1
-      repo_path: "/pgbackrest"
-      image: percona/percona-postgresql-operator:2.5.0-ppg16.4-pgbackrest2.53-1
-      storagePort: 443
-      backupsRetentionDays: 3
-      fullBackupSchedule: "0 0 * * 6"
-      diffBackupSchedule: "0 1 * * 1-6"
-
-    pgBouncer:
-      image: percona/percona-postgresql-operator:2.5.0-ppg16.4-pgbouncer1.23.1
-      replicas: 1
-      poolMode: transaction
-      queryWaitTimeout: 600
-      maxPreparedStatements: 1
-      exposeSuperusers: true
-
+      storageSize: postgres_storage_size
 
   providerConfigsRef:
     scK8sProviderName: sc-kubernetes-provider
