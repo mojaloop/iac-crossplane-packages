@@ -1,2 +1,1 @@
-# SecretSyncer package
-
+# Documentdb package
