@@ -6,35 +6,17 @@ spec = oxr.spec
 parameters = spec.parameters
 # Initialize the items list
 _items = []
-## Adding resources
-_sourceObject = {
-    apiVersion = "kubernetes.crossplane.io/v1alpha2"
-    kind = "Object"
-    metadata = {
-        name = "{}-ss".format(oxr.metadata.name)
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "source-object"
-        }
-    }
-    spec = {
-        forProvider = {
-            manifest = {
-                apiVersion = "v1"
-                kind = "Secret"
-                metadata = {
-                    name = parameters.source.name
-                    namespace = parameters.source.namespace
-                }
-            }
-        }
-        managementPolicies = ["Observe"]
-        providerConfigRef = {
-            name = spec.providerConfigsRef.sourceK8sProviderName
-        }
-    }
-}
 
 if parameters?.objectType == "Secret":
+    _sourceObjectManifest = {
+        apiVersion = "v1"
+        kind = "Secret"
+        metadata = {
+            name = parameters.source.name
+            namespace = parameters.source.namespace
+        }
+    }
+
     _destinationObjectManifest = {
         apiVersion = "v1"
         kind = "Secret"
@@ -47,6 +29,14 @@ if parameters?.objectType == "Secret":
         type = ocds["source-object"]?.Resource?.status?.atProvider?.manifest?.type
     }
 else:
+    _sourceObjectManifest = {
+        apiVersion = "v1"
+        kind = "ConfigMap"
+        metadata = {
+            name = parameters.source.name
+            namespace = parameters.source.namespace
+        }
+    }
     _destinationObjectManifest = {
         apiVersion = "v1"
         kind = "ConfigMap"
@@ -57,6 +47,27 @@ else:
         # Get data and type from the source secret's status
         data = ocds["source-object"]?.Resource?.status?.atProvider?.manifest?.data
     }
+
+## Adding resources
+_sourceObject = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-ss".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "source-object"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = _sourceObjectManifest
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.sourceK8sProviderName
+        }
+    }
+}
 
 _destinationObject = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
