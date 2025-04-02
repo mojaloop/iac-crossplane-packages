@@ -61,7 +61,7 @@ if parameters?.dbType == "documentdb":
             forProvider = {
                 description = "Subnet Group for Doc db {}".format(oxr.metadata.name)
                 region = parameters?.documentdb?.region
-                subnetIds  = parameters?.documentdb?.subnets
+                subnetIds  = parameters?.documentdb?.subnets.split(",")
             }
             providerConfigRef = {
                 name = spec?.providerConfigsRef?.awsProviderConfigName
@@ -100,7 +100,6 @@ if parameters?.dbType == "documentdb":
             forProvider = {
                 allowMajorVersionUpgrade = parameters?.documentdb?.allowMajorVersionUpgrade
                 applyImmediately = parameters?.documentdb?.applyImmediately
-                availabilityZones = parameters?.documentdb?.availabilityZones
                 backupRetentionPeriod = parameters?.documentdb?.backupRetentionPeriod
                 dbClusterParameterGroupNameSelector = { matchControllerRef = True }
                 dbSubnetGroupName = "{}-sng".format(oxr.metadata.name)
@@ -145,7 +144,6 @@ if parameters?.dbType == "documentdb":
             forProvider = {
                 applyImmediately = parameters?.documentdb?.applyImmediately
                 autoMinorVersionUpgrade = parameters?.documentdb?.autoMinorVersionUpgrade
-                availabilityZone = parameters?.documentdb?.availabilityZone
                 clusterIdentifierSelector = { matchControllerRef = True }
                 copyTagsToSnapshot = parameters?.documentdb?.copyTagsToSnapshot
                 enablePerformanceInsights = parameters?.documentdb?.enablePerformanceInsights

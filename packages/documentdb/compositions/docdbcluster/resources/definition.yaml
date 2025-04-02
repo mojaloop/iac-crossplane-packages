@@ -72,11 +72,6 @@ spec:
                       applyImmediately:
                         description: Indicates that changes should be applied immediately
                         type: boolean
-                      availabilityZones:
-                        description: The availability zones
-                        type: array
-                        items:
-                          type: string
                       backupRetentionPeriod:
                         description: The number of days to retain backups for
                         type: integer
@@ -166,10 +161,8 @@ spec:
                         description: The type of storage
                         type: string
                       subnets:
-                        description: The list of subnet-ids to create the subnetgroup
-                        type: array
-                        items:
-                          type: string
+                        description: The comma seperated list of subnet-ids to create the subnetgroup
+                        type: string
                       username:
                         description: The name of master user
                         type: string
