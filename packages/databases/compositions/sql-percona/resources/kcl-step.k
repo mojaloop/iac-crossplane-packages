@@ -199,13 +199,13 @@ if parameters?.consumerClusterType == "controlcenter":
     }
 
     _ip = ocds["percona-db-lb-svc"]?.Resource?.status?.atProvider?.manifest?.status?.loadBalancer?.ingress[0]?.ip if ocds["percona-db-lb-svc"]?.Resource?.status?.atProvider?.manifest?.status?.loadBalancer?.ingress else ""
-    _ExternalNameService = {
+    _HeadlessService = {
         apiVersion = "kubernetes.crossplane.io/v1alpha2"
         kind = "Object"
         metadata = {
             name = "{}-en-svc".format(oxr.metadata.name)
             annotations = {
-                "krm.kcl.dev/composition-resource-name": "percona-db-en-svc"
+                "krm.kcl.dev/composition-resource-name": "percona-db-hs-svc"
             }
         }
         spec = {
@@ -218,8 +218,7 @@ if parameters?.consumerClusterType == "controlcenter":
                         namespace = parameters?.appNamespace
                     }
                     spec = {
-                        type = "ExternalName"
-                        externalName = _ip
+                        clusterIP = "None"
                         ports = [
                             {
                                 port: 5432
@@ -228,6 +227,47 @@ if parameters?.consumerClusterType == "controlcenter":
                             }
                         ]
                     }
+                }
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.ccK8sProviderName
+            }
+        }
+    }
+
+    _Endpoint = {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-en-svc".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "percona-db-ep-svc"
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    kind: "Endpoints"
+                    apiVersion: "v1"
+                    metadata: {
+                        name = parameters?.externalServiceName
+                        namespace = parameters?.appNamespace
+                    }
+                    subsets: [
+                        {
+                            addresses: [
+                                {ip: _ip}
+                            ]
+                            ports: [
+                                {
+                                    port: 5432
+                                    protocol: "TCP"
+                                    targetPort: 5432
+                                }
+                            ]
+                        }
+                    ]
                 }
             }
             managementPolicies = spec.managementPolicies
@@ -277,48 +317,47 @@ if parameters?.consumerClusterType == "environment":
         }
     }
 
-  # _PushSecret = {
-  #     apiVersion = "kubernetes.crossplane.io/v1alpha2"
-  #     kind = "Object"
-  #     metadata = {
-  #         name = "{}-push-secret".format(oxr.metadata.name)
-  #         annotations = {
-  #             "krm.kcl.dev/composition-resource-name": "push-secret"
-  #         }
-  #     }
-  #     spec = {
-  #         forProvider = {
-  #             manifest = {
-  #                 apiVersion = "external-secrets.io/v1alpha1"
-  #                 kind = "PushSecret"
-  #                 metadata = {
-  #                     name = "{}-pushsecret".format(oxr.metadata.name)
-  #                     namespace = parameters?.appNamespace
-  #                 }
-  #                 spec = {
-  #                     secretStoreRefs = [
-  #                         {
-  #                             name = "vault-secret-store"
-  #                             kind = "ClusterSecretStore"
-  #                         }
-  #                     ]
-  #                     selector = {
-  #                         secret = {
-  #                             name = "{}-secret".format(oxr.metadata.name)
-  #                         }
-  #                     }
-  #                     data = [
-  #                     ]
-  #                 }
-  #             }
-  #         }
-  #         managementPolicies = spec.managementPolicies
-  #         providerConfigRef = {
-  #             name = spec.providerConfigsRef.ccK8sProviderName
-  #         }
-  #     }
-  # }
-
+# _PushSecret = {
+#     apiVersion = "kubernetes.crossplane.io/v1alpha2"
+#     kind = "Object"
+#     metadata = {
+#         name = "{}-push-secret".format(oxr.metadata.name)
+#         annotations = {
+#             "krm.kcl.dev/composition-resource-name": "push-secret"
+#         }
+#     }
+#     spec = {
+#         forProvider = {
+#             manifest = {
+#                 apiVersion = "external-secrets.io/v1alpha1"
+#                 kind = "PushSecret"
+#                 metadata = {
+#                     name = "{}-pushsecret".format(oxr.metadata.name)
+#                     namespace = parameters?.appNamespace
+#                 }
+#                 spec = {
+#                     secretStoreRefs = [
+#                         {
+#                             name = "vault-secret-store"
+#                             kind = "ClusterSecretStore"
+#                         }
+#                     ]
+#                     selector = {
+#                         secret = {
+#                             name = "{}-secret".format(oxr.metadata.name)
+#                         }
+#                     }
+#                     data = [
+#                     ]
+#                 }
+#             }
+#         }
+#         managementPolicies = spec.managementPolicies
+#         providerConfigRef = {
+#             name = spec.providerConfigsRef.ccK8sProviderName
+#         }
+#     }
+# }
 _Secret = {
     apiVersion = "utils.mojaloop.io/v1alpha1"
     kind = "XObjectSyncer"
@@ -345,7 +384,7 @@ _Secret = {
     }
 }
 
-_items += [_PGCluster, _Secret, _LBService, _ExternalNameService]
+_items += [_PGCluster, _Secret, _LBService, _HeadlessService, _Endpoint]
 dxr = {
     **oxr
 }
