@@ -1,16 +1,16 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xpg.sc.mojaloop.io
+  name: xpgcluster.sc.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
   group: sc.mojaloop.io
   names:
-    kind: XPG
-    plural: xpg
+    kind: XPGCluster
+    plural: xpgcluster
   claimNames:
-    kind: PG
-    plural: pg
+    kind: PGCluster
+    plural: pgcluster
   versions:
   - name: v1alpha1
     served: true

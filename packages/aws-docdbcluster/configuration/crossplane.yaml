@@ -1,7 +1,7 @@
 apiVersion: meta.pkg.crossplane.io/v1alpha1
 kind: Configuration
 metadata:
-  name: documentdb
+  name: aws-docdbcluster
 spec:
   dependsOn:
     - provider: xpkg.upbound.io/upbound/provider-family-aws

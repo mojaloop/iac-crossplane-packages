@@ -1,4 +1,4 @@
-# PG Composition
+# Postgres Cluster Composition
 
 TBD
 
@@ -6,7 +6,7 @@ TBD
 
 The following test scenarios demonstrate common use cases:
 
-1. [Standard PG Database](test/scenarios/pg/claim.yaml)
+1. [Standard Postgres Cluster](test/scenarios/standard/claim.yaml)
 
 ## Configuration
 

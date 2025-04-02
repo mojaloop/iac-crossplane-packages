@@ -1,5 +1,5 @@
 apiVersion: sc.mojaloop.io/v1alpha1
-kind: XPG
+kind: XPGCluster
 metadata:
   name: db_name
   namespace: namespace
