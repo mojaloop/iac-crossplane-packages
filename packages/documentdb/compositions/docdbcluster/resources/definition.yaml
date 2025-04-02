@@ -42,8 +42,11 @@ spec:
                   type: string
                 type: array
               providerConfigsRef:
-                type: string
-                description: provider config name
+                type: object
+                properties:
+                  awsProviderConfigName:
+                    type: string
+                    description: AWS Provider Config Name
               parameters:
                 type: object
                 properties:

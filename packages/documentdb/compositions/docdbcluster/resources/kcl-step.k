@@ -21,6 +21,10 @@ if parameters?.dbType == "documentdb":
                 region = parameters?.documentdb?.region
                 vpcId  = parameters?.documentdb?.vpcId
             }
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.awsProviderConfigName
+            }
+            managementPolicies = spec.managementPolicies
         }
     }
 
@@ -40,6 +44,10 @@ if parameters?.dbType == "documentdb":
                 toPort = parameters?.documentdb?.port
                 type = "ingress"
             }
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.awsProviderConfigName
+            }
+            managementPolicies = spec.managementPolicies
         }
     }
 
@@ -55,7 +63,10 @@ if parameters?.dbType == "documentdb":
                 region = parameters?.documentdb?.region
                 subnetIds  = parameters?.documentdb?.subnets
             }
-
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.awsProviderConfigName
+            }
+            managementPolicies = spec.managementPolicies
         }
     }
 
@@ -72,7 +83,10 @@ if parameters?.dbType == "documentdb":
                 family = parameters?.documentdb?.family
                 parameter = parameters?.documentdb?.parameter
             }
-
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.awsProviderConfigName
+            }
+            managementPolicies = spec.managementPolicies
         }
     }
 
@@ -112,6 +126,10 @@ if parameters?.dbType == "documentdb":
                             }
 
              }
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.awsProviderConfigName
+            }
+            managementPolicies = spec.managementPolicies
         }
     }
 
@@ -136,6 +154,10 @@ if parameters?.dbType == "documentdb":
                 preferredMaintenanceWindow = parameters?.documentdb?.preferredMaintenanceWindow
                 region = parameters?.documentdb?.region
              }
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.awsProviderConfigName
+            }
+            managementPolicies = spec.managementPolicies
         }
     }  for i in range(instance_count)] if instance_count > 0 else []
 
