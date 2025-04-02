@@ -20,6 +20,7 @@ spec:
 This package includes the following compositions:
 
 1. [ObjectSyncer](compositions/object-syncer/README.md)
+2. [Namespace](compositions/namespace/README.md)
 
 ## Usage
 
