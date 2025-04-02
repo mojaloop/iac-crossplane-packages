@@ -1,10 +1,10 @@
 apiVersion: utils.mojaloop.io/v1alpha1
-kind: XNamespace
+kind: XRemoteNamespace
 metadata:
   name: example-namespace-claim
 spec:
   parameters:
-    name: example-namespace
+    name: examplenamespace
   providerConfigsRef:
     destinationK8sProviderName: kubernetes-provider
   managementPolicies:

@@ -1,12 +1,12 @@
-# Namespace Composition
+# RemoteNamespace Composition
 
-This composition allows you to create Namespace on destination K8s cluster
+This composition allows you to create remote Namespace on destination K8s cluster
 
 ## Usage Examples
 
 The following test scenarios demonstrate common use cases:
 
-1. [Namespace creation](test/scenarios/standard/claim.yaml)
+1. [RemoteNamespace creation](test/scenarios/standard/claim.yaml)
 
 ## Configuration
 

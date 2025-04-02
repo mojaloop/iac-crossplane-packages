@@ -1,16 +1,16 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xnamespace.utils.mojaloop.io
+  name: remotenamespace.utils.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
   group: utils.mojaloop.io
   names:
-    kind: XNamespace
-    plural: xnamespace
+    kind: XRemoteNamespace
+    plural: xremotenamespace
   claimNames:
-    kind: Namespace
-    plural: namespace
+    kind: RemoteNamespace
+    plural: remotenamespace
   versions:
   - name: v1alpha1
     served: true
