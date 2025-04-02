@@ -5,7 +5,7 @@ metadata:
   namespace: namespace
 spec:
   parameters:
-    consumeClusterType: controlcenter
+    consumerClusterType: controlcenter
     clusterName: cluster_name #TODO
     externalServiceName: externalservice_name
     appNamespace: foo

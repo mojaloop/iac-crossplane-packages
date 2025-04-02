@@ -60,7 +60,7 @@ spec:
               parameters:
                 type: object
                 properties:
-                  consumeClusterType:
+                  consumerClusterType:
                     type: string
                     description: Type of consumer cluster
                     enum:
