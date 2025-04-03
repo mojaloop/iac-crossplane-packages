@@ -44,7 +44,7 @@ jobs:
           echo "next_version=${BASE_VERSION}${SUFFIX}" >> $GITHUB_OUTPUT
 
       - name: 🚀 Build & Push
-        uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_pull_request.yaml@feat/CTO-1001_align_packages
+        uses: .github/workflows/xplane_pull_request.yaml
         with:
           CROSSPLANE_PACKAGES_DIR: ${{ inputs.packages_dir }}
           CROSSPLANE_REGISTRY_URL: ${{ inputs.registry }}
@@ -74,7 +74,7 @@ jobs:
           echo "next_version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: 🚀 Build & Push
-        uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_pull_request.yaml@feat/CTO-1001_align_packages
+        uses: .github/workflows/xplane_pull_request.yaml
         with:
           CROSSPLANE_PACKAGES_DIR: ${{ inputs.packages_dir }}
           CROSSPLANE_REGISTRY_URL: ${{ inputs.registry }}
