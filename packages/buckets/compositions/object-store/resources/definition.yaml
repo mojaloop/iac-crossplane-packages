@@ -49,6 +49,9 @@ spec:
                     description: |-
                       The type of object store provider to use.
                     default: "ceph"
+                  clusterName:
+                    type: string
+                    description: Name for the consumer cluster
                   bucketName:
                     type: string
                     description: Name of the bucket to create

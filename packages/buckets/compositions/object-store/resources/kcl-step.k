@@ -30,7 +30,7 @@ if parameters?.objectStoreProvider == "ceph":
           secret = {
             name                  = parameters?.bucketName
             eso_pushsecret        = parameters?.ceph?.eso_pushsecret
-            sc_namespace          = parameters?.Namespace
+            sc_namespace          = parameters?.clusterName
             cc_namespace          = parameters?.Namespace
             vault_secrestore_name = parameters?.ceph?.vault_secrestore_name
             vault_secret_path     = parameters?.ceph?.vault_secret_path
