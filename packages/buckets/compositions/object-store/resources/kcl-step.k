@@ -52,7 +52,7 @@ if parameters?.objectStoreProvider == "s3":
           forceDestroy         = parameters?.s3?.forceDestroy
           deletionPolicy       = parameters?.s3?.deletionPolicy
           providerConfigName   = parameters?.s3?.awsProviderName
-          destinationNamespace = parameters?.Namespace
+          destinationNamespace = parameters?.destinationNamespace
           }
         }
     }
