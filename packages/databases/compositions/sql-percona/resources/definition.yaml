@@ -89,7 +89,9 @@ spec:
                       dbSecret:
                         type: string
                         description: Type of object to be synced
-                        default: db-secret
+                      dbUsername:
+                        type: string
+                        description: Name of the database to be created
                       replicas:
                         type: number
                         description: Type of object to be synced

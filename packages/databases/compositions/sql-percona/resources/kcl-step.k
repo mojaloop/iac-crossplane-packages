@@ -75,7 +75,7 @@ _PGCluster = {
                             databases = [
                                 "{}-db".format(oxr.metadata.name)
                             ]
-                            name = "admin"
+                            name = parameters?.postgres?.dbUsername
                             options = "SUPERUSER"
                             password = {
                                 type = "ASCII"
