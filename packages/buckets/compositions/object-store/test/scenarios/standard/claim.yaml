@@ -17,7 +17,7 @@ spec:
       scK8sProviderName: "sc-kubernetes-provider"
       ccK8sProviderName: "kubernetes-provider"
       storageClassName: "ceph-bucket"
-      maxSize: "10Gi"
+      maxSize: "1Gi"
       eso_pushsecret: true
       vault_secrestore_name: "vault-backend"
       vault_secret_path: "objectstore/my_example_bucket"
