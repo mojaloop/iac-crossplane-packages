@@ -39,7 +39,7 @@ _PGCluster = {
                     unmanaged = False
                     instances = [
                         {
-                            name = "{}-db".format(oxr.metadata.name)
+                            name = parameters?.postgres?.dbName
                             replicas = parameters?.postgres?.replicas
                             affinity = {
                                 podAntiAffinity = {
@@ -73,7 +73,7 @@ _PGCluster = {
                     users = [
                         {
                             databases = [
-                                "{}-db".format(oxr.metadata.name)
+                                parameters?.postgres?.dbName
                             ]
                             name = parameters?.postgres?.dbUsername
                             options = "SUPERUSER"
