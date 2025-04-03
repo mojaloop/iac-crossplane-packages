@@ -1,0 +1,142 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xcephbucket.objectstore.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: objectstore.mojaloop.io
+  names:
+    kind: XCephBucket
+    plural: xcephbucket
+  claimNames:
+    kind: CephBucket
+    plural: cephbuckets
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the remote and local k8s providers.
+                required:
+                  - scK8sProviderName
+                  - ccK8sProviderName
+                properties:
+                  scK8sProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the local k8s provider.
+                    default: "sc-kubernetes-provider"
+                  ccK8sProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the remote k8s provider.
+                    default: "kubernetes-provider"
+              parameters:
+                type: object
+                properties:
+                  bucket:
+                    type: object
+                    description: |-
+                      Bucket variables.
+                    required:
+                      - bucketName
+                      - storageClassName
+                    properties:
+                      bucketName:
+                        type: string
+                        description: Name of the bucket to create
+                      storageClassName:
+                        type: string
+                        description: Storage class to use for the bucket creation
+                        default: "ceph-bucket"
+                      maxSize:
+                        type: string
+                        description: Maximum size of the bucket
+                        default: "10Gi"
+                      maxObjects:
+                        type: string
+                        description: Maximum number of objects in the bucket
+                        default: "10000"
+                  secret:
+                    type: object
+                    description: |-
+                      Secrets params for sync.
+                    required:
+                      - name
+                      - sc_namespace
+                      - cc_namespace
+                    properties:
+                      sc_namespace:
+                        type: string
+                        description: |-
+                          Namespace of the secret to sync from source cluster.
+                      name:
+                        type: string
+                        description: |-
+                          Name of the secret to sync from storage cluster.
+                      cc_namespace:
+                        type: string
+                        description: |-
+                          Namespace of the namespace on destination cluster.
+                      eso_pushsecret:
+                        type: boolean
+                        description: |-
+                          Whether to push the secret to vault.
+                        default: false
+                      eso_push_secret_update_policy:
+                        type: string
+                        description: |-
+                          Policy to update the secret on vault.
+                        default: "Replace"
+                      eso_push_secret_delete_policy:
+                        type: string
+                        description: |-
+                          Policy to delete the secret on vault.
+                        default: "Delete"
+                      eso_push_secret_refresh_interval:
+                        type: string
+                        description: |-
+                          Interval to refresh the secret on vault.
+                        default: "1m"
+                      vault_secrestore_name:
+                        type: string
+                        description: |-
+                          Name of the secretstore on cluster for vault.
+                        default: "vault-secret-store"
+                      vault_secret_store_kind:
+                        type: string
+                        description: |-
+                          Kind of the secret store in vault.
+                        default: "ClusterSecretStore"
+                      vault_secret_path:
+                        type: string
+                        description: |-
+                          Path of the secret in vault.
