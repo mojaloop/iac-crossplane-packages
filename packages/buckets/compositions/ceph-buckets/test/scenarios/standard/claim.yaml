@@ -11,7 +11,6 @@ spec:
       bucketName: "my-example-bucket"
       storageClassName: "ceph-bucket"
       maxSize: "10Gi"
-      # maxObjects: "5000"
     secret:
       sc_namespace: "rook-ceph"
       name: "my-example-bucket"
