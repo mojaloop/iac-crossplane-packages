@@ -22,10 +22,11 @@ on:
         required: true
 
 jobs:
-  pull-request-package:
-    name: 🧪 PR Preview Package
-    if: ${{ github.ref_type != 'tag' && github.ref != 'refs/heads/main' }}
+  calculate-version:
+    name: 🔢 Calculate Version
     runs-on: ubuntu-latest
+    outputs:
+      next_version: ${{ steps.version.outputs.next_version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,50 +36,38 @@ jobs:
         with:
           node-version: 20
 
-      - name: 🔢 Calculate PR Pre-Release Version
+      - name: 🔢 Calculate Version
         id: version
         run: |
           bash .github/scripts/get-next-version.sh ${{ inputs.package }} > base_version.txt
           BASE_VERSION=$(cat base_version.txt)
-          SUFFIX="-pr${{ github.event.pull_request.number }}-${{ github.run_id }}"
-          echo "next_version=${BASE_VERSION}${SUFFIX}" >> $GITHUB_OUTPUT
+          if [[ "${{ github.ref_type }}" != "tag" && "${{ github.ref }}" != "refs/heads/main" ]]; then
+            SUFFIX="-pr${{ github.event.pull_request.number }}-${{ github.run_id }}"
+            echo "next_version=${BASE_VERSION}${SUFFIX}" >> $GITHUB_OUTPUT
+          else
+            echo "next_version=${BASE_VERSION}" >> $GITHUB_OUTPUT
+          fi
 
-      - name: 🚀 Build & Push
-        uses: .github/workflows/xplane_pull_request.yaml
-        with:
-          CROSSPLANE_PACKAGES_DIR: ${{ inputs.packages_dir }}
-          CROSSPLANE_REGISTRY_URL: ${{ inputs.registry }}
-          SUBPATH: ${{ inputs.package }}
-          NEXT_VERSION: v${{ steps.version.outputs.next_version }}
-          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+  pull-request-package:
+    uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_pull_request.yaml@feat/CTO-1001_align_packages
+    name: 🧪 PR Preview Package
+    needs: [calculate-version]
+    if: ${{ github.ref_type != 'tag' && github.ref != 'refs/heads/main' }}
+    secrets: inherit
+    with:
+      CROSSPLANE_PACKAGES_DIR: ${{ inputs.packages_dir }}
+      CROSSPLANE_REGISTRY_URL: ${{ inputs.registry }}
+      SUBPATH: ${{ inputs.package }}
+      NEXT_VERSION: v${{ needs.calculate-version.outputs.next_version }}
 
   release-package:
+    uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_pull_request.yaml@feat/CTO-1001_align_packages
     name: 🚀 Release Package
-    if: ${{ github.ref_type == 'tag' || github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: 🔢 Calculate Release Version
-        id: version
-        run: |
-          bash .github/scripts/get-next-version.sh ${{ inputs.package }} > next_version.txt
-          VERSION=$(cat next_version.txt)
-          echo "next_version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: 🚀 Build & Push
-        uses: .github/workflows/xplane_pull_request.yaml
-        with:
-          CROSSPLANE_PACKAGES_DIR: ${{ inputs.packages_dir }}
-          CROSSPLANE_REGISTRY_URL: ${{ inputs.registry }}
-          SUBPATH: ${{ inputs.package }}
-          NEXT_VERSION: v${{ steps.version.outputs.next_version }}
-          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+    needs: [calculate-version]
+    if: ${{ github.ref_type == 'tag' }}
+    secrets: inherit
+    with:
+      CROSSPLANE_PACKAGES_DIR: ${{ inputs.packages_dir }}
+      CROSSPLANE_REGISTRY_URL: ${{ inputs.registry }}
+      SUBPATH: ${{ inputs.package }}
+      NEXT_VERSION: v${{ needs.calculate-version.outputs.next_version }}

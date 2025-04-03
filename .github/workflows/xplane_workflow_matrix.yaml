@@ -72,7 +72,7 @@ jobs:
     strategy:
       matrix: ${{fromJson(needs.detect-changes.outputs.matrix)}}
       fail-fast: false
-    uses: .github/workflows/xplane_workflow.yaml
+    uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_workflow.yaml@feat/CTO-1001_align_packages
     secrets:
       REGISTRY_USERNAME: ${{ github.actor }}
       REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
