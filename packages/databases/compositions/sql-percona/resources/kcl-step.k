@@ -240,7 +240,7 @@ if parameters?.consumerClusterType == "controlcenter":
         apiVersion = "kubernetes.crossplane.io/v1alpha2"
         kind = "Object"
         metadata = {
-            name = "{}-en-svc".format(oxr.metadata.name)
+            name = "{}-endpoint".format(oxr.metadata.name)
             annotations = {
                 "krm.kcl.dev/composition-resource-name": "percona-db-ep-svc"
             }
