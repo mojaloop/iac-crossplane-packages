@@ -198,6 +198,11 @@ validate: render
 		echo "📋 Provider configuration registered"; \
 	fi
 
+	@if [ -f $(TEST_DIR)/packages.yaml ]; then \
+		cp $(TEST_DIR)/packages.yaml $(EXTENSIONS_DIR)/packages.yaml; \
+		echo "📋 Package configuration registered"; \
+	fi
+
 	@echo "\n🔬 Executing validation checks..."
 
 	@# Validate specific or all files
