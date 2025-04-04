@@ -39,8 +39,8 @@ jobs:
       - name: 🔢 Calculate Version
         id: version
         run: |
-          # Get version and remove any whitespace/newlines
-          VERSION=$(bash .github/scripts/get-next-version.sh ${{ inputs.package }} | tr -d '\n')
+          # Get version, take only the last line and remove whitespace/newlines
+          VERSION=$(bash .github/scripts/get-next-version.sh ${{ inputs.package }} | tail -n1 | tr -d '\n')
 
           # Add suffix if needed
           if [[ "${{ github.ref_type }}" != "tag" && "${{ github.ref }}" != "refs/heads/main" ]]; then
