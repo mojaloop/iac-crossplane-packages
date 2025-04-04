@@ -8,9 +8,10 @@ This project provides a collection of Crossplane composition packages designed t
 
 ## Packages
 
-- [Utils](packages/utils/README.md) - Common utility compositions
-- [Storage Cluster Postgres Cluster](packages/sc-pgcluster/README.md) - Storage Cluster Postgres Cluster composition
-- [AWS DocDbCluster](packages/aws-docdbcluster/README.md) - Storage Cluster Postgres Cluster composition
+- [Utils](packages/utils/README.md) - Common utility compositions package
+- [Storage Cluster Postgres Cluster](packages/sc-pgcluster/README.md) - Storage Cluster Postgres Cluster composition package
+- [AWS DocDbCluster](packages/aws-docdbcluster/README.md) - AWS Documents DB Cluster composition package
+- [SC NetBirdOperatorInstall](packages/sc-nboperatorinstall/README.md) - Storage Cluster NetBird Installation composition package
 - Additional packages coming soon...
 
 ## Getting Started
