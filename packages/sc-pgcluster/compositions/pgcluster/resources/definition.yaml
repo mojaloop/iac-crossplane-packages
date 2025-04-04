@@ -60,7 +60,7 @@ spec:
               parameters:
                 type: object
                 properties:
-                  consumeClusterType:
+                  consumerClusterType:
                     type: string
                     description: Type of consumer cluster
                     enum:
@@ -72,6 +72,9 @@ spec:
                   externalServiceName:
                     type: string
                     description: Name for the external service object created
+                  appNamespace:
+                    type: string
+                    description: Namespace for the consumer application
                   postgres:
                     type: object
                     properties:
@@ -86,7 +89,12 @@ spec:
                       dbSecret:
                         type: string
                         description: Type of object to be synced
-                        default: db-secret
+                      dbUsername:
+                        type: string
+                        description: Name of the database user to be created
+                      dbName:
+                        type: string
+                        description: Name of the database to be created
                       replicas:
                         type: number
                         description: Type of object to be synced
