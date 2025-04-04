@@ -10,7 +10,7 @@ _items: [any] = []
 
 ## Adding resources
 if parameters?.objectStoreProvider == "ceph":
-    _objectStore = {
+    _cephBucket = {
       apiVersion = "objectstore.mojaloop.io/v1alpha1"
       kind = "XCephBucket"
       metadata = {
@@ -39,7 +39,7 @@ if parameters?.objectStoreProvider == "ceph":
       }
     }
 if parameters?.objectStoreProvider == "s3":
-    _objectStore = {
+    _s3Bucket = {
       apiVersion = "mojaloop.io/v1alpha1"
       kind = "S3Bucket"
       metadata = {
@@ -56,7 +56,8 @@ if parameters?.objectStoreProvider == "s3":
           }
         }
     }
-_items += [_objectStore]
+
+_items += [_cephBucket, _s3Bucket]
 
 dxr = {
     **oxr

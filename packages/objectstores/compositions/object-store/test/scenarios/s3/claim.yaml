@@ -5,7 +5,7 @@ metadata:
 spec:
   parameters:
     clusterName: "example-cluster"
-    objectStoreProvider: "ceph"
+    objectStoreProvider: "s3"
     bucketName: "my-example-bucket2"
     Namespace: temp
     s3:
