@@ -12,7 +12,7 @@ if ! command -v npx &> /dev/null; then
   exit 1
 fi
 
-VERSION=$(npx semantic-release --dry-run --no-ci --debug --config ../../release.config.js | grep -oP "The next release version is \K[0-9]+\.[0-9]+\.[0-9]+" || true)
+VERSION=$(npx semantic-release --dry-run --no-ci --debug --config ../../release.config.js --no-verify-conditions | grep -oP "The next release version is \K[0-9]+\.[0-9]+\.[0-9]+" || true)
 
 if [ -z "$VERSION" ]; then
   VERSION=$DEFAULT_VERSION
