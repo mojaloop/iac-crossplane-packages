@@ -12,12 +12,13 @@ if ! command -v npx &> /dev/null; then
   exit 1
 fi
 
+# Updated grep pattern to match the version in the debug output
 VERSION=$(npx semantic-release \
   --dry-run \
   --no-ci \
   --branches main \
   --plugins "@semantic-release/commit-analyzer,@semantic-release/release-notes-generator" \
-  --debug | grep -oP "The next release version is \K[0-9]+\.[0-9]+\.[0-9]+" || true)
+  --debug 2>&1 | grep -oP "version: '\K[0-9]+\.[0-9]+\.[0-9]+(?=')" || true)
 
 if [ -z "$VERSION" ]; then
   VERSION=$DEFAULT_VERSION
