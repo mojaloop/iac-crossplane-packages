@@ -39,14 +39,14 @@ jobs:
       - name: 🔢 Calculate Version
         id: version
         run: |
-          BASE_VERSION=$(bash .github/scripts/get-next-version.sh ${{ inputs.package }})
-          echo "Base version: ${BASE_VERSION}"
+          # Capture version and suppress any debug output
+          VERSION=$(bash .github/scripts/get-next-version.sh ${{ inputs.package }} 2>/dev/null)
           if [[ "${{ github.ref_type }}" != "tag" && "${{ github.ref }}" != "refs/heads/main" ]]; then
             SUFFIX="-pr${{ github.event.pull_request.number || '' }}-${{ github.run_id }}"
-            echo "next_version=${BASE_VERSION}${SUFFIX}" >> "$GITHUB_OUTPUT"
-          else
-            echo "next_version=${BASE_VERSION}" >> "$GITHUB_OUTPUT"
+            VERSION="${VERSION}${SUFFIX}"
           fi
+          echo "next_version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Base version: ${VERSION}"
 
   pull-request-package:
     uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_pull_request.yaml@main

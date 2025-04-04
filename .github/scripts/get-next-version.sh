@@ -30,5 +30,6 @@ else
   fi
 fi
 
-# Output just the version number once
-printf "%s" "${VERSION}"
+# Output just the version number without any extra output
+printf "%s" "${VERSION}" > /dev/null # suppress any debug output
+echo "${VERSION}"
