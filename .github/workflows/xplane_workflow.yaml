@@ -39,8 +39,7 @@ jobs:
       - name: 🔢 Calculate Version
         id: version
         run: |
-          bash .github/scripts/get-next-version.sh ${{ inputs.package }} > base_version.txt
-          BASE_VERSION=$(cat base_version.txt)
+          BASE_VERSION=$(bash .github/scripts/get-next-version.sh ${{ inputs.package }})
           echo "Base version: ${BASE_VERSION}"
           if [[ "${{ github.ref_type }}" != "tag" && "${{ github.ref }}" != "refs/heads/main" ]]; then
             SUFFIX="-pr${{ github.event.pull_request.number || '' }}-${{ github.run_id }}"
