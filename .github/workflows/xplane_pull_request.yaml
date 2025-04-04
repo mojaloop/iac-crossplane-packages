@@ -64,18 +64,20 @@ jobs:
           OUTPUT=$(make all PACKAGE_NAME=${{ inputs.SUBPATH }} 2>&1)
           echo "$OUTPUT"
 
-          # Check for validation failures
-          if echo "$OUTPUT" | grep -q "failure cases"; then
-            echo "❌ Validation failed! Found failure cases in the output"
+          # Check for validation failures by looking for actual failure cases
+          FAILURE_COUNT=$(echo "$OUTPUT" | grep -o "failure cases" | tail -1 | grep -o "[0-9]*")
+          if [ ! -z "$FAILURE_COUNT" ] && [ "$FAILURE_COUNT" -gt 0 ]; then
+            echo "❌ Validation failed! Found $FAILURE_COUNT failure cases in the output"
             # Extract and display the failure details
             echo "Validation Failures:"
             echo "$OUTPUT" | grep "\[x\]"
             exit 1
           fi
 
-          # Check for missing schemas (optional, depending on your requirements)
-          if echo "$OUTPUT" | grep -q "missing schemas"; then
-            echo "⚠️ Warning: Found missing schemas in the output"
+          # Check for missing schemas by looking at the actual count
+          MISSING_SCHEMAS_COUNT=$(echo "$OUTPUT" | grep "missing schemas" | tail -1 | grep -o "[0-9]* missing schemas" | grep -o "[0-9]*")
+          if [ ! -z "$MISSING_SCHEMAS_COUNT" ] && [ "$MISSING_SCHEMAS_COUNT" -gt 0 ]; then
+            echo "⚠️ Warning: Found $MISSING_SCHEMAS_COUNT missing schemas in the output"
             echo "$OUTPUT" | grep "schemas does not exist"
           fi
 
