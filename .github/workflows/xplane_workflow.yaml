@@ -44,9 +44,9 @@ jobs:
           echo "Base version: ${BASE_VERSION}"
           if [[ "${{ github.ref_type }}" != "tag" && "${{ github.ref }}" != "refs/heads/main" ]]; then
             SUFFIX="-pr${{ github.event.pull_request.number || '' }}-${{ github.run_id }}"
-            echo "next_version=${BASE_VERSION}${SUFFIX}" >> $GITHUB_OUTPUT
+            echo "next_version=${BASE_VERSION}${SUFFIX}" >> "$GITHUB_OUTPUT"
           else
-            echo "next_version=${BASE_VERSION}" >> $GITHUB_OUTPUT
+            echo "next_version=${BASE_VERSION}" >> "$GITHUB_OUTPUT"
           fi
 
   pull-request-package:
