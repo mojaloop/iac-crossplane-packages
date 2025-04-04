@@ -40,9 +40,11 @@ jobs:
         id: version
         run: |
           bash .github/scripts/get-next-version.sh ${{ inputs.package }} > base_version.txt
+          cat base_version.txt
           BASE_VERSION=$(cat base_version.txt)
+          echo "BASE_VERSION=${BASE_VERSION}"
           if [[ "${{ github.ref_type }}" != "tag" && "${{ github.ref }}" != "refs/heads/main" ]]; then
-            SUFFIX="-pr${{ github.event.pull_request.number }}-${{ github.run_id }}"
+            SUFFIX="-pr${{ github.event.pull_request.number || '' }}-${{ github.run_id }}"
             echo "next_version=${BASE_VERSION}${SUFFIX}" >> $GITHUB_OUTPUT
           else
             echo "next_version=${BASE_VERSION}" >> $GITHUB_OUTPUT
