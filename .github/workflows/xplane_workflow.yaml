@@ -48,12 +48,7 @@ jobs:
             VERSION="${VERSION}${SUFFIX}"
           fi
 
-          # Use the delimiter syntax for GitHub Actions outputs
-          echo "next_version<<EOF" >> $GITHUB_OUTPUT
-          echo "${VERSION}" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-          # Display for logging
+          echo "next_version=${VERSION}" >> $GITHUB_OUTPUT
           echo "Base version: ${VERSION}"
 
   pull-request-package:
