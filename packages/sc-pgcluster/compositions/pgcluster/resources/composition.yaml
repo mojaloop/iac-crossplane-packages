@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: docdbcluster
+  name: pgcluster
   labels:
-    crossplane.io/xrd: xdocdbcluster.database.mojaloop.io
+    crossplane.io/xrd: xpgcluster.sc.mojaloop.io
 spec:
   compositeTypeRef:
-    apiVersion: database.mojaloop.io/v1alpha1
-    kind: XDocDbCluster
+    apiVersion: sc.mojaloop.io/v1alpha1
+    kind: XPGCluster
   mode: Pipeline
   pipeline:
 

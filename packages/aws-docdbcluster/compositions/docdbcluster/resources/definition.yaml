@@ -1,10 +1,10 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xdocdbcluster.database.mojaloop.io
+  name: xdocdbcluster.aws.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
-  group: database.mojaloop.io
+  group: aws.mojaloop.io
   names:
     kind: XDocDbCluster
     plural: xdocdbcluster
