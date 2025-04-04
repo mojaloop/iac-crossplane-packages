@@ -1,12 +1,15 @@
----
 apiVersion: meta.pkg.crossplane.io/v1alpha1
 kind: Configuration
 metadata:
-  name: databases
+  name: aws-docdbcluster
 spec:
   dependsOn:
-    - provider: xpkg.upbound.io/crossplane-contrib/provider-kubernetes
-      version: ">=v0.14.1"
+    - provider: xpkg.upbound.io/upbound/provider-family-aws
+      version: ">=v1.21.0"
+    - provider: xpkg.upbound.io/upbound/provider-aws-docdb
+      version: ">=v1.21.0"
+    - provider: xpkg.upbound.io/upbound/provider-aws-ec2
+      version: ">=v1.21.0"
     ## Functions
     - provider: xpkg.upbound.io/crossplane-contrib/function-kcl
       version: ">=v0.9.0"
