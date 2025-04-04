@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: objectsyncer
+  name: pgcluster
   labels:
-    crossplane.io/xrd: xobjectsyncer.utils.mojaloop.io
+    crossplane.io/xrd: xpgcluster.sc.mojaloop.io
 spec:
   compositeTypeRef:
-    apiVersion: utils.mojaloop.io/v1alpha1
-    kind: XObjectSyncer
+    apiVersion: sc.mojaloop.io/v1alpha1
+    kind: XPGCluster
   mode: Pipeline
   pipeline:
 

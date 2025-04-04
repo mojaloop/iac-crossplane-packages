@@ -109,6 +109,15 @@ jobs:
           echo "📡 Publishing ${{ inputs.SUBPATH }} version ${{ inputs.NEXT_VERSION }} to registry"
           ./crossplane --verbose xpkg push -f ./artifacts/${{ inputs.SUBPATH }}-${{ inputs.NEXT_VERSION }}.xpkg ${{ inputs.CROSSPLANE_REGISTRY_URL }}/${{ inputs.SUBPATH }}:${{ inputs.NEXT_VERSION }}
 
+      - name: 🏷️ Create and Push Git Tag
+        if: ${{ !contains(inputs.NEXT_VERSION, '-pr') }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ inputs.SUBPATH }}/${{ inputs.NEXT_VERSION }}" -m "Release ${{ inputs.SUBPATH }}/v${{ inputs.NEXT_VERSION }}"
+          git push origin "${{ inputs.SUBPATH }}/${{ inputs.NEXT_VERSION }}"
+
       - name: ✨ Summary
         run: |
           echo "✅ Successfully published ${{ inputs.SUBPATH }} version ${{ inputs.NEXT_VERSION }} to ${{ inputs.CROSSPLANE_REGISTRY_URL }}"
+          echo "✅ Created and pushed git tag ${{ inputs.SUBPATH }}/${{ inputs.NEXT_VERSION }}"

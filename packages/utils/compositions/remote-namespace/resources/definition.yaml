@@ -1,16 +1,16 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xobjectsyncer.utils.mojaloop.io
+  name: remotenamespace.utils.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
   group: utils.mojaloop.io
   names:
-    kind: XObjectSyncer
-    plural: xobjectsyncer
+    kind: XRemoteNamespace
+    plural: xremotenamespace
   claimNames:
-    kind: ObjectSyncer
-    plural: objectsyncer
+    kind: RemoteNamespace
+    plural: remotenamespace
   versions:
   - name: v1alpha1
     served: true
@@ -54,13 +54,8 @@ spec:
                 description: |-
                   The name of the provider config to use for the source and destination k8s providers.
                 required:
-                  - sourceK8sProviderName
                   - destinationK8sProviderName
                 properties:
-                  sourceK8sProviderName:
-                    type: string
-                    description: |-
-                      The name of the provider config to use for the source k8s provider.
                   destinationK8sProviderName:
                     type: string
                     description: |-
@@ -68,41 +63,7 @@ spec:
               parameters:
                 type: object
                 properties:
-                  objectType:
+                  name:
                     type: string
-                    description: Type of object to be synced
-                    enum:
-                      - Secret
-                      - ConfigMap
-                  source:
-                    type: object
                     description: |-
-                      The source secret to sync.
-                    required:
-                      - namespace
-                      - name
-                    properties:
-                      namespace:
-                        type: string
-                        description: |-
-                          Namespace of the secret to sync from source cluster.
-                      name:
-                        type: string
-                        description: |-
-                          Name of the secret to sync from source cluster.
-                  destination:
-                    type: object
-                    description: |-
-                      The destination secret to sync to.
-                    required:
-                      - namespace
-                      - name
-                    properties:
-                      namespace:
-                        type: string
-                        description: |-
-                          Namespace of the secret to sync to destination cluster.
-                      name:
-                        type: string
-                        description: |-
-                          Name of the secret to sync to destination cluster.
+                      The name of the namespace to create.
