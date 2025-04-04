@@ -5,8 +5,8 @@ on:
     branches:
       - '**'
   push:
-    tags:
-      - '**'
+    branches:
+      - 'main'
 
 jobs:
   detect-changes:
