@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: nboperatorinstall
+  name: operatorinstall
   labels:
-    crossplane.io/xrd: xnboperatorinstall.netbird.infitx.org
+    crossplane.io/xrd: xoperatorinstall.netbird.infitx.org
 spec:
   compositeTypeRef:
     apiVersion: netbird.infitx.org/v1alpha1
-    kind: XNbOperatorInstall
+    kind: XOperatorInstall
   mode: Pipeline
   pipeline:
     - step: kcl

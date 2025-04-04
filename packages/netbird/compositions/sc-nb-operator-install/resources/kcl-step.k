@@ -9,20 +9,20 @@ _items = []
 
 
 # SC NB Service User
-_sc_nb_service_user = {
+_sc_service_user = {
   apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
   kind = "NbUser"
   metadata = {
-    name = "{}-sc-nb-service-user".format(parameters.serviceUserName)
+    name = "{}-sc-service-user".format(parameters.serviceUserName)
     annotations = {
-      "krm.kcl.dev/composition-resource-name": "sc-nb-service-user"
+      "krm.kcl.dev/composition-resource-name": "sc-service-user"
     }
   }
   spec = {
     forProvider = {
       name = "{}-service-user".format(parameters.serviceUserName)
-      is_service_user: true
-      role: admin
+      is_service_user: True
+      role: "admin"
       auto_groups: []
     }
     providerConfigRef = {
@@ -33,19 +33,19 @@ _sc_nb_service_user = {
 }
 
 # SC NB Service User Access Token
-_sc_nb_access_token = {
+_sc_access_token = {
   apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
   kind = "NbAccessToken"
   metadata = {
-    name = "{}-sc-nb-access-token".format(parameters.serviceUserName)
+    name = "{}-sc-access-token".format(parameters.serviceUserName)
     annotations = {
-      "krm.kcl.dev/composition-resource-name": "sc-nb-access-token"
+      "krm.kcl.dev/composition-resource-name": "sc-access-token"
     }
   }
   spec = {
     forProvider = {
       name = "{}-access-token".format(parameters.serviceUserName)
-      user_name: ocds["sc-nb-service-user"]?.Resource?.status?.atProvider?.name
+      user_name: ocds["sc-service-user"]?.Resource?.status?.atProvider?.name
       expires_in: parameters.accessTokenExpiresInDays
     }
     providerConfigRef = {
@@ -55,7 +55,7 @@ _sc_nb_access_token = {
   }
 }
 
-_nb_access_token_secret_copy = {
+_access_token_secret_copy = {
     apiVersion = "utils.mojaloop.io/v1alpha1"
     kind = "XObjectSyncer"
     metadata = {
@@ -65,12 +65,12 @@ _nb_access_token_secret_copy = {
         parameters = {
             objectType = "Secret"
             source = {
-                name = ocds["sc-nb-access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.name
-                namespace = ocds["sc-nb-access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.namespace
+                name = ocds["sc-access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.name
+                namespace = ocds["sc-access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.namespace
             }
             destination = {
                 name = "nb-operator-api-key"
-                namespace = parameters.nbOperatorNamespace
+                namespace = parameters.operatorNamespace
             }
         }
         providerConfigsRef = {
@@ -81,13 +81,13 @@ _nb_access_token_secret_copy = {
     }
 }
 
-_sc_argocd_nb_operator_app_install = {
+_sc_argocd_operator_app_install = {
   apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-      name = "{}-sc-argocd-nb-operator-app-install".format(oxr.metadata.name)
+      name = "{}-sc-argocd-operator-app-install".format(oxr.metadata.name)
       annotations = {
-          "krm.kcl.dev/composition-resource-name": "sc-argocd-nb-operator-app-install"
+          "krm.kcl.dev/composition-resource-name": "sc-argocd-operator-app-install"
       }
     }
     spec = {
@@ -96,16 +96,16 @@ _sc_argocd_nb_operator_app_install = {
           apiVersion = "argoproj.io/v1alpha1"
           kind = "Application"
           metadata = {
-              name = parameters.nbOperatorArgoAppName
-              namespace = parameters.nbOperatorNamespace
+              name = parameters.operatorArgoAppName
+              namespace = parameters.operatorNamespace
           }
           finalizers = ["resources-finalizer.argocd.argoproj.io"]
           spec = {
             project = "default"
             syncPolicy = {
               automated = {
-                prune = true
-                selfHeal = true
+                prune = True
+                selfHeal = True
               }
             }
             retry = {
@@ -124,11 +124,11 @@ _sc_argocd_nb_operator_app_install = {
             ]
             destination = {
               server = "https://kubernetes.default.svc"
-              namespace = parameters.nbOperatorNamespace
+              namespace = parameters.operatorNamespace
             }
             source = {
-              repoURL = parameters.nbOperatorArgoAppSourceURL
-              targetRevision = parameters.nbOperatorArgoAppSourceRevision
+              repoURL = parameters.operatorArgoAppSourceURL
+              targetRevision = parameters.operatorArgoAppSourceRevision
               path = "gitops/applications/base/netbird-operator"
               plugin = {
                 name = "envsubst"
@@ -143,15 +143,15 @@ _sc_argocd_nb_operator_app_install = {
                   },
                   {
                     name = "netbird_operator_namespace"
-                    value = parameters.nbOperatorNamespace
+                    value = parameters.operatorNamespace
                   },
                   {
                     name = "netbird_operator_helm_version"
-                    value = parameters.nbOperatorHelmVersion
+                    value = parameters.operatorHelmVersion
                   },
                   {
                     name = "netbird_operator_app_name"
-                    value = parameters.nbOperatorArgoAppName
+                    value = parameters.operatorArgoAppName
                   }
                 ]
               }
@@ -168,10 +168,10 @@ _sc_argocd_nb_operator_app_install = {
 
 # Add the resources to the items list
 _items += [
-  _sc_nb_service_user,
-  _sc_nb_access_token,
-  _nb_access_token_secret_copy,
-  _sc_argocd_nb_operator_app_install
+  _sc_service_user,
+  _sc_access_token,
+  _access_token_secret_copy,
+  _sc_argocd_operator_app_install
 ]
 
 dxr = {

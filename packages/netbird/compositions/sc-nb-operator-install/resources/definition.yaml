@@ -1,16 +1,16 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xnboperatorinstall.netbird.infitx.org
+  name: xoperatorinstall.netbird.infitx.org
 spec:
   defaultCompositeDeletePolicy: Foreground
   group: netbird.infitx.org
   names:
-    kind: XNbOperatorInstall
-    plural: xnboperatorinstall
+    kind: XOperatorInstall
+    plural: xoperatorinstall
   claimNames:
-    kind: NbOperatorInstall
-    plural: xnboperatorinstalls
+    kind: OperatorInstall
+    plural: xoperatorinstalls
   versions:
     - name: v1alpha1
       served: true
@@ -82,18 +82,18 @@ spec:
                     nbManagmentURI:
                       type: string
                       description: The url for nb management server.
-                    nbOperatorHelmVersion:
+                    operatorHelmVersion:
                       type: string
                       description: Version of nb operator helm chart to install on destination cluster.
-                    nbOperatorNamespace:
+                    operatorNamespace:
                       type: string
                       description: Namespace for argo app and helm chart.
-                    nbOperatorArgoAppName:
+                    operatorArgoAppName:
                       type: string
                       description: Name for argo app.
-                    nbOperatorArgoAppSourceURL:
+                    operatorArgoAppSourceURL:
                       type: string
                       description: URL for argo app source.
-                    nbOperatorArgoAppSourceRevision:
+                    operatorArgoAppSourceRevision:
                       type: string
                       description: Revision for argo app source.
