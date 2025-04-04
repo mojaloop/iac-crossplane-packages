@@ -1,0 +1,6 @@
+apiVersion: pkg.crossplane.io/v1
+kind: Configuration
+metadata:
+  name: utils
+spec:
+  package: ghcr.io/mojaloop/iac-crossplane-packages/utils:v0.1.5
