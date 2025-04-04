@@ -45,8 +45,7 @@ jobs:
             SUFFIX="-pr${{ github.event.pull_request.number || '' }}-${{ github.run_id }}"
             VERSION="${VERSION}${SUFFIX}"
           fi
-          echo "next_version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Base version: ${VERSION}"
+          echo "next_version=v${VERSION}" >> "$GITHUB_OUTPUT"
 
   pull-request-package:
     uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_pull_request.yaml@main
@@ -58,7 +57,7 @@ jobs:
       CROSSPLANE_PACKAGES_DIR: ${{ inputs.packages_dir }}
       CROSSPLANE_REGISTRY_URL: ${{ inputs.registry }}
       SUBPATH: ${{ inputs.package }}
-      NEXT_VERSION: v${{ needs.calculate-version.outputs.next_version }}
+      NEXT_VERSION: ${{ needs.calculate-version.outputs.next_version }}
 
   release-package:
     uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_pull_request.yaml@main
@@ -70,4 +69,4 @@ jobs:
       CROSSPLANE_PACKAGES_DIR: ${{ inputs.packages_dir }}
       CROSSPLANE_REGISTRY_URL: ${{ inputs.registry }}
       SUBPATH: ${{ inputs.package }}
-      NEXT_VERSION: v${{ needs.calculate-version.outputs.next_version }}
+      NEXT_VERSION: ${{ needs.calculate-version.outputs.next_version }}
