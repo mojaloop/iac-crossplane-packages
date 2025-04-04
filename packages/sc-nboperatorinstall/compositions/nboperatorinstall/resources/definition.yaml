@@ -1,16 +1,16 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xoperatorinstall.netbird.infitx.org
+  name: xnboperatorinstall.sc.infitx.org
 spec:
   defaultCompositeDeletePolicy: Foreground
   group: netbird.infitx.org
   names:
-    kind: XOperatorInstall
-    plural: xoperatorinstall
+    kind: XNBOperatorInstall
+    plural: xnboperatorinstall
   claimNames:
-    kind: OperatorInstall
-    plural: xoperatorinstalls
+    kind: NBOperatorInstall
+    plural: xnboperatorinstalls
   versions:
     - name: v1alpha1
       served: true

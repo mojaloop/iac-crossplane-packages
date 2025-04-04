@@ -1,7 +1,7 @@
-apiVersion: netbird.infitx.org/v1alpha1
-kind: XOperatorInstall
+apiVersion: sc.infitx.org/v1alpha1
+kind: XNBOperatorInstall
 metadata:
-  name: example-operatorinstall
+  name: example-nboperatorinstall
   namespace: testa
 spec:
   parameters:
