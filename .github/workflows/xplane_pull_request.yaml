@@ -77,8 +77,9 @@ jobs:
           # Check for missing schemas by looking at the actual count
           MISSING_SCHEMAS_COUNT=$(echo "$OUTPUT" | grep "missing schemas" | tail -1 | grep -o "[0-9]* missing schemas" | grep -o "[0-9]*")
           if [ ! -z "$MISSING_SCHEMAS_COUNT" ] && [ "$MISSING_SCHEMAS_COUNT" -gt 0 ]; then
-            echo "⚠️ Warning: Found $MISSING_SCHEMAS_COUNT missing schemas in the output"
+            echo "❌ Validation failed! Found $MISSING_SCHEMAS_COUNT missing schemas in the output"
             echo "$OUTPUT" | grep "schemas does not exist"
+            exit 1
           fi
 
           echo "✅ Validation completed successfully"
