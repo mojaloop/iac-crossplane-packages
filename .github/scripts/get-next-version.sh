@@ -14,9 +14,7 @@ fi
 
 # Updated grep pattern to match both formats that might appear in the output
 VERSION=$(npx semantic-release \
-  --dry-run \
   --no-ci \
-  --branches main \
   --plugins "@semantic-release/commit-analyzer,@semantic-release/release-notes-generator" \
   --debug 2>&1 | grep -oP "(?:version: '|The next release version is )\K[0-9]+\.[0-9]+\.[0-9]+" || true)
 
