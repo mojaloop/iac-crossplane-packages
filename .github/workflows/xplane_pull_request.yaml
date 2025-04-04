@@ -113,10 +113,10 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "${{ inputs.SUBPATH }}/v${{ inputs.NEXT_VERSION }}" -m "Release ${{ inputs.SUBPATH }}/v${{ inputs.NEXT_VERSION }}"
-          git push origin "${{ inputs.SUBPATH }}/v${{ inputs.NEXT_VERSION }}"
+          git tag -a "${{ inputs.SUBPATH }}/${{ inputs.NEXT_VERSION }}" -m "Release ${{ inputs.SUBPATH }}/v${{ inputs.NEXT_VERSION }}"
+          git push origin "${{ inputs.SUBPATH }}/${{ inputs.NEXT_VERSION }}"
 
       - name: ✨ Summary
         run: |
           echo "✅ Successfully published ${{ inputs.SUBPATH }} version ${{ inputs.NEXT_VERSION }} to ${{ inputs.CROSSPLANE_REGISTRY_URL }}"
-          echo "✅ Created and pushed git tag ${{ inputs.SUBPATH }}/v${{ inputs.NEXT_VERSION }}"
+          echo "✅ Created and pushed git tag ${{ inputs.SUBPATH }}/${{ inputs.NEXT_VERSION }}"
