@@ -1,10 +1,10 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xcephbucket.objectstore.mojaloop.io
+  name: xcephbucket.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
-  group: objectstore.mojaloop.io
+  group: mojaloop.io
   names:
     kind: XCephBucket
     plural: xcephbucket
@@ -125,7 +125,7 @@ spec:
                         type: string
                         description: |-
                           Interval to refresh the secret on vault.
-                        default: "1m"
+                        default: "1h"
                       vaultSecretStore:
                         type: string
                         description: |-

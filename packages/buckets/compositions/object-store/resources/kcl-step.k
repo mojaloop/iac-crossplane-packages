@@ -11,7 +11,7 @@ _items: [any] = []
 ## Adding resources
 if parameters?.objectStoreProvider == "ceph":
     _objectStore = {
-      apiVersion = "objectstore.mojaloop.io/v1alpha1"
+      apiVersion = "mojaloop.io/v1alpha1"
       kind = "XCephBucket"
       metadata = {
         name = parameters?.bucketName
@@ -28,12 +28,12 @@ if parameters?.objectStoreProvider == "ceph":
             maxSize                  = parameters?.ceph?.maxSize
           }
           secret = {
-            name              = parameters?.bucketName
-            esoPushSecret     = parameters?.ceph?.esoPushSecret
-            scNamespace       = parameters?.clusterName
-            ccNamespace       = parameters?.Namespace
-            vaultSecretStore  = parameters?.ceph?.vaultSecretStore
-            vaultSecretPath   = parameters?.ceph?.vaultSecretPath
+            name                  = parameters?.bucketName
+            esoPushSecret        = parameters?.ceph?.esoPushSecret
+            scNamespace          = parameters?.clusterName
+            ccNamespace          = parameters?.Namespace
+            vaultSecretStore = parameters?.ceph?.vaultSecretStore
+            vaultSecretPath     = parameters?.ceph?.vaultSecretPath
           }
         }
       }

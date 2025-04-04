@@ -1,7 +1,7 @@
-apiVersion: objectstore.mojaloop.io/v1alpha1
+apiVersion: mojaloop.io/v1alpha1
 kind: XCephBucket
 metadata:
-  name: test-bucket1
+  name: my-example-bucket
 spec:
   providerConfigsRef:
     scK8sProviderName: sc-kubernetes-provider

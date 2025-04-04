@@ -25,7 +25,7 @@ _cephBucket= {
         kind = "ObjectBucketClaim"
         metadata = {
           name = parameters?.bucket?.bucketName
-          namespace = parameters?.secret?.sc_namespace
+          namespace = parameters?.secret?.scNamespace
         }
         spec = {
           bucketName         = parameters?.bucket?.bucketName
@@ -60,7 +60,7 @@ _sourceSecret = {
         kind = "Secret"
         metadata = {
           name = parameters?.bucket?.bucketName
-          namespace = parameters?.secret?.sc_namespace
+          namespace = parameters?.secret?.scNamespace
         }
       }
     }
@@ -87,7 +87,7 @@ _destinationSecret = {
         kind = "Secret"
         metadata = {
           name = parameters?.bucket?.bucketName
-          namespace = parameters?.secret?.cc_namespace
+          namespace = parameters?.secret?.ccNamespace
         }
         # Get data and type from the source secret's status
         data = {
@@ -105,7 +105,7 @@ _destinationSecret = {
   }
 }
 
-if parameters?.secret?.eso_pushsecret:
+if parameters?.secret?.esoPushSecret:
     _pushSecret = {
       apiVersion = "kubernetes.crossplane.io/v1alpha2"
       kind = "Object"
@@ -122,16 +122,16 @@ if parameters?.secret?.eso_pushsecret:
             kind = "PushSecret"
             metadata = {
               name = parameters?.bucket?.bucketName
-              namespace = parameters?.secret?.cc_namespace
+              namespace = parameters?.secret?.ccNamespace
             }
             spec = {
-              updatePolicy = parameters?.secret?.eso_push_secret_update_policy
-              deletionPolicy = parameters?.secret?.eso_push_secret_delete_policy
-              refreshInterval = parameters?.secret?.eso_push_secret_refresh_interval
+              updatePolicy = parameters?.secret?.esoUpdatePolicy
+              deletionPolicy = parameters?.secret?.esoDeletePolicy
+              refreshInterval = parameters?.secret?.esoRefreshInterval
               secretStoreRefs = [
                 {
-                  name = parameters?.secret?.vault_secrestore_name
-                  kind = parameters?.secret?.vault_secret_store_kind
+                  name = parameters?.secret?.vaultSecretStore
+                  kind = parameters?.secret?.vaultSecretStoreKind
                 }
               ]
               selector = {
@@ -144,7 +144,7 @@ if parameters?.secret?.eso_pushsecret:
                   match = {
                     secretKey = "username"
                     remoteRef = {
-                      remoteKey = parameters?.secret?.vault_secret_path
+                      remoteKey = parameters?.secret?.vaultSecretPath
                       property = "username"
                     }
                   }
@@ -153,7 +153,7 @@ if parameters?.secret?.eso_pushsecret:
                   match = {
                     secretKey = "password"
                     remoteRef = {
-                      remoteKey = parameters?.secret?.vault_secret_path
+                      remoteKey = parameters?.secret?.vaultSecretPath
                       property = "password"
                     }
                   }
