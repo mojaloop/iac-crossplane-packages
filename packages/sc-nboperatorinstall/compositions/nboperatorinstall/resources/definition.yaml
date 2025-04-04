@@ -4,7 +4,7 @@ metadata:
   name: xnboperatorinstall.sc.infitx.org
 spec:
   defaultCompositeDeletePolicy: Foreground
-  group: netbird.infitx.org
+  group: sc.infitx.org
   names:
     kind: XNBOperatorInstall
     plural: xnboperatorinstall
