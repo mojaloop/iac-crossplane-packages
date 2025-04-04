@@ -24,15 +24,15 @@ _cephBucket= {
         apiVersion = "objectbucket.io/v1alpha1"
         kind = "ObjectBucketClaim"
         metadata = {
-          name = parameters.bucket.bucketName
-          namespace = parameters.secret.sc_namespace
+          name = parameters?.bucket?.bucketName
+          namespace = parameters?.secret?.sc_namespace
         }
         spec = {
-          bucketName         = parameters.bucket.bucketName
-          storageClassName   = parameters.bucket.storageClassName
+          bucketName         = parameters?.bucket?.bucketName
+          storageClassName   = parameters?.bucket?.storageClassName
           additionalConfig   = {
-            maxSize    = parameters.bucket.maxSize
-            maxObjects = parameters.bucket.maxObjects
+            maxSize    = parameters?.bucket?.maxSize
+            maxObjects = parameters?.bucket?.maxObjects
           }
         }
       }
@@ -59,8 +59,8 @@ _sourceSecret = {
         apiVersion = "v1"
         kind = "Secret"
         metadata = {
-          name = parameters.bucket.bucketName
-          namespace = parameters.secret.sc_namespace
+          name = parameters?.bucket?.bucketName
+          namespace = parameters?.secret?.sc_namespace
         }
       }
     }
@@ -86,8 +86,8 @@ _destinationSecret = {
         apiVersion = "v1"
         kind = "Secret"
         metadata = {
-          name = parameters.bucket.bucketName
-          namespace = parameters.secret.cc_namespace
+          name = parameters?.bucket?.bucketName
+          namespace = parameters?.secret?.cc_namespace
         }
         # Get data and type from the source secret's status
         data = {
@@ -121,22 +121,22 @@ if parameters?.secret?.eso_pushsecret:
             apiVersion = "external-secrets.io/v1alpha1"
             kind = "PushSecret"
             metadata = {
-              name = parameters.bucket.bucketName
-              namespace = parameters.secret.cc_namespace
+              name = parameters?.bucket?.bucketName
+              namespace = parameters?.secret?.cc_namespace
             }
             spec = {
-              updatePolicy = parameters.secret.eso_push_secret_update_policy
-              deletionPolicy = parameters.secret.eso_push_secret_delete_policy
-              refreshInterval = parameters.secret.eso_push_secret_refresh_interval
+              updatePolicy = parameters?.secret?.eso_push_secret_update_policy
+              deletionPolicy = parameters?.secret?.eso_push_secret_delete_policy
+              refreshInterval = parameters?.secret?.eso_push_secret_refresh_interval
               secretStoreRefs = [
                 {
-                  name = parameters.secret.vault_secrestore_name
-                  kind = parameters.secret.vault_secret_store_kind
+                  name = parameters?.secret?.vault_secrestore_name
+                  kind = parameters?.secret?.vault_secret_store_kind
                 }
               ]
               selector = {
                 secret = {
-                  name = parameters.bucket.bucketName
+                  name = parameters?.bucket?.bucketName
                 }
               }
               data = [
@@ -144,7 +144,7 @@ if parameters?.secret?.eso_pushsecret:
                   match = {
                     secretKey = "username"
                     remoteRef = {
-                      remoteKey = parameters.secret.vault_secret_path
+                      remoteKey = parameters?.secret?.vault_secret_path
                       property = "username"
                     }
                   }
@@ -153,7 +153,7 @@ if parameters?.secret?.eso_pushsecret:
                   match = {
                     secretKey = "password"
                     remoteRef = {
-                      remoteKey = parameters.secret.vault_secret_path
+                      remoteKey = parameters?.secret?.vault_secret_path
                       property = "password"
                     }
                   }
