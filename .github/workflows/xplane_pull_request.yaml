@@ -60,7 +60,26 @@ jobs:
         working-directory: ${{ inputs.CROSSPLANE_PACKAGES_DIR }}
         run: |
           echo "🔍 Preparing package for ${{ inputs.SUBPATH }}"
-          make all PACKAGE_NAME=${{ inputs.SUBPATH }}
+          # Run make all and capture output
+          OUTPUT=$(make all PACKAGE_NAME=${{ inputs.SUBPATH }} 2>&1)
+          echo "$OUTPUT"
+
+          # Check for validation failures
+          if echo "$OUTPUT" | grep -q "failure cases"; then
+            echo "❌ Validation failed! Found failure cases in the output"
+            # Extract and display the failure details
+            echo "Validation Failures:"
+            echo "$OUTPUT" | grep "\[x\]"
+            exit 1
+          fi
+
+          # Check for missing schemas (optional, depending on your requirements)
+          if echo "$OUTPUT" | grep -q "missing schemas"; then
+            echo "⚠️ Warning: Found missing schemas in the output"
+            echo "$OUTPUT" | grep "schemas does not exist"
+          fi
+
+          echo "✅ Validation completed successfully"
 
       - name: 📦 Create Package
         working-directory: ${{ inputs.CROSSPLANE_PACKAGES_DIR }}
@@ -109,6 +128,15 @@ jobs:
           echo "📡 Publishing ${{ inputs.SUBPATH }} version ${{ inputs.NEXT_VERSION }} to registry"
           ./crossplane --verbose xpkg push -f ./artifacts/${{ inputs.SUBPATH }}-${{ inputs.NEXT_VERSION }}.xpkg ${{ inputs.CROSSPLANE_REGISTRY_URL }}/${{ inputs.SUBPATH }}:${{ inputs.NEXT_VERSION }}
 
+      - name: 🏷️ Create and Push Git Tag
+        if: ${{ !contains(inputs.NEXT_VERSION, '-pr') }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ inputs.SUBPATH }}/${{ inputs.NEXT_VERSION }}" -m "Release ${{ inputs.SUBPATH }}/v${{ inputs.NEXT_VERSION }}"
+          git push origin "${{ inputs.SUBPATH }}/${{ inputs.NEXT_VERSION }}"
+
       - name: ✨ Summary
         run: |
           echo "✅ Successfully published ${{ inputs.SUBPATH }} version ${{ inputs.NEXT_VERSION }} to ${{ inputs.CROSSPLANE_REGISTRY_URL }}"
+          echo "✅ Created and pushed git tag ${{ inputs.SUBPATH }}/${{ inputs.NEXT_VERSION }}"

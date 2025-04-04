@@ -9,6 +9,8 @@ This project provides a collection of Crossplane composition packages designed t
 ## Packages
 
 - [Utils](packages/utils/README.md) - Common utility compositions
+- [Storage Cluster Postgres Cluster](packages/sc-pgcluster/README.md) - Storage Cluster Postgres Cluster composition
+- [AWS DocDbCluster](packages/aws-docdbcluster/README.md) - Storage Cluster Postgres Cluster composition
 - Additional packages coming soon...
 
 ## Getting Started
@@ -64,6 +66,35 @@ Both commands support additional parameters:
 - `TESTSCENARIO`: Specify a test scenario to validate
 - `EXTRA_RENDER_ARGS`: Additional template processing parameters
 - `EXTRA_VALIDATE_ARGS`: Additional validation parameters
+
+#### Versioning
+
+Each package in this repository follows semantic versioning (SemVer) with package-specific version tracking. The versioning system:
+
+- Uses semantic versioning (MAJOR.MINOR.PATCH)
+- Maintains separate version numbers for each package
+- Creates git tags in the format `packagename/vX.Y.Z` (e.g., `utils/v1.0.0`)
+
+Version increments are determined automatically based on commit messages:
+- `fix:` commits trigger PATCH updates (e.g., v1.0.0 → v1.0.1)
+- `feat:` commits trigger MINOR updates (e.g., v1.0.0 → v1.1.0)
+- `feat!:` or `BREAKING CHANGE:` commits trigger MAJOR updates (e.g., v1.0.0 → v2.0.0)
+
+Development workflow:
+1. Create a pull request with your changes
+2. During PR validation, packages are built with temporary versions:
+   - Format: `vX.Y.Z-pr{number}-{runid}`
+   - Example: `v1.0.0-pr123-456789`
+   - These versions can be used for testing
+
+Release process:
+1. Review and approve pull request
+2. Merge PR into main branch
+3. The CI/CD pipeline automatically:
+   - Calculates the next semantic version based on commit history
+   - Builds and validates the package
+   - Creates a git tag (e.g., `packagename/v1.0.0`)
+   - Pushes the package to the registry with the final version
 
 ## License
 
