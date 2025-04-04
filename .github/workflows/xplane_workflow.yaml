@@ -39,13 +39,22 @@ jobs:
       - name: 🔢 Calculate Version
         id: version
         run: |
-          # Capture version and suppress any debug output
-          VERSION=$(bash .github/scripts/get-next-version.sh ${{ inputs.package }} 2>/dev/null)
+          # Get version and remove any whitespace/newlines
+          VERSION=$(bash .github/scripts/get-next-version.sh ${{ inputs.package }} | tr -d '\n')
+
+          # Add suffix if needed
           if [[ "${{ github.ref_type }}" != "tag" && "${{ github.ref }}" != "refs/heads/main" ]]; then
             SUFFIX="-pr${{ github.event.pull_request.number || '' }}-${{ github.run_id }}"
             VERSION="${VERSION}${SUFFIX}"
           fi
-          echo "next_version=v${VERSION}" >> "$GITHUB_OUTPUT"
+
+          # Use the delimiter syntax for GitHub Actions outputs
+          echo "next_version<<EOF" >> $GITHUB_OUTPUT
+          echo "${VERSION}" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Display for logging
+          echo "Base version: ${VERSION}"
 
   pull-request-package:
     uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_pull_request.yaml@main
