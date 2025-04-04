@@ -40,9 +40,8 @@ jobs:
         id: version
         run: |
           bash .github/scripts/get-next-version.sh ${{ inputs.package }} > base_version.txt
-          cat base_version.txt
           BASE_VERSION=$(cat base_version.txt)
-          echo "BASE_VERSION=${BASE_VERSION}"
+          echo "Base version: ${BASE_VERSION}"
           if [[ "${{ github.ref_type }}" != "tag" && "${{ github.ref }}" != "refs/heads/main" ]]; then
             SUFFIX="-pr${{ github.event.pull_request.number || '' }}-${{ github.run_id }}"
             echo "next_version=${BASE_VERSION}${SUFFIX}" >> $GITHUB_OUTPUT
@@ -66,7 +65,7 @@ jobs:
     uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_pull_request.yaml@main
     name: 🚀 Release Package
     needs: [calculate-version]
-    if: ${{ github.ref_type == 'tag' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     secrets: inherit
     with:
       CROSSPLANE_PACKAGES_DIR: ${{ inputs.packages_dir }}
