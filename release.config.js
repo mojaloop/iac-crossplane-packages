@@ -13,6 +13,16 @@ module.exports = {
   tagFormat: `${pkgName}/v\${version}`,
   plugins: [
     '@semantic-release/commit-analyzer',
-    '@semantic-release/release-notes-generator',
+    '@semantic-release/release-notes-generator'
   ],
+  // Explicitly disable npm and github plugins
+  npmPublish: false,
+  verifyConditions: [
+    '@semantic-release/commit-analyzer',
+    '@semantic-release/release-notes-generator'
+  ],
+  prepare: false,
+  publish: false,
+  success: false,
+  fail: false
 };
