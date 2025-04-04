@@ -8,7 +8,7 @@ cd packages/$PACKAGE_NAME
 
 # Ensure semantic-release is installed
 if ! command -v npx &> /dev/null; then
-  echo "❌ npx not found!"
+  echo "❌ npx not found!" >&2
   exit 1
 fi
 
@@ -30,5 +30,5 @@ else
   fi
 fi
 
-# Output just the version number
-echo "${VERSION}"
+# Output just the version number once
+printf "%s" "${VERSION}"
