@@ -21,3 +21,4 @@ spec:
       esoPushSecret: true
       vaultSecretStore: "vault-backend"
       vaultSecretPath: "objectstore/my_example_bucket"
+
