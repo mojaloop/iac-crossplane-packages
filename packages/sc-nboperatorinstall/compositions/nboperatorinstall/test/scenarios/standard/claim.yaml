@@ -13,6 +13,8 @@ spec:
     operatorArgoAppName: nb-op
     operatorArgoAppSourceURL: https://github.com/mojaloop/iac-modules/gitops/applications/base/netbird-operator
     operatorArgoAppSourceRevision: "feat/np-op-install"
+    localAccessTokenSecretName: localsecret
+    localAccessTokenSecretNamespace: localsecretns
   providerConfigsRef:
     netbirdProviderConfigName: "netbird-provider-config"
     ccK8sProviderName: "cc-kubernetes-provider"

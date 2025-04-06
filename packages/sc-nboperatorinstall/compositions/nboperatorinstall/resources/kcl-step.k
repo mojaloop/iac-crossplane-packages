@@ -45,11 +45,15 @@ _sc_access_token = {
   spec = {
     forProvider = {
       name = "{}-access-token".format(parameters.serviceUserName)
-      user_name: ocds["sc-service-user"]?.Resource?.status?.atProvider?.name
+      user_name: ocds["sc-service-user"]?.Resource?.status?.atProvider?.name or ""
       expires_in: parameters.accessTokenExpiresInDays
     }
     providerConfigRef = {
       name = spec?.providerConfigsRef?.netbirdProviderConfigName
+    }
+    writeConnectionSecretToRef = {
+      name = parameters.localAccessTokenSecretName
+      namespace = parameters.localAccessTokenSecretNamespace
     }
     managementPolicies = spec?.managementPolicies
   }
@@ -65,8 +69,8 @@ _access_token_secret_copy = {
         parameters = {
             objectType = "Secret"
             source = {
-                name = ocds["sc-access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.name
-                namespace = ocds["sc-access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.namespace
+                name = ocds["sc-access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.name or ""
+                namespace = ocds["sc-access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.namespace or ""
             }
             destination = {
                 name = "nb-operator-api-key"
