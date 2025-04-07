@@ -40,8 +40,8 @@ if parameters?.objectStoreProvider == "ceph":
     }
 if parameters?.objectStoreProvider == "s3":
     _s3Bucket = {
-      apiVersion = "mojaloop.io/v1alpha1"
-      kind = "S3Bucket"
+      apiVersion = "objectstore.mojaloop.io/v1alpha1"
+      kind = "XS3Bucket"
       metadata = {
         name        = parameters?.bucketName
       }
