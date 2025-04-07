@@ -21,6 +21,25 @@ spec:
           spec:
             type: object
             properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
               parameters:
                 type: object
                 properties:
