@@ -3,6 +3,8 @@ kind: XS3Bucket
 metadata:
   name: test-bucket101
 spec:
+  managementPolicies:
+    - "*"
   parameters:
     bucketName: "test-bucket101"
     bucketRegion: "eu-west-1"
