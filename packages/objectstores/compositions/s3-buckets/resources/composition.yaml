@@ -24,6 +24,9 @@ spec:
         - fromFieldPath: spec.parameters.providerConfigName
           toFieldPath: spec.providerConfigRef.name
           type: FromCompositeFieldPath
+        - fromFieldPath: spec.managementPolicies
+          toFieldPath: spec.managementPolicies
+          type: FromCompositeFieldPath
       resources:
       - base:
           apiVersion: s3.aws.upbound.io/v1beta1
@@ -212,6 +215,8 @@ spec:
             - fromFieldPath: status.bucketARN
           toFieldPath: spec.forProvider.policy
           type: CombineFromComposite
+          policy:
+            fromFieldPath: Required
       - base:
           apiVersion: iam.aws.upbound.io/v1beta1
           kind: User
