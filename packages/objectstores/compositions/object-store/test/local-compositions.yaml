@@ -1,2 +1,3 @@
 compositionFolders:
 - ceph-buckets
+- s3-buckets
