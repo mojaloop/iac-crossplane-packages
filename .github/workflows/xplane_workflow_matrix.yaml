@@ -18,28 +18,49 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 🔍 Check Commit Message
+      - name: 🔍 Check Commit Messages
         run: |
-          # Get the commit message
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-
-          # Check if it's a merge commit
-          if [[ $COMMIT_MSG == "Merge"* ]]; then
-            echo "Merge commit detected, skipping conventional commit check"
-            exit 0
+          # Get all commits in the PR/branch
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            COMMITS=$(git log --format=%B ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+          else
+            # For push events, check the pushed commits
+            COMMITS=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }})
           fi
 
           # Conventional commit regex pattern
           # Format: type(scope): description
           PATTERN='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9-]+\))?: .+'
 
-          if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
-            echo "Error: Commit message does not follow conventional commit format"
-            echo "Expected format: type(scope): description"
-            echo "Actual message: $COMMIT_MSG"
+          # Flag to track if any non-compliant commits were found
+          FOUND_BAD_COMMIT=0
+
+          while IFS= read -r COMMIT_MSG; do
+            # Skip empty lines
+            if [ -z "$COMMIT_MSG" ]; then
+              continue
+            fi
+
+            # Check if it's a merge commit
+            if [[ $COMMIT_MSG == "Merge"* ]]; then
+              echo "Merge commit detected, skipping: $COMMIT_MSG"
+              continue
+            fi
+
+            if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
+              echo "❌ Error: Found commit that doesn't follow conventional format:"
+              echo "   $COMMIT_MSG"
+              echo "   Expected format: type(scope): description"
+              FOUND_BAD_COMMIT=1
+            else
+              echo "✅ Valid commit message: $COMMIT_MSG"
+            fi
+          done <<< "$COMMITS"
+
+          if [ $FOUND_BAD_COMMIT -eq 1 ]; then
             exit 1
           fi
-          echo "Commit message follows conventional format"
+          echo "All commit messages follow conventional format"
 
   detect-changes:
     name: 🔍 Detect Changed Packages
