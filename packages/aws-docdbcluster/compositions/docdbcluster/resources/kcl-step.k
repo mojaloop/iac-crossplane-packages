@@ -43,6 +43,7 @@ if parameters?.dbType == "documentdb":
                 securityGroupIdSelector = { matchControllerRef = True }
                 toPort = parameters?.documentdb?.port
                 type = "ingress"
+                cidrBlock = parameters?.documentdb?.vpcCidr
             }
             providerConfigRef = {
                 name = spec?.providerConfigsRef?.awsProviderConfigName
