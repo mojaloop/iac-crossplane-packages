@@ -9,8 +9,41 @@ on:
       - 'main'
 
 jobs:
+  check-commit:
+    name: 📝 Check Commit Message
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📅 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Check Commit Message
+        run: |
+          # Get the commit message
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+
+          # Check if it's a merge commit
+          if [[ $COMMIT_MSG == "Merge"* ]]; then
+            echo "Merge commit detected, skipping conventional commit check"
+            exit 0
+          fi
+
+          # Conventional commit regex pattern
+          # Format: type(scope): description
+          PATTERN='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9-]+\))?: .+'
+
+          if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
+            echo "Error: Commit message does not follow conventional commit format"
+            echo "Expected format: type(scope): description"
+            echo "Actual message: $COMMIT_MSG"
+            exit 1
+          fi
+          echo "Commit message follows conventional format"
+
   detect-changes:
     name: 🔍 Detect Changed Packages
+    needs: check-commit
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
