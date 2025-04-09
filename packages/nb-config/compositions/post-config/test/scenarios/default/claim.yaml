@@ -1,0 +1,26 @@
+apiVersion: nb.infitx.org/v1alpha1
+kind: XPostConfig
+metadata:
+  name: example-post-config
+  namespace: testa
+spec:
+  parameters:
+    ccClusterName: "cc-cluster-name"
+    environments:
+      - "dev"
+      - "qa"
+      - "prod"
+    setupKey:
+      name: "setup-key-name"
+      namespace: "setup-key-namespace"
+      gwSetupKeySecretKey: "gw-setup-key-secret-key"
+      buildSetupKeySecretKey: "build-setup-key-secret-key"
+    zitadelProjectId: 123455
+    groupNames:
+      admin: techops-admin
+      externalAccess: techops-users
+  providerConfigsRef:
+    netbirdProviderConfigName: "netbird-provider-config"
+    k8sProviderConfigName: "kubernetes-provider"
+  managementPolicies:
+    - "*"
