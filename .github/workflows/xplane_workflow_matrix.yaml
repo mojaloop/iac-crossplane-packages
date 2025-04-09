@@ -41,8 +41,8 @@ jobs:
               continue
             fi
 
-            # Check if it's a merge commit
-            if [[ $COMMIT_MSG == "Merge"* ]]; then
+            # Check if it's a merge commit (any message starting with "Merge")
+            if [[ $COMMIT_MSG =~ ^Merge ]]; then
               echo "Merge commit detected, skipping: $COMMIT_MSG"
               continue
             fi
