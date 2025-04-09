@@ -67,6 +67,13 @@ Both commands support additional parameters:
 - `EXTRA_RENDER_ARGS`: Additional template processing parameters
 - `EXTRA_VALIDATE_ARGS`: Additional validation parameters
 
+#### Commit and Branch Conventions
+
+This project follows strict commit message and branch naming conventions:
+
+##### Commit Messages
+We use [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages. Each commit message must be structured as follows:
+
 #### Versioning
 
 Each package in this repository follows semantic versioning (SemVer) with package-specific version tracking. The versioning system:
@@ -99,3 +106,4 @@ Release process:
 ## License
 
 This project is licensed under [LICENSE](LICENSE.md) - see the LICENSE file for details.
+

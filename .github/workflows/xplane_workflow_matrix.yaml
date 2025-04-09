@@ -9,8 +9,62 @@ on:
       - 'main'
 
 jobs:
+  check-commit:
+    name: 📝 Check Commit Message
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📅 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Check Commit Messages
+        run: |
+          # Get all commits in the PR/branch
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            COMMITS=$(git log --format=%B ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+          else
+            # For push events, check the pushed commits
+            COMMITS=$(git log --format=%B ${{ github.event.before }}..${{ github.event.after }})
+          fi
+
+          # Conventional commit regex pattern
+          # Format: type(scope): description
+          PATTERN='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9-]+\))?: .+'
+
+          # Flag to track if any non-compliant commits were found
+          FOUND_BAD_COMMIT=0
+
+          while IFS= read -r COMMIT_MSG; do
+            # Skip empty lines
+            if [ -z "$COMMIT_MSG" ]; then
+              continue
+            fi
+
+            # Check if it's a merge commit
+            if [[ $COMMIT_MSG == "Merge"* ]]; then
+              echo "Merge commit detected, skipping: $COMMIT_MSG"
+              continue
+            fi
+
+            if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
+              echo "❌ Error: Found commit that doesn't follow conventional format:"
+              echo "   $COMMIT_MSG"
+              echo "   Expected format: type(scope): description"
+              FOUND_BAD_COMMIT=1
+            else
+              echo "✅ Valid commit message: $COMMIT_MSG"
+            fi
+          done <<< "$COMMITS"
+
+          if [ $FOUND_BAD_COMMIT -eq 1 ]; then
+            exit 1
+          fi
+          echo "All commit messages follow conventional format"
+
   detect-changes:
     name: 🔍 Detect Changed Packages
+    needs: check-commit
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
