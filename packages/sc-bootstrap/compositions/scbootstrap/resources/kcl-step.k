@@ -388,7 +388,7 @@ _daemonSet = {
                 }
             }
         }
-        watch = True
+        #watch = True
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
             name = spec?.providerConfigsRef?.scK8sProviderName
