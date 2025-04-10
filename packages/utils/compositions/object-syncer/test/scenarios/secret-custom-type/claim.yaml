@@ -1,0 +1,20 @@
+apiVersion: utils.mojaloop.io/v1alpha1
+kind: XObjectSyncer
+metadata:
+  name: example-secret-syncer-claim
+  namespace: testa
+spec:
+  parameters:
+    objectType: Secret
+    source:
+      namespace: testa
+      name: example-secret
+    destination:
+      namespace: testb
+      name: example-secret
+      secretType: kubernetes.io/dockerconfigjson
+  providerConfigsRef:
+    sourceK8sProviderName: kubernetes-provider
+    destinationK8sProviderName: kubernetes-provider
+  managementPolicies:
+    - "*"

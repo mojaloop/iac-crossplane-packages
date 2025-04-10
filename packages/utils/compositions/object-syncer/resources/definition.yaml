@@ -106,3 +106,14 @@ spec:
                         type: string
                         description: |-
                           Name of the secret to sync to destination cluster.
+                      secretType:
+                        type: string
+                        description: |-
+                          Type of the secret to sync to destination cluster.
+                        enum:
+                          - Opaque
+                          - kubernetes.io/dockercfg
+                          - kubernetes.io/dockerconfigjson
+                          - kubernetes.io/tls
+
+

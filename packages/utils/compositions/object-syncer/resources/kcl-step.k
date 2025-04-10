@@ -26,7 +26,7 @@ if parameters?.objectType == "Secret":
         }
         # Get data and type from the source secret's status
         data = ocds["source-object"]?.Resource?.status?.atProvider?.manifest?.data
-        type = ocds["source-object"]?.Resource?.status?.atProvider?.manifest?.type
+        type = parameters?.destination?.secretType if parameters?.destination?.secretType else ocds["source-object"]?.Resource?.status?.atProvider?.manifest?.type
     }
 else:
     _sourceObjectManifest = {
