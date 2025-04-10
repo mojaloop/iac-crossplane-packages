@@ -106,12 +106,6 @@ spec:
                     operatorKubeapiGroup:
                       type: string
                       description: group name to give access to kubeapi
-                    netbirdProjectIdSecretName:
+                    operatorClusterName:
                       type: string
-                      description: secret name to fetch netbird prooject id
-                    netbirdProjectIdSecretNamespace:
-                      type: string
-                      description: secret namespace to fetch netbird prooject id
-                    netbirdProjectIdSecretKey:
-                      type: string
-                      description: secret key to fetch netbird prooject id
+                      description: cluster name for nb operator
