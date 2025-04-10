@@ -401,7 +401,10 @@ _argocdHelmChart = {
     apiVersion = "helm.crossplane.io/v1beta1"
     kind = "Release"
     metadata = {
-        name = "wordpress-example"
+        name = "{}-argocd".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "argocd-helm-chart"
+        }
     }
     spec = {
         forProvider = {
