@@ -47,12 +47,7 @@ spec:
                   The name of the provider config to use for the remote and local k8s providers.
                 required:
                   - scK8sProviderName
-                  - ccK8sProviderName
                 properties:
-                  ccK8sProviderName:
-                    type: string
-                    description: |-
-                      The name of the provider config to use for the local k8s provider.
                   scK8sProviderName:
                     type: string
                     description: |-
