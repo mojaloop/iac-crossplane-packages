@@ -7,6 +7,7 @@ parameters = spec.parameters
 # Initialize the items list
 _items = []
 
+
 # SC NB Service User
 _sc_service_user = {
   apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
