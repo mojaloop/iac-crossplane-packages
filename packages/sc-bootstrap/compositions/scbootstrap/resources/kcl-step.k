@@ -406,19 +406,12 @@ _argocdHelmChart = {
     spec = {
         forProvider = {
             chart = {
-                name = ""
-                repository = ""
+                name = "argo-cd"
+                repository = "https://argoproj.github.io/argo-helm"
                 version = parameters?.argocd?.application?.chartVersion
             }
             namespace = "argocd"
-            set = [
-                {name = "param1", value = "value2"}
-            ]
-            values = {
-                service = {
-                    type = "ClusterIP"
-                }
-            }
+            values = {}
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {

@@ -67,7 +67,7 @@ spec:
                     properties:
                       chartVersion:
                         type: string
-                        default: "7.8.23"
+                        default: "7.6.12"
                         description: |-
                           The version of the chart to deploy.
                       application:
