@@ -7,7 +7,6 @@ parameters = spec.parameters
 # Initialize the items list
 _items = []
 
-
 # SC NB Service User
 _sc_service_user = {
   apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
@@ -86,6 +85,35 @@ _access_token_secret_copy = {
     }
 }
 
+
+_sc_netbird_project_id_secret_fetch = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-netbird_project_id_secret_fetch".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "netbird_project_id_secret_fetch"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+              apiVersion = "v1"
+              kind = "Secret"
+              metadata = {
+                  name = parameters.netbirdProjectIdSecretName
+                  namespace = parameters.netbirdProjectIdSecretNamespace
+              }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.ccK8sProviderName
+        }
+    }
+}
+_nb_project_id = ocds["sc-argocd-operator-app-install"]?.Resource?.status?.atProvider?.manifest?.data?[parameters.operatorKubeapiGroup] or "123"
+_group_name = "{}:{}".format(_nb_project_id, parameters.operatorKubeapiGroup)
 _sc_argocd_operator_app_install = {
   apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
@@ -160,7 +188,7 @@ _sc_argocd_operator_app_install = {
                   },
                   {
                     name = "netbird_operator_kubeapi_group"
-                    value = parameters.operatorKubeapiGroup
+                    value = _group_name
                   }
                 ]
               }
