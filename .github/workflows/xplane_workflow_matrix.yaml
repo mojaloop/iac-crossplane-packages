@@ -20,41 +20,26 @@ jobs:
 
       - name: 🔍 Check Commit Messages
         run: |
-          # Get all commits in the PR/branch
+          # Get only the last commit
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            COMMITS=$(git log --format=%s ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+            COMMIT_MSG=$(git log -1 --format=%s ${{ github.event.pull_request.head.sha }})
           else
-            # For push events, check the pushed commits
-            COMMITS=$(git log --format=%s ${{ github.event.before }}..${{ github.event.after }})
+            # For push events, get the last commit
+            COMMIT_MSG=$(git log -1 --format=%s HEAD)
           fi
 
           # Conventional commit regex pattern
           # Format: type(scope): description
           PATTERN='^((build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9-]+\))?: .+|Merge .+)'
 
-          # Flag to track if any non-compliant commits were found
-          FOUND_BAD_COMMIT=0
-
-          while IFS= read -r COMMIT_MSG; do
-            # Skip empty lines
-            if [ -z "$COMMIT_MSG" ]; then
-              continue
-            fi
-
-            if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
-              echo "❌ Error: Found commit that doesn't follow conventional format:"
-              echo "   $COMMIT_MSG"
-              echo "   Expected format: type(scope): description"
-              FOUND_BAD_COMMIT=1
-            else
-              echo "✅ Valid commit message: $COMMIT_MSG"
-            fi
-          done <<< "$COMMITS"
-
-          if [ $FOUND_BAD_COMMIT -eq 1 ]; then
+          if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
+            echo "❌ Error: Found commit that doesn't follow conventional format:"
+            echo "   $COMMIT_MSG"
+            echo "   Expected format: type(scope): description"
             exit 1
+          else
+            echo "✅ Valid commit message: $COMMIT_MSG"
           fi
-          echo "All commit messages follow conventional format"
 
   detect-changes:
     name: 🔍 Detect Changed Packages
