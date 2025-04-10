@@ -4,11 +4,27 @@ ocds = option("params").ocds
 
 spec = oxr.spec
 parameters = spec.parameters
+
+# Method to check if the resource is ready
+ready = lambda o: any, statusPath = "atProvider" -> bool {
+    status = o?.Resource?.status
+    objstatus = status?.conditions or []
+    len(objstatus) > 0 and all_true([c.status == "True" for c in objstatus]) and status and statusPath in status
+}
+
+# Method to check if daemonset is ready
+daemonsetReady = lambda o: any -> bool {
+    status = o?.Resource?.status?.atProvider?.manifest?.status
+    if not status:
+        False
+    status?.numberAvailable == status?.desiredNumberScheduled and (status?.numberAvailable or 0) > 0
+}
+
 # Initialize the items list
 _items = []
 ## Adding resources
 #Weave CNI Install
-_ServiceAccount = {
+_serviceAccount = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
@@ -33,12 +49,12 @@ _ServiceAccount = {
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
-            name = spec.providerConfigsRef.scK8sProviderName
+            name = spec?.providerConfigsRef?.scK8sProviderName
         }
     }
 }
 
-_ClusterRole = {
+_clusterRole = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
@@ -89,7 +105,7 @@ _ClusterRole = {
     }
 }
 
-_ClusterRoleBinding = {
+_clusterRoleBinding = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
@@ -125,12 +141,12 @@ _ClusterRoleBinding = {
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
-            name = spec.providerConfigsRef.scK8sProviderName
+            name = spec?.providerConfigsRef?.scK8sProviderName
         }
     }
 }
 
-_Role = {
+_role = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
@@ -168,12 +184,12 @@ _Role = {
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
-            name = spec.providerConfigsRef.scK8sProviderName
+            name = spec?.providerConfigsRef?.scK8sProviderName
         }
     }
 }
 
-_RoleBinding = {
+_roleBinding = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
@@ -210,12 +226,12 @@ _RoleBinding = {
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
-            name = spec.providerConfigsRef.scK8sProviderName
+            name = spec?.providerConfigsRef?.scK8sProviderName
         }
     }
 }
 
-_DaemonSet = {
+_daemonSet = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
@@ -367,12 +383,45 @@ _DaemonSet = {
                 }
             }
         }
+        watch = True
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
-            name = spec.providerConfigsRef.scK8sProviderName
+            name = spec?.providerConfigsRef?.scK8sProviderName
         }
     }
 }
+
+# ArgoCD Helm Chart install
+_argocdHelmChart = {
+    apiVersion = "helm.crossplane.io/v1beta1"
+    kind = "Release"
+    metadata = {
+        name = "wordpress-example"
+    }
+    spec = {
+        forProvider = {
+            chart = {
+                name = ""
+                repository = ""
+                version = parameters?.argocd?.application?.chartVersion
+            }
+            namespace = "argocd"
+            set = [
+                {name = "param1", value = "value2"}
+            ]
+            values = {
+                service = {
+                    type = "ClusterIP"
+                }
+            }
+        }
+    }
+    managementPolicies = spec.managementPolicies
+    providerConfigRef = {
+        name = spec?.providerConfigsRef?.scHelmProviderName
+    }
+}
+
 # ArgoCD Root application install
 _Application = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -419,39 +468,40 @@ _Application = {
                     }
                     sources = [
                         {
-                            path = "gitops/argo-apps/overlays/local/storage-cluster"
-                            repoURL = "https://github.com//mojaloop/iac-modules.git"
-                            targetRevision = parameters?.argoSourceBranch
+                            path = parameters?.argocd?.application?.source?.path
+                            repoURL = parameters?.argocd?.application?.source?.repoURL
+                            targetRevision = parameters?.argocd?.application?.source?.targetRevision
                             plugin = {
                                 name = "envsubstappofapp"
-                                env = [
-                                    # TODO take long list on enfvars as param
-                                    {}
-                                ]
+                                env = parameters?.argocd?.application?.source?.envVars
                             }
                         }
                     ]
                 }
             }
         }
-        #  name = "cluster_name"
-        #  value = "ccinfra"
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
-            name = spec.providerConfigsRef.scK8sProviderName
+            name = spec?.providerConfigsRef?.scK8sProviderName
         }
     }
 }
 
 _items += [
-    _ServiceAccount
-    _ClusterRole
-    _ClusterRoleBinding
-    _Role
-    _RoleBinding
-    _DaemonSet
-    _Application
+    _serviceAccount
+    _clusterRole
+    _clusterRoleBinding
+    _role
+    _roleBinding
+    _daemonSet
 ]
+
+# # Install ArgoCD only if the DaemonSet is ready
+# if daemonsetReady(_daemonSet):
+#     _items += [_argocdHelmChart, _Application]
+# TODO: Temporarily install ArgoCD anyway
+_items += [_argocdHelmChart, _Application]
+
 dxr = {
     **oxr
 }

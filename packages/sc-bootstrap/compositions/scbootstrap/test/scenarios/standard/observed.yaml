@@ -1,0 +1,12 @@
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: daemon-set
+status:
+  atProvider:
+    data:
+      status:
+        desiredNumberScheduled: 1
+        numberAvailable: 1

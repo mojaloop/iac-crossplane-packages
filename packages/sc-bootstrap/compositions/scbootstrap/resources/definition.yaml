@@ -47,11 +47,65 @@ spec:
                   The name of the provider config to use for the remote and local k8s providers.
                 required:
                   - scK8sProviderName
+                  - scHelmProviderName
                 properties:
                   scK8sProviderName:
                     type: string
                     description: |-
                       The name of the provider config to use for the remote k8s provider.
+                  scHelmProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the remote helm provider.
               parameters:
                 type: object
                 properties:
+                  argocd:
+                    type: object
+                    description: |-
+                      The ArgoCD application to deploy.
+                    properties:
+                      chartVersion:
+                        type: string
+                        description: |-
+                          The version of the chart to deploy.
+                      application:
+                        type: object
+                        description: |-
+                          The ArgoCD application to deploy.
+                        properties:
+                          source:
+                            type: object
+                            description: |-
+                              The source of the ArgoCD application.
+                            properties:
+                              repoURL:
+                                type: string
+                                default: "https://github.com/mojaloop/iac-modules.git"
+                                description: |-
+                                  The URL of the repository containing the ArgoCD application.
+                              targetRevision:
+                                type: string
+                                default: "main"
+                                description: |-
+                                  The target revision of the ArgoCD application.
+                              path:
+                                type: string
+                                default: "gitops/argo-apps/overlays/local/storage-cluster"
+                                description: |-
+                                  The path to the ArgoCD application.
+                              envVars:
+                                type: array
+                                description: |-
+                                  The environment variables to pass to the ArgoCD application.
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                      description: |-
+                                        The name of the environment variable.
+                                    value:
+                                      type: string
+                                      description: |-
+                                        The value of the environment variable.
