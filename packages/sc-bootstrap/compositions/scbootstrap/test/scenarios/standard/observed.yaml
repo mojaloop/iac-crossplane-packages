@@ -6,7 +6,7 @@ metadata:
     crossplane.io/composition-resource-name: daemon-set
 status:
   atProvider:
-    data:
+    manifest:
       status:
         desiredNumberScheduled: 1
         numberAvailable: 1

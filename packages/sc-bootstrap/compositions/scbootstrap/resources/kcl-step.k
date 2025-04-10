@@ -17,8 +17,13 @@ daemonsetReady = lambda o: any -> bool {
     status = o?.Resource?.status?.atProvider?.manifest?.status
     if not status:
         False
-    status?.numberAvailable == status?.desiredNumberScheduled and (status?.numberAvailable or 0) > 0
+    # Check if desiredNumberScheduled is same as numberAvailable
+    status?.desiredNumberScheduled == status?.numberAvailable and (status?.numberAvailable or 0) > 0
 }
+
+print(ocds["daemon-set"]?.Resource?.status?.atProvider?.manifest?.status?.desiredNumberScheduled)
+print(ocds["daemon-set"]?.Resource?.status?.atProvider?.manifest?.status?.numberAvailable)
+
 
 # Initialize the items list
 _items = []
@@ -415,10 +420,10 @@ _argocdHelmChart = {
                 }
             }
         }
-    }
-    managementPolicies = spec.managementPolicies
-    providerConfigRef = {
-        name = spec?.providerConfigsRef?.scHelmProviderName
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.scHelmProviderName
+        }
     }
 }
 
@@ -497,10 +502,8 @@ _items += [
 ]
 
 # # Install ArgoCD only if the DaemonSet is ready
-# if daemonsetReady(_daemonSet):
-#     _items += [_argocdHelmChart, _Application]
-# TODO: Temporarily install ArgoCD anyway
-_items += [_argocdHelmChart, _Application]
+if daemonsetReady(ocds["daemon-set"]):
+    _items += [_argocdHelmChart, _Application]
 
 dxr = {
     **oxr
