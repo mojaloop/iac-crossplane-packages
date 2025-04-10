@@ -101,7 +101,7 @@ _sc_argocd_operator_app_install = {
           kind = "Application"
           metadata = {
               name = parameters.operatorArgoAppName
-              namespace = parameters.operatorNamespace
+              namespace = "argocd"
           }
           finalizers = ["resources-finalizer.argocd.argoproj.io"]
           spec = {
