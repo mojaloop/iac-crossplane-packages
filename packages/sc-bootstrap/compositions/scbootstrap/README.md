@@ -1,4 +1,4 @@
-# Postgres Cluster Composition
+# Storage Cluster Bootstrap Composition
 
 TBD
 
@@ -6,7 +6,7 @@ TBD
 
 The following test scenarios demonstrate common use cases:
 
-1. [Standard Postgres Cluster](test/scenarios/standard/claim.yaml)
+1. [Standard Storage Cluster Bootstrap](test/scenarios/standard/claim.yaml)
 
 ## Configuration
 
