@@ -7,7 +7,6 @@ parameters = spec.parameters
 # Initialize the items list
 _items = []
 ## Adding resources
-
 #Weave CNI Install
 _ServiceAccount = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -274,7 +273,7 @@ _DaemonSet = {
                                     name = "weave"
                                     command = ["/home/weave/launch.sh"]
                                     env = [
-                                        {name = "INIT_CONTAINER", value = "true"}
+                                        {name = "INIT_CONTAINER", value = "True"}
                                         {
                                             name = "HOSTNAME"
                                             valueFrom = {
@@ -333,11 +332,11 @@ _DaemonSet = {
                                         privileged = True
                                     }
                                     volumeMounts = [
-                                        {name = "xtables-lock", mountPath = "/run/xtables.lock", readOnly =False}
+                                        {name = "xtables-lock", mountPath = "/run/xtables.lock", readOnly = False}
                                     ]
                                 }
                             ]
-                            hostNetwork =True
+                            hostNetwork = True
                             dnsPolicy = "ClusterFirstWithHostNet"
                             hostPID = False
                             restartPolicy = "Always"
@@ -374,8 +373,85 @@ _DaemonSet = {
         }
     }
 }
+# ArgoCD Root application install
+_Application = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-app".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "root-application"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "argoproj.io/v1alpha1"
+                kind = "Application"
+                metadata = {
+                    name = "root-deployer"
+                    namespace = "argocd"
+                }
+                spec = {
+                    destination = {
+                        namespace = "argocd"
+                        server = "https://kubernetes.default.svc"
+                    }
+                    project = "default"
+                    syncPolicy = {
+                        automated = {
+                            prune = True
+                            selfHeal = True
+                        }
+                        retry = {
+                            backoff = {
+                                duration = "10s"
+                                factor = 2
+                                maxDuration = "1m0s"
+                            }
+                            limit = 60
+                        }
+                        syncOptions = [
+                            "CreateNamespace=True"
+                            "PrunePropagationPolicy=foreground"
+                            "PruneLast=True"
+                        ]
+                    }
+                    sources = [
+                        {
+                            path = "gitops/argo-apps/overlays/local/storage-cluster"
+                            repoURL = "https://github.com//mojaloop/iac-modules.git"
+                            targetRevision = parameters?.argoSourceBranch
+                            plugin = {
+                                name = "envsubstappofapp"
+                                env = [
+                                    # TODO take long list on enfvars as param
+                                    {}
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        #  name = "cluster_name"
+        #  value = "ccinfra"
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.scK8sProviderName
+        }
+    }
+}
 
-_items += [_ServiceAccount, _ClusterRole, _ClusterRoleBinding, _Role, _RoleBinding, _DaemonSet]
+_items += [
+    _ServiceAccount
+    _ClusterRole
+    _ClusterRoleBinding
+    _Role
+    _RoleBinding
+    _DaemonSet
+    _Application
+]
 dxr = {
     **oxr
 }
