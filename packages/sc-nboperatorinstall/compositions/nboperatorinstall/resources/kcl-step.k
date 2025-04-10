@@ -75,6 +75,7 @@ _access_token_secret_copy = {
             destination = {
                 name = "nb-operator-api-key"
                 namespace = parameters.operatorNamespace
+                secretType = "Opaque"
             }
         }
         providerConfigsRef = {
@@ -156,6 +157,10 @@ _sc_argocd_operator_app_install = {
                   {
                     name = "netbird_operator_app_name"
                     value = parameters.operatorArgoAppName
+                  },
+                  {
+                    name = "netbird_operator_kubeapi_group"
+                    value = parameters.operatorKubeapiGroup
                   }
                 ]
               }

@@ -103,3 +103,6 @@ spec:
                     localAccessTokenSecretNamespace:
                       type: string
                       description: Local Namespace of secret to store accesstoken
+                    operatorKubeapiGroup:
+                      type: string
+                      description: group name to give access to kubeapi
