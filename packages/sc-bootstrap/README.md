@@ -1,4 +1,3 @@
-# Storage Cluster Postgres Cluster Package
+# Storage Cluster Bootstrap Package
 
-[PGCluster Composition](compositions/pgcluster/README.md)
-
+[SCBootstrap Composition](compositions/scbootstrap/README.md)
