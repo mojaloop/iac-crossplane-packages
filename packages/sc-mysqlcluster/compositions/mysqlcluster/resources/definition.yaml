@@ -105,12 +105,19 @@ spec:
                             type: number
                             description: Number of PXC replicas
                             default: 1
-                          requests:
+                          resources:
                             type: object
-                            description: the resources requests for pxc
-                          limit:
-                            type: object
-                            description: the resources limit for pxc
+                            description: The resources for pxc
+                            properties:
+                              requests:
+                                type: object
+                                description: the resources requests for pxc
+                              limit:
+                                type: object
+                                description: the resources limit for pxc
+                          configuration:
+                            type: string
+                            description: Configuration for PXC
                       haproxy:
                         type: object
                         properties:
@@ -121,24 +128,32 @@ spec:
                           imageVersion:
                             type: string
                             description: HAProxy image version
-                          requests:
+                          resources:
                             type: object
-                            description: the resources requests for haproxy
-                          limit:
-                            type: object
-                            description: the resources limit for haproxy
+                            description: The resources for haproxy
+                            properties:
+                              requests:
+                                type: object
+                                description: the resources requests for haproxy
+                              limit:
+                                type: object
+                                description: the resources limit for haproxy
                       logcollector:
                         type: object
                         properties:
                           imageVersion:
                             type: string
                             description: LogCollector image version
-                          requests:
+                          resources:
                             type: object
-                            description: The resources requests for logcollector
-                          limit:
-                            type: object
-                            description: The resources limit for logcollector
+                            description: The resources for LogCollector
+                            properties:
+                              requests:
+                                type: object
+                                description: the resources requests for LogCollector
+                              limit:
+                                type: object
+                                description: the resources limit for LogCollector
                       backup:
                         type: object
                         properties:
