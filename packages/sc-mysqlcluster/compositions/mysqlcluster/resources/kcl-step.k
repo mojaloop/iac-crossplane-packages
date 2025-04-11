@@ -147,7 +147,7 @@ if parameters?.consumerClusterType == "controlcenter":
                         ports = [
                             {
                                 name = "pgbouncer"
-                                port = 5432
+                                port = 3306
                                 protocol = "TCP"
                                 targetPort = "pgbouncer"
                             }
@@ -191,9 +191,9 @@ if parameters?.consumerClusterType == "controlcenter":
                         clusterIP = "None"
                         ports = [
                             {
-                                port: 5432
+                                port: 3306
                                 protocol: "TCP"
-                                targetPort: 5432
+                                targetPort: 3306
                             }
                         ]
                     }
@@ -231,9 +231,9 @@ if parameters?.consumerClusterType == "controlcenter":
                             ]
                             ports: [
                                 {
-                                    port: 5432
+                                    port: 3306
                                     protocol: "TCP"
-                                    targetPort: 5432
+                                    targetPort: 3306
                                 }
                             ]
                         }
