@@ -9,6 +9,7 @@ This project provides a collection of Crossplane composition packages designed t
 ## Packages
 
 - [Utils](packages/utils/README.md) - Common utility compositions
+- [Storage Cluster Bootstrap](packages/sc-bootstrap/README.md) - Storage Cluster Bootstrap composition
 - [Storage Cluster Postgres Cluster](packages/sc-pgcluster/README.md) - Storage Cluster Postgres Cluster composition
 - [AWS DocDbCluster](packages/aws-docdbcluster/README.md) - Storage Cluster Postgres Cluster composition
 - Additional packages coming soon...
@@ -107,3 +108,41 @@ Release process:
 
 This project is licensed under [LICENSE](LICENSE.md) - see the LICENSE file for details.
 
+### Debugging and Troubleshooting
+
+#### Debugging KCL Functions
+
+To debug KCL functions in your compositions, follow these steps:
+
+1. Clone and run the function-kcl locally:
+```bash
+# Clone the function-kcl repository
+git clone https://github.com/crossplane-contrib/function-kcl.git
+cd function-kcl
+
+# Run the function locally in debug mode
+go run . --insecure --debug
+```
+
+2. In your `functions.yaml`, ensure you're using the development runtime annotation:
+```yaml
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: function-kcl
+  annotations:
+    render.crossplane.io/runtime: Development
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/function-kcl:latest
+```
+
+3. In another terminal, validate your composition using the make command:
+```bash
+make validate PACKAGE_NAME=<package> COMPOSITION_NAME=<composition>
+```
+
+This will:
+- Process and render your composition templates
+- Set up a validation environment
+- Connect to your locally running function-kcl
+- Display detailed validation results
