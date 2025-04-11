@@ -55,9 +55,11 @@ _MysqlCluster = {
                             }
 
                             resources = {
-                                requests = parameters?.mysql?.resources?.pxc?.requests
-                                limit  = parameters?.mysql?.resources?.pxc?.limit
+                                requests = parameters?.mysql?.pxc?.resources?.requests
+                                limit  = parameters?.mysql?.pxc?.resources?.limit
                             }
+
+                            configuration = parameters?.mysql?.pxc?.configuration
                         }
                     haproxy = {
                         enabled = True
@@ -71,16 +73,16 @@ _MysqlCluster = {
                         }
                         gracePeriod = 30
                         resources = {
-                            requests = parameters?.mysql?.resources?.haproxy?.requests
-                            limit  = parameters?.mysql?.resources?.haproxy?.limit
+                            requests = parameters?.mysql?.haproxy?.resources?.requests
+                            limit  = parameters?.mysql?.haproxy?.resources?.limit
                         }
                     }
                     logcollector = {
                         enabled = True
                         image = "percona/percona-xtradb-cluster-operator:{}".format(parameters?.mysql?.logcollector?.imageVersion)
                         resources = {
-                            requests = parameters?.mysql?.resources?.logcollector?.requests
-                            limit  = parameters?.mysql?.resources?.logcollector?.limit
+                            requests = parameters?.mysql?.logcollector?.resources?.requests
+                            limit  = parameters?.mysql?.logcollector?.resources?.limit
                         }
                     }
                     backup = {
