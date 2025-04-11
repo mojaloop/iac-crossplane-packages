@@ -42,6 +42,7 @@ spec:
           wsrep_auto_increment_control=OFF
       haproxy:
         imageVersion: "2.8.11" #example
+        expose: false
         replicas: 2
         resources:
           requests:
