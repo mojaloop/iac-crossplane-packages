@@ -77,6 +77,9 @@ _MysqlCluster = {
                         podDisruptionBudget = {
                             maxUnavailable = 1
                         }
+                        exposePrimary = {
+                            enabled = True
+                        }
                         gracePeriod = 30
                         resources = {
                             requests = {
