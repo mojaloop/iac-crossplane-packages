@@ -7,10 +7,10 @@ parameters = spec.parameters
 # Initialize the items list
 _items = []
 
-secretReady = lambda o: any, statusPath = "atProvider" -> bool {
-    status = o?.Resource?.status
-    objstatus = status?.conditions or []
-    len(objstatus) > 0 and all_true([c.status == "True" for c in objstatus]) and status and statusPath in status
+ready = lambda o: any, statusPath = "atProvider" -> bool {
+  status = o?.Resource?.status
+  objstatus = status?.conditions or []
+  len(objstatus) > 0 and all_true([c.status == "True" for c in objstatus]) and status and statusPath in status
 }
 
 # SC NB Service User
@@ -62,6 +62,32 @@ _sc_access_token = {
     }
     managementPolicies = spec?.managementPolicies
   }
+}
+
+_netbird_namespace = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-ns".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "netbird-namespace"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Namespace"
+                metadata = {
+                    name = parameters.operatorNamespace
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.scK8sProviderName
+        }
+    }
 }
 
 _access_token_secret_copy = {
@@ -205,6 +231,7 @@ _sc_argocd_operator_app_install = {
 _items += [
   _sc_service_user,
   _sc_access_token,
+  _netbird_namespace,
   _access_token_secret_copy,
   _sc_argocd_operator_app_install
 ]
@@ -214,9 +241,3 @@ dxr = {
 }
 
 items = _items + [dxr]
-
-ready = lambda o: any, statusPath = "atProvider" -> bool {
-    status = o?.Resource?.status
-    objstatus = status?.conditions or []
-    len(objstatus) > 0 and all_true([c.status == "True" for c in objstatus]) and status and statusPath in status
-}
