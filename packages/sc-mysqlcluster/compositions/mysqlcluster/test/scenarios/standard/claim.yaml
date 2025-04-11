@@ -1,0 +1,57 @@
+apiVersion: sc.mojaloop.io/v1alpha1
+kind: XMysqlCluster
+metadata:
+  name: my-mysql-cluster
+  namespace: my-namespace
+spec:
+  parameters:
+    consumerClusterType: controlcenter
+    clusterName: my-cluster
+    externalServiceName: my-cluster-service
+    appNamespace: my-app
+    mysql:
+      crVersion: "1.16.1"
+      dbSecret: my-db-secret
+      dbUsername: my-user
+      dbName: my-database
+      pxc:
+        imageVersion: "8.0.39-30.1" #example
+        storageSize: "20Gi"
+        replicas: 3
+        requests:
+          memory: 2Gi
+          cpu: "1"
+        limit:
+          memory: 4Gi
+          cpu: "2"
+      haproxy:
+        imageVersion: "2.8.11" #example
+        replicas: 2
+        requests:
+          memory: 1Gi
+          cpu: 500m
+        limit:
+          memory: 2Gi
+          cpu: "1"
+      logcollector:
+        imageVersion: "1.16.1-logcollector-fluentbit3.2.2" #example
+        requests:
+          memory: 200Mi
+          cpu: 100m
+        limit:
+          memory: 500Mi
+          cpu: 200m
+      backup:
+        imageVersion: "1.14.0" # example
+        verifyTLS: true
+        bucket: "s3-bucket-name"
+        credentialsSecret: "s3-credentials"
+        bucketRegion: "us-east-1"
+        scheduleName: "daily-backup"
+        cronScheduleExpression: "0 0 * * *"
+        backupRetention: 7
+  providerConfigsRef:
+    scK8sProviderName: sc-provider
+    ccK8sProviderName: cc-provider
+  managementPolicies:
+    - "*"
