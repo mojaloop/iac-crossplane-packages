@@ -1,0 +1,168 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xmysqlcluster.sc.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: sc.mojaloop.io
+  names:
+    kind: XMysqlCluster
+    plural: xmysqlcluster
+  claimNames:
+    kind: MysqlCluster
+    plural: mysqlcluster
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the remote and local k8s providers.
+                required:
+                  - scK8sProviderName
+                  - ccK8sProviderName
+                properties:
+                  ccK8sProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the local k8s provider.
+                  scK8sProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the remote k8s provider.
+              parameters:
+                type: object
+                properties:
+                  consumerClusterType:
+                    type: string
+                    description: Type of consumer cluster
+                    enum:
+                      - controlcenter
+                      - environment
+                  clusterName:
+                    type: string
+                    description: Name for the consumer cluster
+                  externalServiceName:
+                    type: string
+                    description: Name for the external service object created
+                  appNamespace:
+                    type: string
+                    description: Namespace for the consumer application
+                  mysql:
+                    type: object
+                    properties:
+                      crVersion:
+                        type: string
+                        description: Type of object to be synced
+                        default: "2.5.0"
+                      dbSecret:
+                        type: string
+                        description: Type of object to be synced
+                      dbUsername:
+                        type: string
+                        description: Name of the database user to be created
+                      dbName:
+                        type: string
+                        description: Name of the database to be created
+                      pxc:
+                        type: object
+                        properties:
+                          imageVersion:
+                            type: string
+                            description: PXC image version
+                          storageSize:
+                            type: string
+                            description: Size of storage requested for PXC
+                            default: 10Gi
+                          replicas:
+                            type: number
+                            description: Number of PXC replicas
+                            default: 1
+                          requests:
+                            type: object
+                            description: the resources requests for pxc
+                          limit:
+                            type: object
+                            description: the resources limit for pxc
+                      haproxy:
+                        type: object
+                        properties:
+                          replicas:
+                            type: number
+                            description: Number of HAProxy replicas
+                            default: 1
+                          imageVersion:
+                            type: string
+                            description: HAProxy image version
+                          requests:
+                            type: object
+                            description: the resources requests for haproxy
+                          limit:
+                            type: object
+                            description: the resources limit for haproxy
+                      logcollector:
+                        type: object
+                        properties:
+                          imageVersion:
+                            type: string
+                            description: LogCollector image version
+                          requests:
+                            type: object
+                            description: The resources requests for logcollector
+                          limit:
+                            type: object
+                            description: The resources limit for logcollector
+                      backup:
+                        type: object
+                        properties:
+                          imageVersion:
+                            type: string
+                            description: Backup image version.
+                          verifyTLS:
+                            type: boolean
+                            description: Verify TLS for S3.
+                          bucket:
+                            type: string
+                            description: S3 bucket name.
+                          credentialsSecret:
+                            type: string
+                            description: S3 credentials secret name.
+                          bucketRegion:
+                            type: string
+                            description: S3 bucket region.
+                          scheduleName:
+                            type: string
+                            description: Name of the backup schedule.
+                          cronScheduleExpression:
+                            type: string
+                            description: Cron expression for the backup schedule.
+                          backupRetention:
+                            type: integer
+                            description: Number of backups to retain.
