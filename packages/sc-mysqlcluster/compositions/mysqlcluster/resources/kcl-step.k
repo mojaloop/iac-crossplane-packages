@@ -55,8 +55,14 @@ _MysqlCluster = {
                             }
 
                             resources = {
-                                requests = parameters?.mysql?.pxc?.resources?.requests
-                                limit  = parameters?.mysql?.pxc?.resources?.limit
+                                requests =  {
+                                    cpu = parameters?.mysql?.pxc?.resources?.requests?.cpu
+                                    memory = parameters?.mysql?.pxc?.resources?.requests?.memory
+                                }
+                                limits = {
+                                    cpu = parameters?.mysql?.pxc?.resources?.limits?.cpu
+                                    memory = parameters?.mysql?.pxc?.resources?.limits?.memory
+                                }
                             }
 
                             configuration = parameters?.mysql?.pxc?.configuration
@@ -73,16 +79,30 @@ _MysqlCluster = {
                         }
                         gracePeriod = 30
                         resources = {
-                            requests = parameters?.mysql?.haproxy?.resources?.requests
-                            limit  = parameters?.mysql?.haproxy?.resources?.limit
+                            requests = {
+                                cpu = parameters?.mysql?.haproxy?.resources?.requests?.cpu
+                                memory = parameters?.mysql?.haproxy?.resources?.requests?.memory
+                            }
+                            limit = {
+                                cpu = parameters?.mysql?.haproxy?.resources?.limit?.cpu
+                                memory = parameters?.mysql?.haproxy?.resources?.limit?.memory
+                            }
                         }
                     }
                     logcollector = {
                         enabled = True
                         image = "percona/percona-xtradb-cluster-operator:{}".format(parameters?.mysql?.logcollector?.imageVersion)
                         resources = {
-                            requests = parameters?.mysql?.logcollector?.resources?.requests
-                            limit  = parameters?.mysql?.logcollector?.resources?.limit
+                            requests = {
+                                cpu = parameters?.mysql?.logcollector?.resources?.requests?.cpu
+                                memory = parameters?.mysql?.logcollector?.resources?.requests?.memory
+                            }
+
+                            limit = {
+                                cpu = parameters?.mysql?.logcollector?.resources?.limit?.cpu
+                                memory = parameters?.mysql?.logcollector?.resources?.limit?.memory
+                            }
+
                         }
                     }
                     backup = {
