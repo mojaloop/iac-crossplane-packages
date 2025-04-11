@@ -24,7 +24,9 @@ spec:
             properties:
               managementPolicies:
                 default:
-                  - "*"
+                  - Create
+                  - LateInitialize
+                  - Observe
                 description: |-
                   A ManagementAction represents an action that the Crossplane controllers
                   can take on an external resource.
