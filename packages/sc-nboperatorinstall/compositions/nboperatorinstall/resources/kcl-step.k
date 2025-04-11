@@ -185,10 +185,6 @@ _sc_argocd_operator_app_install = {
                     value = parameters.operatorArgoAppName
                   },
                   {
-                    name = "netbird_operator_kubeapi_group"
-                    value = ocds["sc-kubernetes-group"]?.Resource?.status?.atProvider?.name or parameters.operatorKubeapiGroup
-                  },
-                  {
                     name = "netbird_operator_cluster_name"
                     value = parameters.operatorClusterName
                   }

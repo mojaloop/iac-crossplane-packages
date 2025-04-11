@@ -15,7 +15,6 @@ spec:
     operatorArgoAppSourceRevision: "feat/np-op-install"
     localAccessTokenSecretName: localsecret
     localAccessTokenSecretNamespace: localsecretns
-    operatorKubeapiGroup: sc-kubernetes
     operatorClusterName: storage-cluster
   providerConfigsRef:
     netbirdProviderConfigName: "netbird-provider-config"
