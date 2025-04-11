@@ -78,7 +78,7 @@ _MysqlCluster = {
                             maxUnavailable = 1
                         }
                         exposePrimary = {
-                            enabled = True
+                            enabled = parameters?.mysql?.haproxy?.expose
                         }
                         gracePeriod = 30
                         resources = {

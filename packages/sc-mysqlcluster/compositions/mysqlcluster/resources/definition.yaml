@@ -142,6 +142,9 @@ spec:
                           imageVersion:
                             type: string
                             description: HAProxy image version
+                          expose:
+                            type: boolean
+                            description: Expose HAProxy service
                           resources:
                             type: object
                             description: The resources for haproxy
