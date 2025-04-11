@@ -7,10 +7,11 @@ parameters = spec.parameters
 # Initialize the items list
 _items = []
 
-ready = lambda o: any, statusPath = "atProvider" -> bool {
-  status = o?.Resource?.status
-  objstatus = status?.conditions or []
-  len(objstatus) > 0 and all_true([c.status == "True" for c in objstatus]) and status and statusPath in status
+readyBasedOnConditions = lambda o: any -> bool {
+  # Get conditions directly from status
+  conditions = o?.Resource?.status?.conditions or []
+  # Simply check if all conditions are True
+  len(conditions) > 0 and all_true([c.status == "True" for c in conditions])
 }
 
 # SC NB Service User
@@ -95,6 +96,9 @@ _access_token_secret_copy = {
     kind = "XObjectSyncer"
     metadata = {
         name = "{}-secret".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "access-token-secret"
+        }
     }
     spec = {
         parameters = {
@@ -233,8 +237,11 @@ _items += [
   _sc_access_token,
   _netbird_namespace,
   _access_token_secret_copy,
-  _sc_argocd_operator_app_install
 ]
+
+# Create Argocd Operator App if secret is ready
+if readyBasedOnConditions(ocds["access-token-secret"]):
+  _items += [_sc_argocd_operator_app_install]
 
 dxr = {
   **oxr
