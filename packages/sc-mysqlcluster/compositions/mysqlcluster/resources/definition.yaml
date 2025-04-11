@@ -112,9 +112,23 @@ spec:
                               requests:
                                 type: object
                                 description: the resources requests for pxc
+                                properties:
+                                  memory:
+                                    type: string
+                                    description: Memory request for pxc
+                                  cpu:
+                                    type: string
+                                    description: CPU request for pxc
                               limit:
                                 type: object
                                 description: the resources limit for pxc
+                                properties:
+                                  memory:
+                                    type: string
+                                    description: Memory limit for pxc
+                                  cpu:
+                                    type: string
+                                    description: CPU limit for pxc
                           configuration:
                             type: string
                             description: Configuration for PXC
@@ -135,9 +149,23 @@ spec:
                               requests:
                                 type: object
                                 description: the resources requests for haproxy
+                                properties:
+                                  memory:
+                                    type: string
+                                    description: Memory request for haproxy
+                                  cpu:
+                                    type: string
+                                    description: CPU request for haproxy
                               limit:
                                 type: object
                                 description: the resources limit for haproxy
+                                properties:
+                                  memory:
+                                    type: string
+                                    description: Memory limit for haproxy
+                                  cpu:
+                                    type: string
+                                    description: CPU limit for haproxy
                       logcollector:
                         type: object
                         properties:
@@ -151,9 +179,23 @@ spec:
                               requests:
                                 type: object
                                 description: the resources requests for LogCollector
+                                properties:
+                                  memory:
+                                    type: string
+                                    description: Memory request for LogCollector
+                                  cpu:
+                                    type: string
+                                    description: CPU request for LogCollector
                               limit:
                                 type: object
                                 description: the resources limit for LogCollector
+                                properties:
+                                  memory:
+                                    type: string
+                                    description: Memory limit for LogCollector
+                                  cpu:
+                                    type: string
+                                    description: CPU limit for LogCollector
                       backup:
                         type: object
                         properties:
