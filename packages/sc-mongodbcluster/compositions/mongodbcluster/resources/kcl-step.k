@@ -7,7 +7,7 @@ parameters = spec.parameters
 # Initialize the items list
 _items = []
 ## Adding resources
-_MysqlCluster = {
+_MongodbCluster = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
@@ -19,117 +19,118 @@ _MysqlCluster = {
     spec = {
         forProvider = {
             manifest = {
-                apiVersion = "pxc.percona.com/v1"
-                kind = "PerconaXtraDBCluster"
+                apiVersion = "psmdb.percona.com/v1"
+                kind = "PerconaServerMongoDB"
                 metadata = {
                     name = "{}-db".format(oxr.metadata.name)
                     namespace = parameters.clusterName
                 }
                 spec = {
-                    crVersion = parameters?.mysql?.crVersion
-                    allowUnsafeConfigurations = True
-                    imagePullPolicy = "IfNotPresent"
-                    pxc = {
-                            size = parameters?.mysql?.pxc?.replicas
-                            image = "percona/percona-xtradb-cluster:{}".format(parameters?.mysql?.pxc?.imageVersion)
+                    crVersion = parameters?.mongodb?.crVersion
+                    image = parameters?.mongodb?.image
+                    imagePullPolicy = parameters?.mongodb?.imagePullPolicy
+                    secrets = {
+                        users = parameters?.mongodb?.secrets?.users
+                    }
+                    replsets = [
+                        {
+                            name = "rs0"
+                            size = parameters?.mongodb?.replsets?.size
                             affinity = {
                                 antiAffinityTopologyKey = "kubernetes.io/hostname"
                             }
-                            podDisruptionBudget = {
-                               maxUnavailable = 1
+                            expose = {
+                                enabled = parameters?.mongodb?.replsets?.expose?.enabled
+                                type = parameters?.mongodb?.replsets?.expose?.type
                             }
-
-                            gracePeriod = 600
-
+                            resources = {
+                                limits = {
+                                    cpu = parameters?.mongodb?.replsets?.resources?.limits?.cpu
+                                    memory = parameters?.mongodb?.replsets?.resources?.limits?.memory
+                                }
+                                requests = {
+                                    cpu = parameters?.mongodb?.replsets?.resources?.requests?.cpu
+                                    memory = parameters?.mongodb?.replsets?.resources?.requests?.memory
+                                }
+                            }
                             volumeSpec = {
-                                accessModes = [
-                                    "ReadWriteOnce"
-                                ]
                                 persistentVolumeClaim = {
                                     resources = {
-                                        requests =  {
-                                            storage = parameters?.mysql?.pxc?.storageSize
+                                        requests = {
+                                            storage = parameters?.mongodb?.replsets?.volumeSpec?.persistentVolumeClaim?.resources?.requests?.storage
                                         }
                                     }
                                 }
                             }
-
+                        }
+                    ]
+                    sharding = {
+                        enabled = parameters?.mongodb?.sharding?.enabled
+                        configsvrReplSet = {
+                            size = parameters?.mongodb?.sharding?.configsvrReplSet?.size
+                            affinity = {
+                                antiAffinityTopologyKey = "kubernetes.io/hostname"
+                            }
                             resources = {
-                                requests =  {
-                                    cpu = parameters?.mysql?.pxc?.resources?.requests?.cpu
-                                    memory = parameters?.mysql?.pxc?.resources?.requests?.memory
-                                }
                                 limits = {
-                                    cpu = parameters?.mysql?.pxc?.resources?.limits?.cpu
-                                    memory = parameters?.mysql?.pxc?.resources?.limits?.memory
+                                    cpu = parameters?.mongodb?.sharding?.configsvrReplSet?.resources?.limits?.cpu
+                                    memory = parameters?.mongodb?.sharding?.configsvrReplSet?.resources?.limits?.memory
+                                }
+                                requests = {
+                                    cpu = parameters?.mongodb?.sharding?.configsvrReplSet?.resources?.requests?.cpu
+                                    memory = parameters?.mongodb?.sharding?.configsvrReplSet?.resources?.requests?.memory
                                 }
                             }
-
-                            configuration = parameters?.mysql?.pxc?.configuration
-                        }
-                    haproxy = {
-                        enabled = True
-                        size = parameters?.mysql?.haproxy?.replicas
-                        image = "percona/haproxy:{}".format(parameters?.mysql?.haproxy?.imageVersion)
-                        affinity = {
-                            antiAffinityTopologyKey = "kubernetes.io/hostname"
-                        }
-                        podDisruptionBudget = {
-                            maxUnavailable = 1
-                        }
-                        exposePrimary = {
-                            enabled = parameters?.mysql?.haproxy?.expose
-                        }
-                        gracePeriod = 30
-                        resources = {
-                            requests = {
-                                cpu = parameters?.mysql?.haproxy?.resources?.requests?.cpu
-                                memory = parameters?.mysql?.haproxy?.resources?.requests?.memory
+                            podDisruptionBudget = {
+                                maxUnavailable = parameters?.mongodb?.sharding?.configsvrReplSet?.podDisruptionBudget?.maxUnavailable
                             }
-                            limit = {
-                                cpu = parameters?.mysql?.haproxy?.resources?.limit?.cpu
-                                memory = parameters?.mysql?.haproxy?.resources?.limit?.memory
+                            expose = {
+                                enabled = parameters?.mongodb?.sharding?.configsvrReplSet?.expose?.enabled
+                                type = parameters?.mongodb?.sharding?.configsvrReplSet?.expose?.type
+                            }
+                            volumeSpec = {
+                                persistentVolumeClaim = {
+                                    resources = {
+                                        requests = {
+                                            storage = parameters?.mongodb?.sharding?.configsvrReplSet?.volumeSpec?.persistentVolumeClaim?.resources?.requests?.storage
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
-                    logcollector = {
-                        enabled = True
-                        image = "percona/percona-xtradb-cluster-operator:{}".format(parameters?.mysql?.logcollector?.imageVersion)
-                        resources = {
-                            requests = {
-                                cpu = parameters?.mysql?.logcollector?.resources?.requests?.cpu
-                                memory = parameters?.mysql?.logcollector?.resources?.requests?.memory
+                        mongos = {
+                            size = parameters?.mongodb?.sharding?.mongos?.size
+                            affinity = {
+                                antiAffinityTopologyKey = "kubernetes.io/hostname"
                             }
-
-                            limit = {
-                                cpu = parameters?.mysql?.logcollector?.resources?.limit?.cpu
-                                memory = parameters?.mysql?.logcollector?.resources?.limit?.memory
+                            resources = {
+                                limits = {
+                                    cpu = parameters?.mongodb?.sharding?.mongos?.resources?.limits?.cpu
+                                    memory = parameters?.mongodb?.sharding?.mongos?.resources?.limits?.memory
+                                }
+                                requests = {
+                                    cpu = parameters?.mongodb?.sharding?.mongos?.resources?.requests?.cpu
+                                    memory = parameters?.mongodb?.sharding?.mongos?.resources?.requests?.memory
+                                }
                             }
-
+                            podDisruptionBudget = {
+                                maxUnavailable = parameters?.mongodb?.sharding?.mongos?.podDisruptionBudget?.maxUnavailable
+                            }
+                            expose = {
+                                type = parameters?.mongodb?.sharding?.mongos?.expose?.type
+                            }
                         }
                     }
                     backup = {
-                    image = "percona/percona-xtradb-cluster-operator:{}".format(parameters?.mysql?.backup?.imageVersion)
-                    storages = {
-                        "s3-backup-storage" = {
-                            type = "s3"
-                            verifyTLS = parameters?.mysql?.backup?.verifyTLS
-                            s3 = {
-                                bucket = parameters?.mysql?.backup?.bucket
-                                credentialsSecret = parameters?.mysql?.backup?.credentialsSecret
-                                region = parameters?.mysql?.backup?.bucketRegion
-                            }
+                        enabled = parameters?.mongodb?.backup?.enabled
+                        image = parameters?.mongodb?.backup?.image
+                        pitr = {
+                            enabled = parameters?.mongodb?.backup?.pitr?.enabled
+                            oplogOnly = parameters?.mongodb?.backup?.pitr?.oplogOnly
+                            compressionType = parameters?.mongodb?.backup?.pitr?.compressionType
+                            compressionLevel = parameters?.mongodb?.backup?.pitr?.compressionLevel
                         }
                     }
-                    schedule = [
-                        {
-                            name = parameters?.mysql?.backup?.scheduleName
-                            schedule = parameters?.mysql?.backup?.cronScheduleExpression
-                            keep = parameters?.mysql?.backup?.backupRetention
-                            storageName = "s3-backup-storage"
-                        }
-                    ]
-                }
                 }
             }
         }
@@ -139,6 +140,7 @@ _MysqlCluster = {
         }
     }
 }
+
 
 if parameters?.consumerClusterType == "controlcenter":
     _LBService = {
@@ -169,10 +171,10 @@ if parameters?.consumerClusterType == "controlcenter":
                         ipFamilyPolicy = "SingleStack"
                         ports = [
                             {
-                                name = "haproxy"
-                                port = 3306
+                                name = "mongos"
+                                port = 2207
                                 protocol = "TCP"
-                                targetPort = "haproxy"
+                                targetPort = "mongos"
                             }
                         ]
                         selector = {
@@ -320,11 +322,11 @@ _Secret = {
         parameters = {
             objectType = "Secret"
             source = {
-                name = parameters?.mysql?.dbSecret
+                name = parameters?.mongodb?.dbSecret
                 namespace = parameters?.clusterName
             }
             destination = {
-                name = parameters?.mysql?.dbSecret
+                name = parameters?.mongodb?.dbSecret
                 namespace = parameters?.appNamespace
             }
         }
@@ -336,7 +338,7 @@ _Secret = {
     }
 }
 
-_items += [_MysqlCluster, _Secret, _LBService, _HeadlessService, _Endpoint]
+_items += [_MongodbCluster, _Secret, _LBService, _HeadlessService, _Endpoint]
 dxr = {
     **oxr
 }
