@@ -9,36 +9,33 @@ spec:
   providerConfigsRef:
       awsProviderConfigName: "aws-provider"
   parameters:
-    dbType: "rds"
-    dbName: "exampledb"
-    dbNamespace: "default"
-    rds:
-      allowMajorVersionUpgrade: false
-      applyImmediately: false
-      backupRetentionPeriod: 7
-      dbClusterInstanceClass: "db.t3.medium"
-      deletionProtection: false
-      engine: "aurora-mysql"
-      engineVersion: "8.0.mysql_aurora.3.04.0"
-      family: "aurora-mysql8.0"
-      instanceCount: 1
-      parameter:
-      - name: character_set_client
-        value: utf8mb4
-      - name: character_set_server
-        value: utf8mb4
-      passwordSecret:
-        key: "password"
-        name: "example-db-secret"
-        namespace: "default"
-      port: 3306
-      preferredBackupWindow: "02:00-04:00"
-      preferredMaintenanceWindow: "Tue:23:45-Wed:00:15"
-      region: "eu-west-1"
-      skipFinalSnapshot: true
-      finalSnapshotIdentifier: "example-rds-aurora-cluster"
-      storageEncrypted: true
-      subnets: "subnet-0fb26add714322910,subnet-044648d6e6107d293,subnet-0252e9bfa6e483fd7"
-      username: "mojaloop"
-      vpcCidr: "10.0.0.0/16"
-      vpcId: "vpc-07ff0e8c129aa5db0"
+    allowMajorVersionUpgrade: false
+    applyImmediately: false
+    backupRetentionPeriod: 7
+    databaseName: "exampledb"
+    dbClusterInstanceClass: "db.t3.medium"
+    deletionProtection: false
+    engine: "aurora-mysql"
+    engineVersion: "8.0.mysql_aurora.3.04.0"
+    family: "aurora-mysql8.0"
+    instanceCount: 1
+    parameter:
+    - name: character_set_client
+      value: utf8mb4
+    - name: character_set_server
+      value: utf8mb4
+    passwordSecret:
+      key: "password"
+      name: "example-db-secret"
+      namespace: "default"
+    port: 3306
+    preferredBackupWindow: "02:00-04:00"
+    preferredMaintenanceWindow: "Tue:23:45-Wed:00:15"
+    region: "eu-west-1"
+    skipFinalSnapshot: true
+    finalSnapshotIdentifier: "example-rds-aurora-cluster"
+    storageEncrypted: true
+    subnets: "subnet-0fb26add714322910,subnet-044648d6e6107d293,subnet-0252e9bfa6e483fd7"
+    username: "mojaloop"
+    vpcCidr: "10.0.0.0/16"
+    vpcId: "vpc-07ff0e8c129aa5db0"
