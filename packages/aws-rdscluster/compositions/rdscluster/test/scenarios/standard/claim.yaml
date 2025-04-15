@@ -38,7 +38,6 @@ spec:
       skipFinalSnapshot: true
       finalSnapshotIdentifier: "example-rds-cluster"
       storageEncrypted: true
-      storageType: "io1"
       subnets: "subnet-0fb26add714322910,subnet-044648d6e6107d293,subnet-0252e9bfa6e483fd7"
       username: "mojaloop"
       vpcCidr: "10.0.0.0/16"
