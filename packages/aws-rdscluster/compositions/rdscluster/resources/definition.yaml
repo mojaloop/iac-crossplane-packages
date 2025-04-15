@@ -160,6 +160,12 @@ spec:
                       storageType:
                         description: The type of storage
                         type: string
+                      iops:
+                        description: The number of IOPS to provision for storage
+                        type: integer
+                      allocatedStorage:
+                        description: The amount of storage to allocate in GB
+                        type: integer
                       subnets:
                         description: The comma seperated list of subnet-ids to create the subnetgroup
                         type: string

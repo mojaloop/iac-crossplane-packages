@@ -103,6 +103,7 @@ if parameters?.dbType == "rds":
                 applyImmediately = parameters?.rds?.applyImmediately
                 backupRetentionPeriod = parameters?.rds?.backupRetentionPeriod
                 dbClusterParameterGroupNameSelector = { matchControllerRef = True }
+                dbClusterInstanceClass = parameters?.rds?.dbClusterInstanceClass
                 dbSubnetGroupName = "{}-sng".format(oxr.metadata.name)
                 deletionProtection = parameters?.rds?.deletionProtection
                 engine = parameters?.rds?.engine
@@ -118,6 +119,8 @@ if parameters?.dbType == "rds":
                 snapshotIdentifier = parameters?.rds?.snapshotIdentifier
                 storageEncrypted = parameters?.rds?.storageEncrypted
                 storageType = parameters?.rds?.storageType
+                iops = parameters?.rds?.iops
+                allocatedStorage = parameters?.rds?.allocatedStorage
                 vpcSecurityGroupIdSelector = { matchControllerRef = True }
                 masterPasswordSecretRef = {
                                 key = parameters?.rds?.passwordSecret?.key
