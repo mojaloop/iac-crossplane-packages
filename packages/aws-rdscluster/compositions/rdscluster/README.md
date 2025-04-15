@@ -1,4 +1,4 @@
-# Cluster Composition
+# RDS Cluster Composition
 
 TBD
 
@@ -6,7 +6,8 @@ TBD
 
 The following test scenarios demonstrate common use cases:
 
-1. [Standard Cluster](test/scenarios/standard/claim.yaml)
+1. [Aurora RDS Cluster](test/scenarios/standard/claim.yaml)
+2. [Conventional RDS Cluster](test/scenarios/conventional-rds/claim.yaml)
 
 ## Configuration
 
