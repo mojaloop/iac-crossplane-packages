@@ -42,6 +42,7 @@ _account = {
         peer_login_expiration = 86400
         peer_login_expiration_enabled = True
         regular_users_view_blocked = True
+        routing_peer_dns_resolution_enabled = True
       }
     }
     providerConfigRef = {
@@ -78,31 +79,37 @@ _all_group = {
   }
 }
 
-# Update Netbird DNS Settings
-_dns = {
+_internal_nameserver = {
   apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-  kind = "NbDnsSetting"
+  kind = "NbNameServer"
   metadata = {
-    name = "{}-nb-dns-setting".format(oxr.metadata.name)
+    name = "{}-admin-group".format(oxr.metadata.name)
     annotations = {
-      "krm.kcl.dev/composition-resource-name": "nb-dns-setting"
+      "krm.kcl.dev/composition-resource-name": "admin-group"
+      "crossplane.io/external-name": admin_group_name
     }
   }
   spec = {
     forProvider = {
-      disabled_management_groups = [
-        ocds["all-group"]?.Resource?.status?.atProvider?.id or ""
+      name = "default ns"
+      description = "default ns for internal services"
+      enabled = True
+      primary = False
+      search_domains_enabled = True
+      domains = parameters.k8sDomains
+      groups = [ocds["all-group"]?.Resource?.status?.atProvider?.id or ""]
+      nameservers = [
+        {
+          ip = "8.8.8.8"
+          ns_type = "udp"
+          port = 53
+        }
       ]
     }
     providerConfigRef = {
       name = spec?.providerConfigsRef?.netbirdProviderConfigName
     }
-    managementPolicies = [
-      "Observe",
-      "Update",
-      "Create",
-      "LateInitialize"
-    ]
+    managementPolicies = ["*"]
   }
 }
 
@@ -285,7 +292,7 @@ _items += [
   _all_group,
   _admin_group,
   _account,
-  _dns,
+  # _dns,
   _cc_gateway_group,
   _cc_gateway_setup_key,
   _build_server_setup_key,
