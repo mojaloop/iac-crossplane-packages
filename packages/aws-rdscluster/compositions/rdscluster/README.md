@@ -1,4 +1,4 @@
-# DocDbCluster Composition
+# Cluster Composition
 
 TBD
 
@@ -6,7 +6,7 @@ TBD
 
 The following test scenarios demonstrate common use cases:
 
-1. [Standard DocDbCluster](test/scenarios/standard/claim.yaml)
+1. [Standard Cluster](test/scenarios/standard/claim.yaml)
 
 ## Configuration
 

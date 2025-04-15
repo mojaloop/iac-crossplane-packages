@@ -1,3 +1,3 @@
-# AWS DocDbCluster Package
+# AWS Cluster Package
 
-[DocDbCluster Composition](compositions/rdscluster/README.md)
+[Cluster Composition](compositions/rdscluster/README.md)

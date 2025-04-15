@@ -6,10 +6,10 @@ spec:
   defaultCompositeDeletePolicy: Foreground
   group: aws.mojaloop.io
   names:
-    kind: XDocDbCluster
+    kind: XRDSCluster
     plural: xrdscluster
   claimNames:
-    kind: DocDbCluster
+    kind: RDSCluster
     plural: rdscluster
   versions:
   - name: v1alpha1
