@@ -1,7 +1,7 @@
 apiVersion: aws.mojaloop.io/v1alpha1
 kind: XRDSCluster
 metadata:
-  name: example-rds-cluster
+  name: example-rds-aurora-cluster
   namespace: default
 spec:
   managementPolicies:
@@ -36,7 +36,7 @@ spec:
       preferredMaintenanceWindow: "Tue:23:45-Wed:00:15"
       region: "eu-west-1"
       skipFinalSnapshot: true
-      finalSnapshotIdentifier: "example-rds-cluster"
+      finalSnapshotIdentifier: "example-rds-aurora-cluster"
       storageEncrypted: true
       subnets: "subnet-0fb26add714322910,subnet-044648d6e6107d293,subnet-0252e9bfa6e483fd7"
       username: "mojaloop"

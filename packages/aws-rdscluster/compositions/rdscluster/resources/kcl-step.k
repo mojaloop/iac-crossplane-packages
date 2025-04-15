@@ -1,4 +1,5 @@
 # Read the XR and the OCDs
+import regex
 oxr = option("params").oxr
 ocds = option("params").ocds
 
@@ -91,6 +92,12 @@ if parameters?.dbType == "rds":
         }
     }
 
+
+    if regex.search(parameters?.rds?.engine, "aurora") == True:
+       _dbClusterInstanceClass = ""
+    else:
+        _dbClusterInstanceClass = parameters?.rds?.dbClusterInstanceClass
+
     _Cluster = {
         apiVersion = "rds.aws.upbound.io/v1beta1"
         kind = "Cluster"
@@ -103,7 +110,7 @@ if parameters?.dbType == "rds":
                 applyImmediately = parameters?.rds?.applyImmediately
                 backupRetentionPeriod = parameters?.rds?.backupRetentionPeriod
                 dbClusterParameterGroupNameSelector = { matchControllerRef = True }
-                dbClusterInstanceClass = parameters?.rds?.dbClusterInstanceClass
+                dbClusterInstanceClass = _dbClusterInstanceClass
                 dbSubnetGroupName = "{}-sng".format(oxr.metadata.name)
                 deletionProtection = parameters?.rds?.deletionProtection
                 engine = parameters?.rds?.engine
