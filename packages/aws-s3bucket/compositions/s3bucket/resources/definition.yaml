@@ -1,0 +1,81 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xs3bucket.aws.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: aws.mojaloop.io
+  names:
+    kind: XS3Bucket
+    plural: xs3buckets
+  claimNames:
+    kind: S3Bucket
+    plural: s3buckets
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - Create
+                  - LateInitialize
+                  - Observe
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the source and destination k8s providers.
+                required:
+                  - awsProviderName
+                properties:
+                  awsProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the source k8s provider.
+              parameters:
+                type: object
+                description: |-
+                  The parameters for the S3 bucket.
+                required:
+                  - bucketName
+                properties:
+                  bucketName:
+                    type: string
+                  bucketRegion:
+                    type: string
+                    default: "eu-west-1"
+                  forceDestroy:
+                    type: boolean
+                    default: false
+                  deletionPolicy:
+                    type: string
+                    default: "Delete"
+          status:
+            type: object
+            properties:
+              iamUserARN:
+                type: string
+              bucketARN:
+                type: string
