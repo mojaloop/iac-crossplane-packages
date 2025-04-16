@@ -1,0 +1,15 @@
+apiVersion: aws.mojaloop.io/v1alpha1
+kind: XS3Bucket
+metadata:
+  name: example-s3bucket
+  namespace: default
+spec:
+  parameters:
+    bucketName: "example-s3bucket-someuniquestring"
+    bucketRegion: "eu-west-1"
+    forceDestroy: false
+    deletionPolicy: "Delete"
+  providerConfigsRef:
+    awsProviderName: "aws-provider"
+  managementPolicies:
+    - "*"

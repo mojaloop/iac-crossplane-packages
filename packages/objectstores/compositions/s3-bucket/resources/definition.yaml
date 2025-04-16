@@ -1,12 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xs3bucket.objectstore.mojaloop.io
+  name: xs3buckets.aws.mojaloop.io
 spec:
-  group: objectstore.mojaloop.io
+  defaultCompositeDeletePolicy: Foreground
+  group: aws.mojaloop.io
   names:
     kind: XS3Bucket
-    plural: xs3bucket
+    plural: xs3buckets
   claimNames:
     kind: S3Bucket
     plural: s3buckets
@@ -23,7 +24,9 @@ spec:
             properties:
               managementPolicies:
                 default:
-                  - "*"
+                  - Create
+                  - LateInitialize
+                  - Observe
                 description: |-
                   A ManagementAction represents an action that the Crossplane controllers
                   can take on an external resource.
@@ -40,20 +43,29 @@ spec:
                     - "*"
                   type: string
                 type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the source and destination k8s providers.
+                required:
+                  - awsProviderName
+                properties:
+                  awsProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the source k8s provider.
               parameters:
                 type: object
+                description: |-
+                  The parameters for the S3 bucket.
+                required:
+                  - bucketName
                 properties:
                   bucketName:
                     type: string
                   bucketRegion:
                     type: string
                     default: "eu-west-1"
-                  providerConfigName:
-                    type: string
-                    default: "aws-cp-upbound-provider-config"
-                  destinationNamespace:
-                    type: string
-                    default: crossplane-system
                   forceDestroy:
                     type: boolean
                     default: false
@@ -66,14 +78,4 @@ spec:
               iamUserARN:
                 type: string
               bucketARN:
-                type: string
-              iamUserId:
-                type: string
-              accessKeyID:
-                type: string
-              accessKeyIDEncoded:
-                type: string
-              secretAccessKey:
-                type: string
-              secretAccessKeyEncoded:
                 type: string

@@ -40,10 +40,11 @@ if parameters?.objectStoreProvider == "ceph":
     }
 if parameters?.objectStoreProvider == "s3":
     _s3Bucket = {
-      apiVersion = "objectstore.mojaloop.io/v1alpha1"
+      apiVersion = "aws.mojaloop.io/v1alpha1"
       kind = "XS3Bucket"
       metadata = {
         name        = parameters?.bucketName
+        namespace   = parameters?.Namespace
       }
       spec = {
         parameters = {
@@ -51,10 +52,11 @@ if parameters?.objectStoreProvider == "s3":
           bucketRegion         = parameters?.s3?.bucketRegion
           forceDestroy         = parameters?.s3?.forceDestroy
           deletionPolicy       = parameters?.s3?.deletionPolicy
-          providerConfigName   = parameters?.s3?.awsProviderName
-          destinationNamespace = parameters?.Namespace
           }
+        providerConfigsRef = {
+          awsProviderName = parameters?.s3?.awsProviderName
         }
+      }
     }
 
 _items += [_cephBucket, _s3Bucket]
