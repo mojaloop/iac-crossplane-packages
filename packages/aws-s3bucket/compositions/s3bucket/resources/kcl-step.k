@@ -1,3 +1,4 @@
+import json
 # Read the XR and the OCDs
 oxr = option("params").oxr
 ocds = option("params").ocds
@@ -176,7 +177,7 @@ _bucketPolicy = {
         forProvider = {
             region = parameters.bucketRegion
             bucket = parameters.bucketName
-            policy = str(_bucketPolicyObject)
+            policy = json.encode(_bucketPolicyObject)
         }
         providerConfigRef = {
             name = spec.providerConfigsRef.awsProviderName
@@ -216,7 +217,7 @@ _iamAccessKey = {
     }
     spec = {
         forProvider = {
-            user = parameters.bucketName
+            user = _iamUserId
         }
         writeConnectionSecretToRef = {
             name = parameters.bucketName

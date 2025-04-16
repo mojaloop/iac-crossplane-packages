@@ -1,15 +1,15 @@
 apiVersion: aws.mojaloop.io/v1alpha1
 kind: XS3Bucket
 metadata:
-  name: example-s3bucket-claim
-  namespace: testa
+  name: example-s3bucket-bronco123
+  namespace: default
 spec:
   parameters:
-    bucketName: "example-s3bucket"
+    bucketName: "example-s3bucket-bronco123"
     bucketRegion: "eu-west-1"
     forceDestroy: false
     deletionPolicy: "Delete"
   providerConfigsRef:
-    awsProviderName: "aws-cp-upbound-provider-config"
+    awsProviderName: "aws-provider"
   managementPolicies:
     - "*"

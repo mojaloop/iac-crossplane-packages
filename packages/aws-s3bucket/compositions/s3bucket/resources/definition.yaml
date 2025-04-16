@@ -1,7 +1,7 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xs3bucket.aws.mojaloop.io
+  name: xs3buckets.aws.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
   group: aws.mojaloop.io
