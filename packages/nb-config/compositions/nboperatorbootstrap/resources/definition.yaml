@@ -1,0 +1,92 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xnboperatorbootstrap.nb.infitx.org
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: nb.infitx.org
+  names:
+    kind: XNBOperatorBootstrap
+    plural: xnboperatorbootstrap
+  claimNames:
+    kind: NBOperatorInstall
+    plural: xnboperatorinstalls
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                managementPolicies:
+                  default:
+                    - "*"
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  items:
+                    description: |-
+                      A ManagementAction represents an action that the Crossplane controllers
+                      can take on an external resource.
+                    enum:
+                      - Observe
+                      - Create
+                      - Update
+                      - Delete
+                      - LateInitialize
+                      - "*"
+                    type: string
+                  type: array
+                providerConfigsRef:
+                  type: object
+                  description: |-
+                    The name of the provider config to use for the source and destination k8s providers.
+                  required:
+                    - netbirdProviderConfigName
+                  properties:
+                    ccK8sProviderName:
+                      type: string
+                      description: |-
+                        The name of the provider config to use for the local k8s provider.
+                        Required if accessToken.destinationType is sc or tenantVault.
+                    scK8sProviderName:
+                      type: string
+                      description: |-
+                        The name of the provider config to use for the remote k8s provider.
+                        Required if accessToken.destinationType is sc.
+                    netbirdProviderConfigName:
+                      type: string
+                      description: |-
+                        The name of the provider config to use for the destination k8s provider.
+                    vaultProviderName:
+                      type: string
+                      description: |-
+                        The name of the provider config to use for the vault provider.
+                        Required if accessToken.destinationType is tenantVault.
+                parameters:
+                  type: object
+                  properties:
+                    serviceUserName:
+                      type: string
+                      description: The name of the nb service user to create to own sc cluster nb access token.
+                    accessTokenExpiresInDays:
+                      type: number
+                      description: The number of days in which token expires after creation.
+                    operatorKubeapiGroup:
+                      type: string
+                      description: group name to give access to kubeapi
+                    accessToken:
+                      type: object
+                      properties:
+                        destinationType:
+                          type: string
+                          description: The type of destination to store the access token.
+                          enum:
+                            - local
+                            - sc
+                            - tenantVault
+                        # TODO: Parameters for example for tenantVault

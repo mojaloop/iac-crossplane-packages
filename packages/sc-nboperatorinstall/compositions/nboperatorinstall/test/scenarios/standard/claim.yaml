@@ -5,20 +5,13 @@ metadata:
   namespace: testa
 spec:
   parameters:
-    serviceUserName: testserviceuser
-    accessTokenExpiresInDays: 5
     nbManagmentURI: https://netbird.test.com/
     operatorHelmVersion: 0.1.6
     operatorNamespace: netbird
     operatorArgoAppName: nb-op
     operatorArgoAppSourceURL: https://github.com/mojaloop/iac-modules/gitops/applications/base/netbird-operator
     operatorArgoAppSourceRevision: "feat/np-op-install"
-    localAccessTokenSecretName: localsecret
-    localAccessTokenSecretNamespace: localsecretns
-    operatorClusterName: storage-cluster
   providerConfigsRef:
-    netbirdProviderConfigName: "netbird-provider-config"
-    ccK8sProviderName: "cc-kubernetes-provider"
     scK8sProviderName: "sc-kubernetes-provider"
   managementPolicies:
     - "*"
