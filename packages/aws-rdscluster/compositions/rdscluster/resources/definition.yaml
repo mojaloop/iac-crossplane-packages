@@ -1,16 +1,16 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xdocdbcluster.aws.mojaloop.io
+  name: xrdscluster.aws.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
   group: aws.mojaloop.io
   names:
-    kind: XDocDbCluster
-    plural: xdocdbcluster
+    kind: XRDSCluster
+    plural: xrdscluster
   claimNames:
-    kind: DocDbCluster
-    plural: docdbcluster
+    kind: RDSCluster
+    plural: rdscluster
   versions:
   - name: v1alpha1
     served: true
@@ -50,24 +50,26 @@ spec:
               parameters:
                 type: object
                 properties:
-                  databaseName:
-                    type: string
-                    description: Name for the created DB
                   allowMajorVersionUpgrade:
                     description: Indicates that major version upgrades are allowed
                     type: boolean
+                    default: false
                   applyImmediately:
                     description: Indicates that changes should be applied immediately
                     type: boolean
                   backupRetentionPeriod:
                     description: The number of days to retain backups for
                     type: integer
+                  databaseName:
+                    description: The name of the database
+                    type: string
                   dbClusterInstanceClass:
                     description: "Db instance class"
                     type: string
                   copyTagsToSnapshot:
                     description: Indicates that tags should be copied to snapshots
                     type: boolean
+                    default: true
                   deletionProtection:
                     description: Indicates that deletion protection is enabled
                     type: boolean
@@ -86,6 +88,7 @@ spec:
                   enablePerformanceInsights:
                     description: Indicates that performance insights are enabled
                     type: boolean
+                    default: false
                   instanceCount:
                     description: The number of instances in the cluster
                     type: integer
@@ -147,14 +150,20 @@ spec:
                   storageType:
                     description: The type of storage
                     type: string
+                  iops:
+                    description: The number of IOPS to provision for storage
+                    type: integer
+                  allocatedStorage:
+                    description: The amount of storage to allocate in GB
+                    type: integer
                   subnets:
-                    description: The comma seperated list of subnet-ids to create the subnetgroup
+                    description: The comma separated list of subnet-ids to create the subnetgroup
                     type: string
                   username:
                     description: The name of master user
                     type: string
                   vpcCidr:
-                    description: Vpc CIDR
+                    description: Comma separated Vpc CIDR blocks
                     type: string
                   vpcId:
                     description: Vpc id

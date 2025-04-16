@@ -1,7 +1,7 @@
 apiVersion: aws.mojaloop.io/v1alpha1
-kind: XDocDbCluster
+kind: XRDSCluster
 metadata:
-  name: example-documentdb-cluster
+  name: example-convn-rds-cluster
   namespace: default
 spec:
   managementPolicies:
@@ -13,27 +13,31 @@ spec:
     applyImmediately: false
     backupRetentionPeriod: 7
     databaseName: "exampledb"
-    dbClusterInstanceClass: "db.t3.medium"
+    dbClusterInstanceClass: "db.m5d.large"
     deletionProtection: false
-    engine: "docdb"
-    engineVersion: "5.0"
-    family: "docdb5.0"
-    instanceCount: 1
+    engine: "mysql"
+    engineVersion: "8.0.40"
+    family: "mysql8.0"
+    instanceCount: 0
     parameter:
-    - name: "audit_logs"
-      value: "disabled"
+    - name: character_set_client
+      value: utf8mb4
+    - name: character_set_server
+      value: utf8mb4
     passwordSecret:
       key: "password"
       name: "example-db-secret"
       namespace: "default"
-    port: 27017
+    port: 3306
     preferredBackupWindow: "02:00-04:00"
     preferredMaintenanceWindow: "Tue:23:45-Wed:00:15"
     region: "eu-west-1"
     skipFinalSnapshot: true
-    finalSnapshotIdentifier: "example-documentdb-cluster"
+    finalSnapshotIdentifier: "example-convn-rds-cluster"
     storageEncrypted: true
-    storageType: "standard"
+    storageType: "io1"
+    iops: 5000
+    allocatedStorage: 100
     subnets: "subnet-0fb26add714322910,subnet-044648d6e6107d293,subnet-0252e9bfa6e483fd7"
     username: "mojaloop"
     vpcCidr: "10.0.0.0/16"

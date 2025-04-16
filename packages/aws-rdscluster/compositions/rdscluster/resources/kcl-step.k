@@ -1,4 +1,5 @@
 # Read the XR and the OCDs
+import regex
 oxr = option("params").oxr
 ocds = option("params").ocds
 
@@ -53,7 +54,7 @@ _SecurityGroupRule = {
 }
 
 _SubnetGroup = {
-    apiVersion = "docdb.aws.upbound.io/v1beta1"
+    apiVersion = "rds.aws.upbound.io/v1beta1"
     kind = "SubnetGroup"
     metadata = {
         name = "{}-sng".format(oxr.metadata.name)
@@ -72,7 +73,7 @@ _SubnetGroup = {
 }
 
 _ClusterParameterGroup = {
-    apiVersion = "docdb.aws.upbound.io/v1beta1"
+    apiVersion = "rds.aws.upbound.io/v1beta1"
     kind = "ClusterParameterGroup"
     metadata = {
         name = "{}-cpg".format(oxr.metadata.name)
@@ -91,8 +92,14 @@ _ClusterParameterGroup = {
     }
 }
 
+
+if regex.search(parameters?.engine, "aurora") == True:
+    _dbClusterInstanceClass = ""
+else:
+    _dbClusterInstanceClass = parameters?.dbClusterInstanceClass
+
 _Cluster = {
-    apiVersion = "docdb.aws.upbound.io/v1beta1"
+    apiVersion = "rds.aws.upbound.io/v1beta1"
     kind = "Cluster"
     metadata = {
         name = "{}-cluster".format(oxr.metadata.name)
@@ -102,7 +109,9 @@ _Cluster = {
             allowMajorVersionUpgrade = parameters?.allowMajorVersionUpgrade
             applyImmediately = parameters?.applyImmediately
             backupRetentionPeriod = parameters?.backupRetentionPeriod
+            databaseName = parameters?.databaseName
             dbClusterParameterGroupNameSelector = { matchControllerRef = True }
+            dbClusterInstanceClass = _dbClusterInstanceClass
             dbSubnetGroupName = "{}-sng".format(oxr.metadata.name)
             deletionProtection = parameters?.deletionProtection
             engine = parameters?.engine
@@ -118,6 +127,8 @@ _Cluster = {
             snapshotIdentifier = parameters?.snapshotIdentifier
             storageEncrypted = parameters?.storageEncrypted
             storageType = parameters?.storageType
+            iops = parameters?.iops
+            allocatedStorage = parameters?.allocatedStorage
             vpcSecurityGroupIdSelector = { matchControllerRef = True }
             masterPasswordSecretRef = {
                             key = parameters?.passwordSecret?.key
@@ -136,7 +147,7 @@ _Cluster = {
 instance_count = parameters?.instanceCount
 
 _ClusterInstances = [{
-    apiVersion = "docdb.aws.upbound.io/v1beta1"
+    apiVersion = "rds.aws.upbound.io/v1beta1"
     kind = "ClusterInstance"
     metadata = {
         name = "{}-cluster-instance-{}".format(oxr.metadata.name, i)
@@ -147,7 +158,7 @@ _ClusterInstances = [{
             autoMinorVersionUpgrade = parameters?.autoMinorVersionUpgrade
             clusterIdentifierSelector = { matchControllerRef = True }
             copyTagsToSnapshot = parameters?.copyTagsToSnapshot
-            enablePerformanceInsights = parameters?.enablePerformanceInsights
+            performanceInsightsEnabled = parameters?.enablePerformanceInsights
             engine = parameters?.engine
             instanceClass = parameters?.dbClusterInstanceClass
             preferredMaintenanceWindow = parameters?.preferredMaintenanceWindow
