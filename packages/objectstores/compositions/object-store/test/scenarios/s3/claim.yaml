@@ -7,7 +7,6 @@ spec:
     clusterName: "example-cluster"
     objectStoreProvider: "s3"
     bucketName: "my-example-bucket2"
-    Namespace: temp
     s3:
       awsProviderName: "aws-cp-upbound-provider-config"
       bucketRegion: "us-east-1"

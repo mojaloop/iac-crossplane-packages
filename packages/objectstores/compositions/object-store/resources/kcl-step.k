@@ -31,20 +31,21 @@ if parameters?.objectStoreProvider == "ceph":
             name              = parameters?.bucketName
             esoPushSecret     = parameters?.ceph?.esoPushSecret
             scNamespace       = parameters?.clusterName
-            ccNamespace       = parameters?.Namespace
+            ccNamespace       = oxr.metadata.namespace if oxr.metadata.namespace else "crossplane-system"
             vaultSecretStore  = parameters?.ceph?.vaultSecretStore
             vaultSecretPath   = parameters?.ceph?.vaultSecretPath
           }
         }
+        managementPolicies = spec?.managementPolicies
       }
     }
 if parameters?.objectStoreProvider == "s3":
+    _providerConfigName = parameters?.s3?.awsProviderName
     _s3Bucket = {
       apiVersion = "aws.mojaloop.io/v1alpha1"
       kind = "XS3Bucket"
       metadata = {
         name        = parameters?.bucketName
-        namespace   = parameters?.Namespace
       }
       spec = {
         parameters = {
@@ -52,10 +53,11 @@ if parameters?.objectStoreProvider == "s3":
           bucketRegion         = parameters?.s3?.bucketRegion
           forceDestroy         = parameters?.s3?.forceDestroy
           deletionPolicy       = parameters?.s3?.deletionPolicy
-          }
-        providerConfigsRef = {
-          awsProviderName = parameters?.s3?.awsProviderName
         }
+        providerConfigsRef = {
+          awsProviderName = _providerConfigName
+        }
+        managementPolicies = spec?.managementPolicies
       }
     }
 

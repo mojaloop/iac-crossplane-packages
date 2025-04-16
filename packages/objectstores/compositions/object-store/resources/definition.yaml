@@ -106,6 +106,7 @@ spec:
                       vaultSecretPath:
                         type: string
                         description: Path of the secret in vault.
+
                   s3:
                     type: object
                     description: AWS bucket variables.
@@ -130,7 +131,5 @@ spec:
                           If set to "Delete", the bucket will be deleted when the claim is deleted.
                           If set to "Retain", the bucket will be retained when the claim is deleted.
                         default: "Delete"
-                  Namespace:
-                    type: string
-                    description: Namespace of the bucket claim to create
+
 

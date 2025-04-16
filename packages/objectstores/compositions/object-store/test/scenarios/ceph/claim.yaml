@@ -7,12 +7,6 @@ spec:
     clusterName: "example-cluster"
     objectStoreProvider: "ceph"
     bucketName: "my-example-bucket2"
-    Namespace: temp
-    s3:
-      awsProviderName: "aws-cp-upbound-provider-config"
-      bucketRegion: "us-east-1"
-      forceDestroy: true
-      deletionPolicy: "Delete"
     ceph:
       scK8sProviderName: "sc-kubernetes-provider"
       ccK8sProviderName: "kubernetes-provider"
