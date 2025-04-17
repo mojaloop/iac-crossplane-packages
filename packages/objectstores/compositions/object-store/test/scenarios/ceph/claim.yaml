@@ -2,6 +2,7 @@ apiVersion: objectstore.mojaloop.io/v1alpha1
 kind: XObjectStore
 metadata:
   name: example-object-store
+  namespace: "example-namespace"
 spec:
   parameters:
     clusterName: "example-cluster"
