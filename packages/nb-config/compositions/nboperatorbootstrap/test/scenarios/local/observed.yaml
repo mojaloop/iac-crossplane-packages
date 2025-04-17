@@ -1,0 +1,8 @@
+apiVersion: vpn.netbird.crossplane.io/v1alpha1
+kind: NbUser
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: service-user
+status:
+  atProvider:
+    name: testserviceuser-service-user

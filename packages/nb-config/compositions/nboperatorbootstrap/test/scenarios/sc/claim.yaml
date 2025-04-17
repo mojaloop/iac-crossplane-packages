@@ -1,0 +1,18 @@
+apiVersion: nb.infitx.org/v1alpha1
+kind: XNBOperatorBootstrap
+metadata:
+  name: example-nboperatorbootstrap
+  namespace: testa
+spec:
+  parameters:
+    serviceUserName: testserviceuser
+    accessTokenExpiresInDays: 5
+    operatorKubeapiGroup: testgroup
+    accessToken:
+      destinationType: sc
+  providerConfigsRef:
+    netbirdProviderConfigName: "netbird-provider-config"
+    ccK8sProviderName: "cc-kubernetes-provider"
+    scK8sProviderName: "sc-kubernetes-provider"
+  managementPolicies:
+    - "*"
