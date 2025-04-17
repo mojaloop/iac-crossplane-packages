@@ -171,9 +171,40 @@ _ClusterInstances = [{
     }
 }  for i in range(instance_count)] if instance_count > 0 else []
 
+_externalName = ocds["cluster"]?.Resource?.status?.atProvider?.endpoint or ""
 
+_ExternalService = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-en-svc".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "aws-rdscluster-svc"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Service"
+                metadata = {
+                    name = parameters?.externalServiceName
+                    namespace = parameters?.appNamespace
+                }
+                spec = {
+                    type = "ExternalName"
+                    externalName = _externalName
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.ccK8sProviderName
+        }
+    }
+}
 
-_items += [_SecurityGroupRule, _SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster] + _ClusterInstances
+_items += [_SecurityGroupRule, _SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster, _ExternalService] + _ClusterInstances
 
 print(_items)
 
