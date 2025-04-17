@@ -31,7 +31,7 @@ if parameters?.objectStoreProvider == "ceph":
             name              = parameters?.bucketName
             esoPushSecret     = parameters?.ceph?.esoPushSecret
             scNamespace       = parameters?.clusterName
-            ccNamespace       = oxr.metadata.namespace if oxr.metadata.namespace else "crossplane-system"
+            ccNamespace       = parameters?.ceph?.namespace
             vaultSecretStore  = parameters?.ceph?.vaultSecretStore
             vaultSecretPath   = parameters?.ceph?.vaultSecretPath
           }
