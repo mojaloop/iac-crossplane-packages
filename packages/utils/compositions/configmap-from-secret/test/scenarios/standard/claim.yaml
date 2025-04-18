@@ -1,5 +1,5 @@
 apiVersion: utils.mojaloop.io/v1alpha1
-kind: XSecretconfigMap
+kind: XConfigMapfromSecret
 metadata:
   name: example-secret-configmap-claim
   namespace: temp

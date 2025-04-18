@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: secretconfigmap
+  name: configmapfromsecret
   labels:
-    crossplane.io/xrd: xsecretconfigmap.utils.mojaloop.io
+    crossplane.io/xrd: xconfigmapfromsecret.utils.mojaloop.io
 spec:
   compositeTypeRef:
     apiVersion: utils.mojaloop.io/v1alpha1
-    kind: XSecretconfigMap
+    kind: XConfigMapfromSecret
   mode: Pipeline
   pipeline:
 
