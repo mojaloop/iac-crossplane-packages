@@ -1,16 +1,16 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xsecretconfigmap.utils.mojaloop.io
+  name: xconfigmapfromsecret.utils.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
   group: utils.mojaloop.io
   names:
-    kind: XSecretconfigMap
-    plural: xsecretconfigmap
+    kind: XConfigMapfromSecret
+    plural: xconfigmapfromsecret
   claimNames:
-    kind: SecretconfigMap
-    plural: secretconfigmap
+    kind: ConfigMapfromSecret
+    plural: configmapfromsecret
   versions:
   - name: v1alpha1
     served: true

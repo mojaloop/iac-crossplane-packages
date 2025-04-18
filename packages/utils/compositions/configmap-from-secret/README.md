@@ -1,4 +1,4 @@
-# SecretconfigMap Composition
+# ConfigMapfromSecret Composition
 
 This composition allows you to create Kubernetes ConfigMaps by sourcing data from Secret Object keys
 
