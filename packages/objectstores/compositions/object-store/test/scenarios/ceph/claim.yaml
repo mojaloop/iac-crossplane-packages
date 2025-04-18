@@ -7,12 +7,12 @@ spec:
     clusterName: "example-cluster"
     objectStoreProvider: "ceph"
     bucketName: "my-example-bucket"
+    ccK8sProviderName: "kubernetes-provider"
+    esoPushSecret: false
+    vaultSecretStore: "vault-backend"
+    vaultSecretPath: "objectstore/my_example_bucket"
+    namespace: "default"
     ceph:
       scK8sProviderName: "sc-kubernetes-provider"
-      ccK8sProviderName: "kubernetes-provider"
-      namespace: "default"
       storageClassName: "ceph-bucket"
       maxSize: "1Gi"
-      esoPushSecret: false
-      vaultSecretStore: "vault-backend"
-      vaultSecretPath: "objectstore/my_example_bucket"

@@ -19,7 +19,7 @@ if parameters?.objectStoreProvider == "ceph":
       spec = {
         providerConfigsRef = {
           scK8sProviderName = parameters?.ceph?.scK8sProviderName
-          ccK8sProviderName = parameters?.ceph?.ccK8sProviderName
+          ccK8sProviderName = parameters?.ccK8sProviderName
         }
         parameters = {
           bucket = {
@@ -29,18 +29,19 @@ if parameters?.objectStoreProvider == "ceph":
           }
           secret = {
             name              = parameters?.bucketName
-            esoPushSecret     = parameters?.ceph?.esoPushSecret
+            esoPushSecret     = parameters?.esoPushSecret
             scNamespace       = parameters?.clusterName
-            ccNamespace       = parameters?.ceph?.namespace
-            vaultSecretStore  = parameters?.ceph?.vaultSecretStore
-            vaultSecretPath   = parameters?.ceph?.vaultSecretPath
+            ccNamespace       = parameters?.namespace
+            vaultSecretStore  = parameters?.vaultSecretStore
+            vaultSecretPath   = parameters?.vaultSecretPath
           }
         }
         managementPolicies = spec?.managementPolicies
       }
     }
 if parameters?.objectStoreProvider == "s3":
-    _providerConfigName = parameters?.s3?.awsProviderName
+    _awsProviderName = parameters?.s3?.awsProviderName
+    _k8sProviderName = parameters?.ccK8sProviderName
     _s3Bucket = {
       apiVersion = "aws.mojaloop.io/v1alpha1"
       kind = "XS3Bucket"
@@ -49,13 +50,23 @@ if parameters?.objectStoreProvider == "s3":
       }
       spec = {
         parameters = {
+          bucket = {
           bucketName           = parameters?.bucketName
           bucketRegion         = parameters?.s3?.bucketRegion
           forceDestroy         = parameters?.s3?.forceDestroy
           deletionPolicy       = parameters?.s3?.deletionPolicy
+          }
+        secret = {
+          name             = parameters?.bucketName
+          namespace        = parameters?.namespace
+          esoPushSecret    = parameters?.esoPushSecret
+          vaultSecretStore = parameters?.vaultSecretStore
+          vaultSecretPath  = parameters?.vaultSecretPath
+          }
         }
         providerConfigsRef = {
-          awsProviderName = _providerConfigName
+          awsProviderName = _awsProviderName
+          k8sProviderName = _k8sProviderName
         }
         managementPolicies = spec?.managementPolicies
       }

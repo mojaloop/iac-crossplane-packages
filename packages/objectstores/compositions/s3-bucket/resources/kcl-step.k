@@ -21,16 +21,16 @@ _bucket = {
     apiVersion = "s3.aws.upbound.io/v1beta1"
     kind = "Bucket"
     metadata = {
-        name = parameters.bucketName
+        name = parameters?.bucket?.bucketName
         annotations = {
             "krm.kcl.dev/composition-resource-name": "bucket"
         }
     }
     spec = {
-        deletionPolicy = parameters.deletionPolicy
+        deletionPolicy = parameters?.bucket?.deletionPolicy
         forProvider = {
-            region = parameters.bucketRegion
-            forceDestroy = parameters.forceDestroy
+            region = parameters?.bucket?.bucketRegion
+            forceDestroy = parameters?.bucket?.forceDestroy
         }
         providerConfigRef = {
             name = spec.providerConfigsRef.awsProviderName
@@ -43,15 +43,15 @@ _bucketAcl = {
     apiVersion = "s3.aws.upbound.io/v1beta1"
     kind = "BucketACL"
     metadata = {
-        name = "{}-acl".format(parameters.bucketName)
+        name = "{}-acl".format(parameters?.bucket?.bucketName)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "bucket-acl"
         }
     }
     spec = {
         forProvider = {
-            region = parameters.bucketRegion
-            bucket = parameters.bucketName
+            region = parameters?.bucket?.bucketRegion
+            bucket = parameters?.bucket?.bucketName
             acl = "private"
         }
         providerConfigRef = {
@@ -65,15 +65,15 @@ _bucketOwnershipControls = {
     apiVersion = "s3.aws.upbound.io/v1beta1"
     kind = "BucketOwnershipControls"
     metadata = {
-        name = "{}-ownership".format(parameters.bucketName)
+        name = "{}-ownership".format(parameters?.bucket?.bucketName)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "bucket-ownership"
         }
     }
     spec = {
         forProvider = {
-            region = parameters.bucketRegion
-            bucket = parameters.bucketName
+            region = parameters?.bucket?.bucketRegion
+            bucket = parameters?.bucket?.bucketName
             rule = [{
                 objectOwnership = "BucketOwnerPreferred"
             }]
@@ -168,15 +168,15 @@ _bucketPolicy = {
     apiVersion = "s3.aws.upbound.io/v1beta1"
     kind = "BucketPolicy"
     metadata = {
-        name = "{}-policy".format(parameters.bucketName)
+        name = "{}-policy".format(parameters?.bucket?.bucketName)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "bucket-policy"
         }
     }
     spec = {
         forProvider = {
-            region = parameters.bucketRegion
-            bucket = parameters.bucketName
+            region = parameters?.bucket?.bucketRegion
+            bucket = parameters?.bucket?.bucketName
             policy = json.encode(_bucketPolicyObject)
         }
         providerConfigRef = {
@@ -190,14 +190,14 @@ _iamUser = {
     apiVersion = "iam.aws.upbound.io/v1beta1"
     kind = "User"
     metadata = {
-        name = "{}-user".format(parameters.bucketName)
+        name = "{}-user".format(parameters?.bucket?.bucketName)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "iam-user"
         }
     }
     spec = {
         forProvider = {
-            forceDestroy = parameters.forceDestroy
+            forceDestroy = parameters?.bucket?.forceDestroy
         }
         providerConfigRef = {
             name = spec.providerConfigsRef.awsProviderName
@@ -210,7 +210,7 @@ _iamAccessKey = {
     apiVersion = "iam.aws.upbound.io/v1beta1"
     kind = "AccessKey"
     metadata = {
-        name = "{}-access-key".format(parameters.bucketName)
+        name = "{}-access-key".format(parameters?.bucket?.bucketName)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "iam-access-key"
         }
@@ -220,14 +220,78 @@ _iamAccessKey = {
             user = _iamUserId
         }
         writeConnectionSecretToRef = {
-            name = parameters.bucketName
-            namespace = oxr.metadata.namespace if oxr.metadata.namespace else "crossplane-system"
+            name = parameters.secret.name
+            namespace = parameters.secret.namespace
         }
         providerConfigRef = {
             name = spec.providerConfigsRef.awsProviderName
         }
     }
 }
+
+if parameters?.secret?.esoPushSecret:
+    _pushSecret = {
+      apiVersion = "kubernetes.crossplane.io/v1alpha2"
+      kind = "Object"
+      metadata = {
+        name = "{}-push-secret".format(oxr.metadata.name)
+        annotations = {
+          "krm.kcl.dev/composition-resource-name": "push-secret"
+        }
+      }
+      spec = {
+        forProvider = {
+          manifest = {
+            apiVersion = "external-secrets.io/v1alpha1"
+            kind = "PushSecret"
+            metadata = {
+              name = parameters?.bucketName
+              namespace = parameters?.secret?.namespace
+            }
+            spec = {
+              updatePolicy = parameters?.secret?.esoUpdatePolicy
+              deletionPolicy = parameters?.secret?.esoDeletePolicy
+              refreshInterval = parameters?.secret?.esoRefreshInterval
+              secretStoreRefs = [
+                {
+                  name = parameters?.secret?.vaultSecretStore,
+                  kind = parameters?.secret?.vaultSecretStoreKind
+                }
+              ]
+              selector = {
+                secret = {
+                  name = parameters?.secret?.name
+                }
+              }
+              data = [
+                {
+                  match = {
+                    secretKey = "username"
+                    remoteRef = {
+                      remoteKey = parameters?.secret?.vaultSecretPath
+                      property = "username"
+                    }
+                  }
+                },
+                {
+                  match = {
+                    secretKey = "password"
+                    remoteRef = {
+                      remoteKey = parameters?.secret?.vaultSecretPath
+                      property = "password"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+          name = spec.providerConfigsRef.k8sProviderName
+        }
+      }
+    }
 
 # Add all resources to items list
 _items += [
@@ -236,7 +300,8 @@ _items += [
     _bucketOwnershipControls,
     _bucketPolicy,
     _iamUser,
-    _iamAccessKey
+    _iamAccessKey,
+    _pushSecret
 ]
 
 # Update the XR with status fields

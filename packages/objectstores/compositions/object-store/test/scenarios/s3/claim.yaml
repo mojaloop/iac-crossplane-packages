@@ -1,15 +1,19 @@
 apiVersion: objectstore.mojaloop.io/v1alpha1
 kind: XObjectStore
 metadata:
-  name: example-object-store
+  name: example-mojaloopxyz-object-store
 spec:
   parameters:
     clusterName: "example-cluster"
     objectStoreProvider: "s3"
-    bucketName: "my-example-bucket2"
+    bucketName: "example-mojaloopxyz-object-store"
+    ccK8sProviderName: "kubernetes-provider"
+    esoPushSecret: false
+    vaultSecretStore: "vault-backend"
+    vaultSecretPath: "objectstore/my_example_bucket"
+    namespace: "default"
     s3:
-      awsProviderName: "aws-cp-upbound-provider-config"
-      bucketRegion: "us-east-1"
+      awsProviderName: "aws-provider"
+      bucketRegion: "eu-west-1"
       forceDestroy: true
       deletionPolicy: "Delete"
-

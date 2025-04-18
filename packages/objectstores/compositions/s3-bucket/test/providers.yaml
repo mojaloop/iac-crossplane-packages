@@ -19,3 +19,10 @@ metadata:
   name: provider-aws-iam
 spec:
   package: xpkg.upbound.io/upbound/provider-aws-iam:v1
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-kubernetes
+spec:
+  package: xpkg.upbound.io/upbound/provider-kubernetes:v0.17.1
