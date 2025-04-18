@@ -1,14 +1,17 @@
 apiVersion: aws.mojaloop.io/v1alpha1
 kind: XRDSCluster
 metadata:
-  name: example-rds-aurora-cluster
+  name: example-aurora-mysql-cluster
   namespace: default
 spec:
   managementPolicies:
     - "*"
   providerConfigsRef:
       awsProviderConfigName: "aws-provider"
+      ccK8sProviderName: "provider-kubernetes"
   parameters:
+    externalServiceName: "example-rds-aurora-cluster"
+    appNamespace: "default"
     allowMajorVersionUpgrade: false
     applyImmediately: false
     backupRetentionPeriod: 7
@@ -35,7 +38,7 @@ spec:
     skipFinalSnapshot: true
     finalSnapshotIdentifier: "example-rds-aurora-cluster"
     storageEncrypted: true
-    subnets: "subnet-0fb26add714322910,subnet-044648d6e6107d293,subnet-0252e9bfa6e483fd7"
+    subnets: "subnet-0a2b4a2a0e71ff936,subnet-0e4fe74d1d445e437,subnet-03fec93c6b529f361"
     username: "mojaloop"
     vpcCidr: "10.0.0.0/16"
-    vpcId: "vpc-07ff0e8c129aa5db0"
+    vpcId: "vpc-093a94cea27a9ff99"
