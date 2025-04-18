@@ -1,0 +1,20 @@
+apiVersion: utils.mojaloop.io/v1alpha1
+kind: XSecretconfigMap
+metadata:
+  name: example-secret-configmap-claim
+  namespace: temp
+spec:
+  parameters:
+    keyMappings:
+      - sourceKey: example-source-key
+        destinationKey: example-destination-key
+    sourceSecret:
+      namespace: source-namespace
+      name: example-secret
+    destinationConfigMap:
+      namespace: destinaton-namespace
+      name: example-configmap
+  providerConfigsRef:
+    k8sProviderName: kubernetes-provider
+  managementPolicies:
+    - "*"
