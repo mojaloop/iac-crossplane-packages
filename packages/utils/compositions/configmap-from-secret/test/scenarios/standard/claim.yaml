@@ -2,7 +2,7 @@ apiVersion: utils.mojaloop.io/v1alpha1
 kind: XConfigMapfromSecret
 metadata:
   name: example-secret-configmap-claim
-  namespace: temp
+  namespace: default
 spec:
   parameters:
     keyMappings:
