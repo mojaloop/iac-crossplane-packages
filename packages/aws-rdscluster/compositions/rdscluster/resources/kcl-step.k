@@ -103,6 +103,9 @@ _Cluster = {
     kind = "Cluster"
     metadata = {
         name = "{}-cluster".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "cluster"
+        }
     }
     spec = {
         forProvider = {
