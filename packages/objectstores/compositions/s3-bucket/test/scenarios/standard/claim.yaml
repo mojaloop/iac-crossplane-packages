@@ -1,0 +1,23 @@
+apiVersion: aws.mojaloop.io/v1alpha1
+kind: XS3Bucket
+metadata:
+  name: example-s3bucket
+  namespace: default
+spec:
+  parameters:
+    bucket:
+      bucketName: "example-s3bucket-someuniquestring"
+      bucketRegion: "eu-west-1"
+      forceDestroy: false
+      deletionPolicy: "Delete"
+    secret:
+      name: "example-s3bucket-secret"
+      namespace: "default"
+      esoPushSecret: true
+      vaultSecretStore: "vault-secret-store"
+      vaultSecretPath: "example-s3bucket"
+  providerConfigsRef:
+      awsProviderName: "aws-provider"
+      k8sProviderName: "kubernetes-provider"
+  managementPolicies:
+    - "*"

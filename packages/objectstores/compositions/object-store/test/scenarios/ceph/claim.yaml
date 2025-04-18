@@ -1,0 +1,18 @@
+apiVersion: objectstore.mojaloop.io/v1alpha1
+kind: XObjectStore
+metadata:
+  name: example-object-store
+spec:
+  parameters:
+    clusterName: "example-cluster"
+    objectStoreProvider: "ceph"
+    bucketName: "my-example-bucket"
+    ccK8sProviderName: "kubernetes-provider"
+    esoPushSecret: false
+    vaultSecretStore: "vault-backend"
+    vaultSecretPath: "objectstore/my_example_bucket"
+    namespace: "default"
+    ceph:
+      scK8sProviderName: "sc-kubernetes-provider"
+      storageClassName: "ceph-bucket"
+      maxSize: "1Gi"
