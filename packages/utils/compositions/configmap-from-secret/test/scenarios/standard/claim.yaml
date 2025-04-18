@@ -6,14 +6,14 @@ metadata:
 spec:
   parameters:
     keyMappings:
-      - sourceKey: example-source-key
-        destinationKey: example-destination-key
+      - sourceKey: example-secret-source-key
+        destinationKey: example-destination-cm-key
     sourceSecret:
-      namespace: source-namespace
-      name: example-secret
+      namespace: secret-source-namespace
+      name: example-secret-name
     destinationConfigMap:
-      namespace: destinaton-namespace
-      name: example-configmap
+      namespace: destinaton-cm-namespace
+      name: example-configmap-name
   providerConfigsRef:
     k8sProviderName: kubernetes-provider
   managementPolicies:
