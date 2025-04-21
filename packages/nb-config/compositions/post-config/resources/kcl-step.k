@@ -7,9 +7,36 @@ parameters = spec.parameters
 # Initialize the items list
 _items = []
 
-## Replacement of Ansible
-admin_group_name = "{}:{}".format(parameters.zitadelProjectId, parameters.groupNames.admin)
-external_access_group_name = "{}:{}".format(parameters.zitadelProjectId, parameters.groupNames.externalAccess)
+_zitadel_project_id_secret = {
+  apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-zitadel-project-id-secret".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "zitadel-project-id-secret"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = parameters.zitadelProjectIdSecret.name
+                    namespace = parameters.zitadelProjectIdSecret.namespace
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+          name = spec?.providerConfigsRef?.k8sProviderConfigName
+        }
+    }
+}
+
+zitadel_project_id = ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or ""] or ""
+admin_group_name = "{}:{}".format(zitadel_project_id, parameters.groupNames.admin)
+external_access_group_name = "{}:{}".format(zitadel_project_id, parameters.groupNames.externalAccess)
 
 # Get Netbird Account ID
 ## HTTP Provider call to get account id
@@ -29,6 +56,8 @@ _account = {
       settings = {
         extra = {
           peer_approval_enabled = False
+          network_traffic_logs_enabled = False
+          network_traffic_packet_counter_enabled = False
         }
         groups_propagation_enabled = True
         jwt_allow_groups = [
@@ -42,6 +71,7 @@ _account = {
         peer_login_expiration = 86400
         peer_login_expiration_enabled = True
         regular_users_view_blocked = True
+        routing_peer_dns_resolution_enabled = True
       }
     }
     providerConfigRef = {
@@ -78,33 +108,6 @@ _all_group = {
   }
 }
 
-# Update Netbird DNS Settings
-_dns = {
-  apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-  kind = "NbDnsSetting"
-  metadata = {
-    name = "{}-nb-dns-setting".format(oxr.metadata.name)
-    annotations = {
-      "krm.kcl.dev/composition-resource-name": "nb-dns-setting"
-    }
-  }
-  spec = {
-    forProvider = {
-      disabled_management_groups = [
-        ocds["all-group"]?.Resource?.status?.atProvider?.id or ""
-      ]
-    }
-    providerConfigRef = {
-      name = spec?.providerConfigsRef?.netbirdProviderConfigName
-    }
-    managementPolicies = [
-      "Observe",
-      "Update",
-      "Create",
-      "LateInitialize"
-    ]
-  }
-}
 
 # Admin Group
 _admin_group = {
@@ -128,98 +131,36 @@ _admin_group = {
   }
 }
 
-## TOOD Zitadel User Role Syncer
-
-## Replacement of Terraform
-# CC Gateway Group
-_cc_gateway_group = {
+# ExternalAccess Group
+_external_access_group = {
   apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
   kind = "NbGroup"
   metadata = {
-    name = "{}-cc-gateway-group".format(oxr.metadata.name)
+    name = "{}-external-access-group".format(oxr.metadata.name)
     annotations = {
-      "krm.kcl.dev/composition-resource-name": "cc-gateway-group"
+      "krm.kcl.dev/composition-resource-name": "external-access-group"
+      "crossplane.io/external-name": external_access_group_name
     }
   }
   spec = {
     forProvider = {
-      name = "{}-gateway".format(parameters.ccClusterName)
+      name = external_access_group_name
     }
     providerConfigRef = {
       name = spec?.providerConfigsRef?.netbirdProviderConfigName
     }
-    managementPolicies = spec?.managementPolicies
+    managementPolicies = ["Observe"]
   }
 }
 
-# CC Gateway Setup Key
-_cc_gateway_setup_key = {
-  apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-  kind = "NbSetupKey"
-  metadata = {
-    name = "{}-cc-gw-setup-key".format(oxr.metadata.name)
-    annotations = {
-      "krm.kcl.dev/composition-resource-name": "cc-gw-setup-key"
-    }
-  }
-  spec = {
-    forProvider = {
-      name = "cc bastion gateway setup key"
-      type = "reusable"
-      auto_groups = [
-        ocds["cc-gateway-group"]?.Resource?.status?.atProvider?.id or ""
-      ]
-      ephemeral = False
-      usage_limit = 0
-      expires_in = 7776000
-      allow_extra_dns_labels = False
-      revoked = False
-    }
-    providerConfigRef = {
-      name = spec?.providerConfigsRef?.netbirdProviderConfigName
-    }
-    managementPolicies = spec?.managementPolicies
-  }
-}
-
-## Environments
-_environment_groups = []
-_environment_groups += [{
-    apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-    kind = "NbGroup"
-    metadata = {
-      name = "{}-{}-env-gateway-group".format(oxr.metadata.name, env)
-      annotations = {
-        "krm.kcl.dev/composition-resource-name": "{}-env-gateway-group".format(env)
-      }
-    }
-    spec = {
-      forProvider = {
-        name = "{}-k8s-peers".format(env)
-      }
-      providerConfigRef = {
-        name = spec?.providerConfigsRef?.netbirdProviderConfigName
-      }
-      managementPolicies = spec?.managementPolicies
-    }
-  } for env in parameters.environments
-]
+## TOOD Zitadel User Role Syncer
 
 ## Build Server Setup Key
 _setup_keys_groups = []
 
 _setup_keys_groups += [
-  ocds["admin-group"]?.Resource?.status?.atProvider?.id or "",
-  ocds["all-group"]?.Resource?.status?.atProvider?.id or ""
+  ocds["external-access-group"]?.Resource?.status?.atProvider?.id or ""
 ]
-
-_environment_groups_ids = []
-_environment_groups_ids += [
-  ocds["{}-env-gateway-group".format(env)]?.Resource?.status?.atProvider?.id or ""
-  for env in parameters.environments
-]
-
-_setup_keys_groups += _environment_groups_ids
 
 _build_server_setup_key = {
   apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
@@ -244,52 +185,93 @@ _build_server_setup_key = {
     providerConfigRef = {
       name = spec?.providerConfigsRef?.netbirdProviderConfigName
     }
+    writeConnectionSecretToRef = {
+      name = parameters.setupKey.name
+      namespace = parameters.setupKey.namespace
+    }
     managementPolicies = spec?.managementPolicies
   }
 }
-#need to remove
-_build_server_setup_key_secret = {
-  apiVersion = "kubernetes.crossplane.io/v1alpha2"
-    kind = "Object"
-    metadata = {
-        name = "{}-build-server-setup-key-secret".format(oxr.metadata.name)
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "build-server-setup-key-secret"
-        }
+
+
+# _build_server_setup_key_secret = {
+#   apiVersion = "kubernetes.crossplane.io/v1alpha2"
+#     kind = "Object"
+#     metadata = {
+#         name = "{}-build-server-setup-key-secret".format(oxr.metadata.name)
+#         annotations = {
+#             "krm.kcl.dev/composition-resource-name": "build-server-setup-key-secret"
+#         }
+#     }
+#     spec = {
+#         forProvider = {
+#             manifest = {
+#                 apiVersion = "v1"
+#                 kind = "Secret"
+#                 metadata = {
+#                     name = parameters.setupKey.name
+#                     namespace = parameters.setupKey.namespace
+#                 }
+#                 data = {
+#                   parameters?.setupKey?.buildSetupKeySecretKey = ocds["build-server-setup-key"]?.Resource?.status?.atProvider?.key or ""
+#                 }
+#                 type = "Opaque"
+#             }
+#         }
+#         managementPolicies = spec?.managementPolicies
+#         providerConfigRef = {
+#           name = spec?.providerConfigsRef?.k8sProviderConfigName
+#         }
+#     }
+# }
+
+
+_nameserver = {
+  apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+  kind = "NbNameServer"
+  metadata = {
+    name = "{}-default-nameserver".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "default-nameserver"
     }
-    spec = {
-        forProvider = {
-            manifest = {
-                apiVersion = "v1"
-                kind = "Secret"
-                metadata = {
-                    name = parameters.setupKey.name
-                    namespace = parameters.setupKey.namespace
-                }
-                data = {
-                  parameters?.setupKey?.buildSetupKeySecretKey = ocds["build-server-setup-key"]?.Resource?.status?.atProvider?.key or ""
-                  parameters?.setupKey?.gwSetupKeySecretKey = ocds["cc-gw-setup-key"]?.Resource?.status?.atProvider?.key or ""
-                }
-                type = "Opaque"
-            }
+  }
+  spec = {
+    forProvider = {
+      name = "default-ns"
+      description = "default nameserver"
+      groups = [
+        ocds["all-group"]?.Resource?.status?.atProvider?.id or ""
+      ]
+      domains = ["clusters.local"]
+      enabled = True
+      primary = False
+      search_domains_enabled = False
+      nameservers = [
+        {
+          ip = "8.8.8.8"
+          ns_type = "udp"
+          port = 53
         }
-        managementPolicies = spec?.managementPolicies
-        providerConfigRef = {
-          name = spec?.providerConfigsRef?.k8sProviderConfigName
-        }
+      ]
     }
+    providerConfigRef = {
+      name = spec?.providerConfigsRef?.netbirdProviderConfigName
+    }
+    managementPolicies = spec?.managementPolicies
+  }
 }
+
+
 
 # Add the resources to the items list
 _items += [
+  _zitadel_project_id_secret,
+  _account,
   _all_group,
   _admin_group,
-  _account,
-  _dns,
-  _cc_gateway_group,
-  _cc_gateway_setup_key,
+  _external_access_group,
   _build_server_setup_key,
-  *_environment_groups
+  _nameserver,
 ]
 
 dxr = {

@@ -6,11 +6,12 @@ metadata:
 spec:
   parameters:
     nbManagmentURI: https://netbird.test.com/
-    operatorHelmVersion: 0.1.6
+    operatorHelmVersion: 0.1.7
     operatorNamespace: netbird
     operatorArgoAppName: nb-op
     operatorArgoAppSourceURL: https://github.com/mojaloop/iac-modules/gitops/applications/base/netbird-operator
     operatorArgoAppSourceRevision: "feat/np-op-install"
+    operatorKubeapiGroupName: "cluster-k8s"
   providerConfigsRef:
     scK8sProviderName: "sc-kubernetes-provider"
   managementPolicies:

@@ -82,6 +82,10 @@ _sc_argocd_operator_app_install = {
                   {
                     name = "netbird_operator_cluster_name"
                     value = parameters.operatorClusterName
+                  },
+                  {
+                    name = "netbird_operator_kubeapi_group"
+                    value = parameters.operatorKubeapiGroupName
                   }
                 ]
               }

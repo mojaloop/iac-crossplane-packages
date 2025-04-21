@@ -13,9 +13,10 @@ spec:
     setupKey:
       name: "setup-key-name"
       namespace: "setup-key-namespace"
-      gwSetupKeySecretKey: "gw-setup-key-secret-key"
-      buildSetupKeySecretKey: "build-setup-key-secret-key"
-    zitadelProjectId: 123455
+    zitadelProjectIdSecret:
+      name: "zit-projid-secret-name"
+      namespace: "zit-projid-secret-namespace"
+      key: "zit-projid-secret-key"
     groupNames:
       admin: techops-admin
       externalAccess: techops-users

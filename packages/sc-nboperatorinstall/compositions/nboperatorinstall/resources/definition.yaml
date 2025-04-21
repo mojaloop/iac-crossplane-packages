@@ -73,3 +73,6 @@ spec:
                     operatorArgoAppSourceRevision:
                       type: string
                       description: Revision for argo app source.
+                    operatorKubeapiGroupName:
+                      type: string
+                      description: Group name to associate with netbird kubeapi resource.

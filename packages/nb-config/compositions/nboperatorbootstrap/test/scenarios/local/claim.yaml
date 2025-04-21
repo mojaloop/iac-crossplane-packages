@@ -5,12 +5,21 @@ metadata:
   namespace: testa
 spec:
   parameters:
+    zitadelProjectIdSecret:
+      name: "zit-projid-secret-name"
+      namespace: "zit-projid-secret-namespace"
+      key: "zit-projid-secret-key"
+    groupNames:
+      admin: techops-admin
+      externalAccess: techops-users
+      kubeapiResourceGroup: cc-k8s
     serviceUserName: testserviceuser
     accessTokenExpiresInDays: 5
     operatorKubeapiGroup: testgroup
     accessToken:
       destinationType: local
   providerConfigsRef:
+    ccK8sProviderName: "cc-kubernetes-provider"
     netbirdProviderConfigName: "netbird-provider-config"
   managementPolicies:
     - "*"

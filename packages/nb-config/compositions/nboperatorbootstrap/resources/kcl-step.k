@@ -8,12 +8,63 @@ parameters = spec.parameters
 _items = []
 
 readyBasedOnConditions = lambda o: any -> bool {
-  # Get conditions directly from status
-  conditions = o?.Resource?.status?.conditions or []
-  # Simply check if all conditions are True
-  len(conditions) > 0 and all_true([c.status == "True" for c in conditions])
+    # Get conditions directly from status
+    conditions = o?.Resource?.status?.conditions or []
+    # Simply check if all conditions are True
+    len(conditions) > 0 and all_true([c.status == "True" for c in conditions])
 }
 
+_zitadel_project_id_secret = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-zitadel-project-id-secret".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "zitadel-project-id-secret"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = parameters.zitadelProjectIdSecret.name
+                    namespace = parameters.zitadelProjectIdSecret.namespace
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.ccK8sProviderName
+        }
+    }
+}
+
+zitadel_project_id = ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or ""] or ""
+admin_group_name = "{}:{}".format(zitadel_project_id, parameters.groupNames.admin)
+external_access_group_name = "{}:{}".format(zitadel_project_id, parameters.groupNames.externalAccess)
+
+_external_access_group = {
+    apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+    kind = "NbGroup"
+    metadata = {
+        name = "{}-external-access-group".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "external-access-group"
+            "crossplane.io/external-name": external_access_group_name
+        }
+    }
+    spec = {
+        forProvider = {
+            name = external_access_group_name
+        }
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.netbirdProviderConfigName
+        }
+        managementPolicies = ["Observe"]
+    }
+}
 # Kubernetes Group
 _kubernetes_group = {
     apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
@@ -26,7 +77,7 @@ _kubernetes_group = {
     }
     spec = {
         forProvider = {
-            name = parameters.operatorKubeapiGroup
+            name = parameters.groupNames.kubeapiResourceGroup
         }
         providerConfigRef = {
             name = spec?.providerConfigsRef?.netbirdProviderConfigName
@@ -34,7 +85,6 @@ _kubernetes_group = {
         managementPolicies = spec?.managementPolicies
     }
 }
-
 # NB Service User
 _service_user = {
     apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
@@ -58,8 +108,6 @@ _service_user = {
         managementPolicies = spec?.managementPolicies
     }
 }
-
-
 ### Access Token
 # NB Service User Access Token
 if parameters.accessToken.destinationType == "local":
@@ -68,7 +116,6 @@ if parameters.accessToken.destinationType == "local":
 else:
     _access_token_secret_name = "{}-access-token".format(oxr.metadata.name)
     _access_token_secret_namespace = oxr.metadata.namespace if oxr.metadata.namespace else "crossplane-system"
-
 _access_token = {
     apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
     kind = "NbAccessToken"
@@ -94,7 +141,6 @@ _access_token = {
         managementPolicies = spec?.managementPolicies
     }
 }
-
 # Access Token Secret Copy
 if parameters.accessToken.destinationType == "sc":
     # Netbird Namespace
@@ -153,24 +199,73 @@ if parameters.accessToken.destinationType == "sc":
             managementPolicies = spec?.managementPolicies
         }
     }
+
 # elif parameters.accessToken.destinationType == "tenantVault":
 #     # TODO: Implement tenant vault stuff
-
-
+_k8s_policy = {
+    apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+    kind = "NbPolicy"
+    metadata = {
+        name = "{}-k8s-policy".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "k8s-policy"
+        }
+    }
+    spec = {
+        forProvider = {
+            name = "{}-k8s-policy".format(oxr.metadata.name)
+            enabled = True
+            description = "Policy for connecting to kubeapi for {}".format(oxr.metadata.name)
+            rules = [
+                {
+                    action = "accept"
+                    bidirectional = False
+                    description = "k8s accept"
+                    name = "k8s-accept-rule"
+                    enabled = True
+                    destinations = [
+                        {
+                            id = ocds["kubernetes-group"]?.Resource?.status?.atProvider?.id or ""
+                        }
+                    ]
+                    sources = [
+                        {
+                            id = ocds["external-access-group"]?.Resource?.status?.atProvider?.id or ""
+                        }
+                    ]
+                    port_ranges = [
+                        {
+                            start = 443
+                            end = 443
+                        }
+                    ]
+                    protocol = "tcp"
+                }
+            ]
+        }
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.netbirdProviderConfigName
+        }
+        managementPolicies = spec?.managementPolicies
+    }
+}
 # Add the resources to the items list
 _items += [
-  _kubernetes_group,
-  _service_user,
-  _access_token,
+    _zitadel_project_id_secret
+    _external_access_group
+    _kubernetes_group
+    _service_user
+    _access_token
+    _k8s_policy
 ]
 
 if parameters.accessToken.destinationType == "sc":
     _items += [_sc_netbird_namespace, _sc_access_token_secret_copy]
+
 # elif parameters.accessToken.destinationType == "tenantVault":
 #     _items += [_tenant_vault_access_token_secret_copy] # TODO: Implement tenant vault stuff
-
 dxr = {
-  **oxr
+    **oxr
 }
 
 items = _items + [dxr]

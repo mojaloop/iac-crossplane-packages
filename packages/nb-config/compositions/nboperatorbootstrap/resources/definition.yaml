@@ -79,6 +79,30 @@ spec:
                     operatorKubeapiGroup:
                       type: string
                       description: group name to give access to kubeapi
+                    zitadelProjectIdSecret:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: The name of the secret containing the Zitadel project id to use for the post-config.
+                        namespace:
+                          type: string
+                          description: The namespace of the secret containing the Zitadel project id to use for the post-config.
+                        key:
+                          type: string
+                          description: The key of the secret containing the Zitadel project id to use for the post-config.
+                    groupNames:
+                      type: object
+                      properties:
+                        admin:
+                          type: string
+                          description: The name of the admin group to use for the post-config.
+                        externalAccess:
+                          type: string
+                          description: The name of the external access group to use for the post-config.
+                        kubeapiResourceGroup:
+                          type: string
+                          description: The name of the group to give to kubeapi netbird resource.
                     accessToken:
                       type: object
                       properties:
