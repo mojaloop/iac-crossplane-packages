@@ -1,0 +1,57 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xproject.gitlab.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: gitlab.mojaloop.io
+  names:
+    kind: XProject
+    plural: xproject
+  claimNames:
+    kind: Project
+    plural: project
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the remote and local k8s providers.
+                required:
+                  - GitlabProvider
+                properties:
+                  gitlabProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the local k8s provider.
+              parameters:
+                type: object
+                properties: {}
