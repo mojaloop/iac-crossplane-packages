@@ -1,0 +1,8 @@
+apiVersion: projects.gitlab.crossplane.io/v1alpha1
+kind: Project
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: project
+status:
+  atProvider:
+    id: 1000

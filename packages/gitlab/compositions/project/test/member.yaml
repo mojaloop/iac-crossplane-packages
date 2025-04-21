@@ -1,0 +1,12 @@
+apiVersion: gitlab.mojaloop.io/v1alpha1
+kind: Member
+metadata:
+  name: member
+  namespace: default
+spec:
+  parameters:
+    scope: 1
+    memberType: project
+    members:
+    - gitlabUserID: 2
+      role: 50

@@ -44,14 +44,242 @@ spec:
               providerConfigsRef:
                 type: object
                 description: |-
-                  The name of the provider config to use for the remote and local k8s providers.
+                  The name of the provider config to use for the gitlab provider.
                 required:
-                  - GitlabProvider
+                  - gitlabProvider
                 properties:
                   gitlabProvider:
                     type: string
                     description: |-
-                      The name of the provider config to use for the local k8s provider.
+                      The name of the provider config to use for the gitlab provider.
               parameters:
                 type: object
-                properties: {}
+                properties:
+                  project:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      groupName:
+                        type: string
+                      groupId:
+                        description: GroupId for the new project (defaults to the current
+                          user’s namespace).
+                        type: integer
+                      groupIdRef:
+                        description: GroupIdRef is a reference to a project to retrieve
+                          its groupId
+                        properties:
+                          name:
+                            description: Name of the referenced object.
+                            type: string
+                          policy:
+                            description: Policies for referencing.
+                            properties:
+                              resolution:
+                                default: Required
+                                description: |-
+                                  Resolution specifies whether resolution of this reference is required.
+                                  The default is 'Required', which means the reconcile will fail if the
+                                  reference cannot be resolved. 'Optional' means this reference will be
+                                  a no-op if it cannot be resolved.
+                                enum:
+                                - Required
+                                - Optional
+                                type: string
+                              resolve:
+                                description: |-
+                                  Resolve specifies when this reference should be resolved. The default
+                                  is 'IfNotPresent', which will attempt to resolve the reference only when
+                                  the corresponding field is not present. Use 'Always' to resolve the
+                                  reference on every reconcile.
+                                enum:
+                                - Always
+                                - IfNotPresent
+                                type: string
+                            type: object
+                        required:
+                        - name
+                        type: object
+                      groupIdSelector:
+                        description: GroupIdSelector selects reference to a project
+                          to retrieve its groupId.
+                        properties:
+                          matchControllerRef:
+                            description: |-
+                              MatchControllerRef ensures an object with the same controller reference
+                              as the selecting object is selected.
+                            type: boolean
+                          matchLabels:
+                            additionalProperties:
+                              type: string
+                            description: MatchLabels ensures an object with matching labels
+                              is selected.
+                            type: object
+                          policy:
+                            description: Policies for selection.
+                            properties:
+                              resolution:
+                                default: Required
+                                description: |-
+                                  Resolution specifies whether resolution of this reference is required.
+                                  The default is 'Required', which means the reconcile will fail if the
+                                  reference cannot be resolved. 'Optional' means this reference will be
+                                  a no-op if it cannot be resolved.
+                                enum:
+                                - Required
+                                - Optional
+                                type: string
+                              resolve:
+                                description: |-
+                                  Resolve specifies when this reference should be resolved. The default
+                                  is 'IfNotPresent', which will attempt to resolve the reference only when
+                                  the corresponding field is not present. Use 'Always' to resolve the
+                                  reference on every reconcile.
+                                enum:
+                                - Always
+                                - IfNotPresent
+                                type: string
+                            type: object
+                        type: object
+                      description:
+                        type: string
+                      members:
+                        type: array
+                        items:
+                          type: object
+                          description: Member parameters.
+                          oneOf:
+                          - required: ["gitlabUserID"]
+                          - required: ["gitlabUserName"]
+                          properties:
+                            gitlabUserID:
+                              type: integer
+                              description: ID of the gitlab user in scope.
+                            gitlabUserName:
+                              type: string
+                              description: Username of the gitlab user in scope.
+                            role:
+                              type: integer
+                              description: The role of the user on the target scope.
+                              default: 30
+                              enum:
+                              - 10 #Guest
+                              - 20 #Reporter
+                              - 30 #Developer
+                              - 40 #Maintainer
+                              - 50 #Owner
+                      defaultBranch:
+                        type: string
+                      visibility:
+                        type: string
+                        enum:
+                          - private
+                          - internal
+                          - public
+                        default: private
+                      repositoryAccessLevel:
+                        type: string
+                        enum:
+                          - disabled
+                          - private
+                          - enabled
+                        default: enabled
+                      approvalsBeforeMerge:
+                        type: integer
+                        default: 1
+                      initializeWithReadme:
+                        type: boolean
+                        default: true
+                      forkingAccessLevel:
+                        type: string
+                        enum:
+                          - disabled
+                          - private
+                          - enabled
+                        default: enabled
+                      issuesAccessLevel:
+                        type: string
+                        enum:
+                          - disabled
+                          - private
+                          - enabled
+                        default: enabled
+                      mergeRequestsAccessLevel:
+                        type: string
+                        enum:
+                          - disabled
+                          - private
+                          - enabled
+                        default: enabled
+                      buildsAccessLevel:
+                        type: string
+                        enum:
+                          - disabled
+                          - private
+                          - enabled
+                        default: enabled
+                      wikiAccessLevel:
+                        type: string
+                        enum:
+                          - disabled
+                          - private
+                          - enabled
+                        default: enabled
+                      snippetsAccessLevel:
+                        type: string
+                        enum:
+                          - disabled
+                          - private
+                          - enabled
+                        default: enabled
+                      pagesAccessLevel:
+                        type: string
+                        enum:
+                          - disabled
+                          - private
+                          - enabled
+                        default: enabled
+                      operationsAccessLevel:
+                        type: string
+                        enum:
+                          - disabled
+                          - private
+                          - enabled
+                        default: enabled
+                      lfsEnabled:
+                        type: boolean
+                        default: true
+                      mergeMethod:
+                        type: string
+                        enum:
+                          - merge
+                          - rebase_merge
+                          - ff
+                        default: merge
+                      allowMergeOnSkippedPipeline:
+                        type: boolean
+                        default: false
+                      onlyAllowMergeIfPipelineSucceeds:
+                        type: boolean
+                        default: true
+                      onlyAllowMergeIfAllDiscussionsAreResolved:
+                        type: boolean
+                        default: true
+                      onlyMirrorProtectedBranches:
+                        type: boolean
+                      removeSourceBranchAfterMerge:
+                        type: boolean
+                        default: true
+                      requestAccessEnabled:
+                        type: boolean
+                        default: false
+                      importUrl:
+                        type: string
+                        description: Url for the repository to import as base
+                      ciConfigPath:
+                        type: string
+                        description: Path of the gitlab ci yml file
+                        default: ".gitlab-ci.yml"
+                    required:
+                      - name
