@@ -3,10 +3,10 @@ kind: Composition
 metadata:
   name: nboperatorinstall
   labels:
-    crossplane.io/xrd: xnboperatorinstall.sc.infitx.org
+    crossplane.io/xrd: xnboperatorinstall.sc.mojaloop.io
 spec:
   compositeTypeRef:
-    apiVersion: sc.infitx.org/v1alpha1
+    apiVersion: sc.mojaloop.io/v1alpha1
     kind: XNBOperatorInstall
   mode: Pipeline
   pipeline:

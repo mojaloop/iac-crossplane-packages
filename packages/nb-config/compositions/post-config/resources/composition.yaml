@@ -3,14 +3,13 @@ kind: Composition
 metadata:
   name: postconfig
   labels:
-    crossplane.io/xrd: xpostconfig.nb.infitx.org
+    crossplane.io/xrd: xpostconfig.nb.mojaloop.io
 spec:
   compositeTypeRef:
-    apiVersion: nb.infitx.org/v1alpha1
+    apiVersion: nb.mojaloop.io/v1alpha1
     kind: XPostConfig
   mode: Pipeline
   pipeline:
-
     - step: kcl
       functionRef:
         name: function-kcl

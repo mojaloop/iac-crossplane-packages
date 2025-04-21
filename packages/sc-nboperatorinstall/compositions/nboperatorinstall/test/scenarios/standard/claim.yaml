@@ -1,4 +1,4 @@
-apiVersion: sc.infitx.org/v1alpha1
+apiVersion: sc.mojaloop.io/v1alpha1
 kind: XNBOperatorInstall
 metadata:
   name: example-nboperatorinstall

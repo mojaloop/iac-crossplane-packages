@@ -1,4 +1,4 @@
-apiVersion: nb.infitx.org/v1alpha1
+apiVersion: nb.mojaloop.io/v1alpha1
 kind: XPostConfig
 metadata:
   name: example-post-config

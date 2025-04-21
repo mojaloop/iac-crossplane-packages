@@ -23,8 +23,8 @@ spec:
 
 This package includes the following compositions:
 
-1. PostConfig.nb.infitx.org
-2. ZitadelUserRolesSyncer.nb.infitx.org
+1. PostConfig.nb.mojaloop.io
+2. ZitadelUserRolesSyncer.nb.mojaloop.io
 
 ## Usage
 

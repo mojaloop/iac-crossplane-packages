@@ -3,14 +3,13 @@ kind: Composition
 metadata:
   name: zitadeluserrolesyncer
   labels:
-    crossplane.io/xrd: xzitadeluserrolesyncer.nb.infitx.org
+    crossplane.io/xrd: xzitadeluserrolesyncer.nb.mojaloop.io
 spec:
   compositeTypeRef:
-    apiVersion: nb.infitx.org/v1alpha1
+    apiVersion: nb.mojaloop.io/v1alpha1
     kind: ZitadelUserRoleSyncer
   mode: Pipeline
   pipeline:
-
     - step: kcl
       functionRef:
         name: function-kcl
