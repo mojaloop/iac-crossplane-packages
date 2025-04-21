@@ -1,0 +1,12 @@
+apiVersion: gitlab.mojaloop.io/v1alpha1
+kind: XProject
+metadata:
+  name: gitlab
+  namespace: gitlab
+spec:
+  parameters: {}
+
+  providerConfigsRef:
+    gitlabProvider: gitlab-provider
+  managementPolicies:
+    - "*"
