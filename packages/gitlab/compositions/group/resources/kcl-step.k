@@ -64,7 +64,7 @@ _Memberships += [{
         }
         managementPolicies = spec.managementPolicies
         providerConfigsRef = {
-            name = spec?.providerConfigsRef?.gitlabProvider
+            gitlabProvider = spec?.providerConfigsRef?.gitlabProvider
         }
     }
 } if (members) else {} for i, m in members]
