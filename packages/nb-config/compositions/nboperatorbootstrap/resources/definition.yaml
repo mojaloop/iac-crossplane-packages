@@ -106,6 +106,9 @@ spec:
                     accessToken:
                       type: object
                       properties:
+                        localSecretName:
+                          type: string
+                          description: "token secret name"
                         destinationType:
                           type: string
                           description: The type of destination to store the access token.

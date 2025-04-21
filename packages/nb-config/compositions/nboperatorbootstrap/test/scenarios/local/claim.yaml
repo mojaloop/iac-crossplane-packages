@@ -15,9 +15,9 @@ spec:
       kubeapiResourceGroup: cc-k8s
     serviceUserName: testserviceuser
     accessTokenExpiresInDays: 5
-    operatorKubeapiGroup: testgroup
     accessToken:
       destinationType: local
+      localSecretName: test-secret
   providerConfigsRef:
     ccK8sProviderName: "cc-kubernetes-provider"
     netbirdProviderConfigName: "netbird-provider-config"

@@ -111,7 +111,7 @@ _service_user = {
 ### Access Token
 # NB Service User Access Token
 if parameters.accessToken.destinationType == "local":
-    _access_token_secret_name = "nb-operator-api-key"
+    _access_token_secret_name = parameters.accessToken.localSecretName
     _access_token_secret_namespace = oxr.metadata.namespace if oxr.metadata.namespace else "crossplane-system"
 else:
     _access_token_secret_name = "{}-access-token".format(oxr.metadata.name)
