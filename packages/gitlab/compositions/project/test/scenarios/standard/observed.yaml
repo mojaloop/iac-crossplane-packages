@@ -5,4 +5,4 @@ metadata:
     crossplane.io/composition-resource-name: project
 status:
   atProvider:
-    id: 1000
+    id: 3
