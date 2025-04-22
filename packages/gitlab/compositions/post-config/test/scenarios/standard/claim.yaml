@@ -1,5 +1,5 @@
 apiVersion: gitlab.mojaloop.io/v1alpha1
-kind: XPostConfig
+kind: XGitlabPostConfig
 metadata:
   name: post
   namespace: default

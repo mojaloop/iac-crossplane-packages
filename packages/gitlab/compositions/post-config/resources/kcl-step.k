@@ -1,5 +1,3 @@
-import regex
-
 # Read the XR
 oxr = option("params").oxr
 ocds = option("params").ocds

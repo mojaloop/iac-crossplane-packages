@@ -1,16 +1,16 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xpostconfig.gitlab.mojaloop.io
+  name: xgitlabpostconfig.gitlab.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
   group: gitlab.mojaloop.io
   names:
-    kind: XPostConfig
-    plural: xpostconfig
+    kind: XGitlabPostConfig
+    plural: xgitlabpostconfig
   claimNames:
-    kind: PostConfig
-    plural: postconfig
+    kind: GitlabPostConfig
+    plural: gitlabpostconfig
   versions:
   - name: v1alpha1
     served: true

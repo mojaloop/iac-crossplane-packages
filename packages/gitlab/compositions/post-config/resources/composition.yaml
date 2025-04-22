@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: postconfig
+  name: gitlabpostconfig
   labels:
-    crossplane.io/xrd: xpostconfig.gitlab.mojaloop.io
+    crossplane.io/xrd: xgitlabpostconfig.gitlab.mojaloop.io
 spec:
   compositeTypeRef:
     apiVersion: gitlab.mojaloop.io/v1alpha1
-    kind: XPostConfig
+    kind: XGitlabPostConfig
   mode: Pipeline
   pipeline:
 
