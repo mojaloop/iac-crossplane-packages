@@ -15,7 +15,6 @@ _groupIAC = {
         parameters = {
             group = {
                 name = "xiac"
-                path = "xiac"
             }
         }
         managementPolicies = spec.managementPolicies
@@ -50,7 +49,7 @@ _projBootstrap = {
         parameters = {
             project = {
                 name = "bootstrap"
-                namespaceId = ocds["iac"]?.Resource?.status?.atProvider?.id
+                groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             }
         }
         managementPolicies = spec.managementPolicies
@@ -194,7 +193,6 @@ _groupTenancy = {
         parameters = {
             group = {
                 name = "xtenancy-internal"
-                path = "xtenancy-internal"
             }
         }
         managementPolicies = spec.managementPolicies
@@ -212,7 +210,7 @@ _projDocs = {
         parameters = {
             project = {
                 name = "tenancy-docs"
-                namespaceId = ocds["tenancy-internal"]?.Resource?.status?.atProvider?.id
+                groupId = ocds["tenancy-internal"]?.Resource?.status?.atProvider?.id
             }
         }
         managementPolicies = spec.managementPolicies
