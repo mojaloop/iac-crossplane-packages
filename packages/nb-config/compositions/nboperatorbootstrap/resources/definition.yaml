@@ -10,7 +10,7 @@ spec:
     plural: xnboperatorbootstrap
   claimNames:
     kind: NBOperatorBootstrap
-    plural: xnboperatorbootstraps
+    plural: nboperatorbootstrap
   versions:
     - name: v1alpha1
       served: true
