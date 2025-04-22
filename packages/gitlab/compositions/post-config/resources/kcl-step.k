@@ -50,8 +50,10 @@ _projBootstrap = {
     metadata.annotations: {"krm.kcl.dev/composition-resource-name" = "bootstrap"}
     spec = {
         parameters = {
-            name = "bootstrap"
-            namespaceId = ocds["iac"]?.Resource?.status?.atProvider?.id
+            project = {
+                name = "bootstrap"
+                namespaceId = ocds["iac"]?.Resource?.status?.atProvider?.id
+            }
         }
         managementPolicies = spec.managementPolicies
         providerConfigsRef = {
@@ -192,8 +194,10 @@ _groupTenancy = {
     metadata.annotations: {"krm.kcl.dev/composition-resource-name" = "tenancy-internal"}
     spec = {
         parameters = {
-            name = "xtenancy-internal"
-            path = "xtenancy-internal"
+            group = {
+                name = "xtenancy-internal"
+                path = "xtenancy-internal"
+            }
         }
         managementPolicies = spec.managementPolicies
         providerConfigsRef = {
@@ -208,8 +212,10 @@ _projDocs = {
     metadata.annotations: {"krm.kcl.dev/composition-resource-name" = "tenancy-docs"}
     spec = {
         parameters = {
-            name = "tenancy-docs"
-            namespaceId = ocds["tenancy-internal"]?.Resource?.status?.atProvider?.id
+            project = {
+                name = "tenancy-docs"
+                namespaceId = ocds["tenancy-internal"]?.Resource?.status?.atProvider?.id
+            }
         }
         managementPolicies = spec.managementPolicies
         providerConfigsRef = {
