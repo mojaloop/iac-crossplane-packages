@@ -1,0 +1,79 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xpostconfig.gitlab.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: gitlab.mojaloop.io
+  names:
+    kind: XPostConfig
+    plural: xpostconfig
+  claimNames:
+    kind: PostConfig
+    plural: postconfig
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the gitlab providers.
+                required:
+                  - gitlabProvider
+                properties:
+                  gitlabProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the gitlab provider.
+              parameters:
+                type: object
+                properties:
+                  gitlabRunnerRoleName:
+                    type: string
+                    description: |-
+                      The name of the role to assign the gitlab runners.
+                    default: gitlab-runner-role
+                  gitlabRunnerJwtPath:
+                    type: string
+                    description: |-
+                      Vault jwt path for gitlab secrets integration.
+                    default: gitlab_secrets_jwt
+                  vaultFqdn:
+                    type: string
+                    description: |-
+                      The fqdn for vault api.
+                  privateRepoUser:
+                    type: string
+                    description: |-
+                      Repo user name for private iac repo.
+                  privateRepo:
+                    type: string
+                    description: |-
+                      Repo location for private iac.

@@ -1,0 +1,10 @@
+apiVersion: gitlab.mojaloop.io/v1alpha1
+kind: XPostConfig
+metadata:
+  name: post
+  namespace: default
+spec:
+  parameters:
+    privateRepo: foo
+  providerConfigsRef:
+    gitlabProvider: gitlab-provider
