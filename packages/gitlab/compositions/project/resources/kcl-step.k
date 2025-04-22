@@ -83,11 +83,11 @@ _projectMembers += [{
         parameters = {
             members = members
             memberType = "project"
-            scope = ocds["project"]?.Resource?.status?.id
+            scope = ocds["project"]?.Resource?.status?.atProvider?.id
         }
         managementPolicies = spec.managementPolicies
-        providerConfigRef = {
-            name = spec?.providerConfigsRef?.gitlabProvider
+        providerConfigsRef = {
+            name = spec?.providerConfigRef?.gitlabProvider
         }
     }
 } if (members) else {} for i, m in members]
