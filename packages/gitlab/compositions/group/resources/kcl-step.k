@@ -60,7 +60,7 @@ _Memberships += [{
         parameters = {
             members = members
             memberType = "group"
-            scope = ocds["group"]?.Resource?.status?.path
+            scope = ocds["group"]?.Resource?.status?.atProvider?.id
         }
         managementPolicies = spec.managementPolicies
         providerConfigsRef = {

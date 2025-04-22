@@ -7,5 +7,6 @@ spec:
   parameters:
     group:
       name: group
+      parentId: 1
   providerConfigsRef:
     gitlabProvider: gitlab-provider
