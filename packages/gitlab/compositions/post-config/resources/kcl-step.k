@@ -67,7 +67,7 @@ _groupVarVaultAuthPath = {
     }
     spec = {
         forProvider = {
-            groupId: ocds["iac"]?.Resource?.status?.atProvider?.id
+            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             key = "VAULT_AUTH_PATH"
             value = p?.gitlabRunnerJwtPath
             protected = True
@@ -88,7 +88,7 @@ _groupVarVaultAuthRole = {
     }
     spec = {
         forProvider = {
-            groupId: ocds["iac"]?.Resource?.status?.atProvider?.id
+            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             key = "VAULT_AUTH_ROLE"
             value = p?.gitlabRunnerRoleName
             protected = True
@@ -109,7 +109,7 @@ _groupVarVaultFqdn = {
     }
     spec = {
         forProvider = {
-            groupId: ocds["iac"]?.Resource?.status?.atProvider?.id
+            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             key = "VAULT_FQDN"
             value = p?.vaultFqdn
             protected = True
@@ -130,7 +130,7 @@ _groupVarPrivateRepoUser = {
     }
     spec = {
         forProvider = {
-            groupId: ocds["iac"]?.Resource?.status?.atProvider?.id
+            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             key = "PRIVATE_REPO_USER"
             value = p?.privateRepoUser
             protected = True
@@ -151,7 +151,7 @@ _groupVarPrivateRepo = {
     }
     spec = {
         forProvider = {
-            groupId: ocds["iac"]?.Resource?.status?.atProvider?.id
+            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             key = "PRIVATE_REPO"
             value = p?.privateRepo
             protected = True
@@ -172,7 +172,7 @@ _groupVarPrivateRepoTokenVaultPath = {
     }
     spec = {
         forProvider = {
-            groupId: ocds["iac"]?.Resource?.status?.atProvider?.id
+            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             key = "PRIVATE_REPO_TOKEN_PATH"
             value = p?.privateRepo
             protected = True
