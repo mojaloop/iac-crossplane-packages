@@ -9,8 +9,8 @@ spec:
     kind: XNBOperatorBootstrap
     plural: xnboperatorbootstrap
   claimNames:
-    kind: NBOperatorInstall
-    plural: xnboperatorinstalls
+    kind: NBOperatorBootstrap
+    plural: xnboperatorbootstraps
   versions:
     - name: v1alpha1
       served: true
