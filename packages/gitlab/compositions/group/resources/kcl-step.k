@@ -69,6 +69,13 @@ _Memberships += [{
     }
 } if (members) else {} for i, m in members]
 
+
 _items += [_Group] + _Memberships
-dxr = {**oxr}
+
+
+
+dxr = {
+  **oxr
+  status.groupId = ocds["group"]?.Resource?.status?.atProvider?.id
+}
 items = _items + [dxr]
