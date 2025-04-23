@@ -60,27 +60,36 @@ jobs:
         working-directory: ${{ inputs.CROSSPLANE_PACKAGES_DIR }}
         run: |
           echo "🔍 Preparing package for ${{ inputs.SUBPATH }}"
-          # Run make all and capture output
-          OUTPUT=$(make all PACKAGE_NAME=${{ inputs.SUBPATH }} 2>&1)
-          echo "$OUTPUT"
+          # Run make all and display output in real-time
+          make all PACKAGE_NAME=${{ inputs.SUBPATH }} 2>&1 | tee /tmp/build_output.log
 
-          # Check for validation failures by looking for actual failure cases
-          FAILURE_COUNT=$(echo "$OUTPUT" | grep -o "failure cases" | tail -1 | grep -o "[0-9]*")
-          if [ ! -z "$FAILURE_COUNT" ] && [ "$FAILURE_COUNT" -gt 0 ]; then
-            echo "❌ Validation failed! Found $FAILURE_COUNT failure cases in the output"
-            # Extract and display the failure details
+          # Check for any validation failures across the entire output
+          FAILURE_LINES=$(grep -c "\[x\]" /tmp/build_output.log)
+          if [ "$FAILURE_LINES" -gt 0 ]; then
+            echo "❌ Validation failed! Found $FAILURE_LINES failure lines in the output"
             echo "Validation Failures:"
-            echo "$OUTPUT" | grep "\[x\]"
+            grep "\[x\]" /tmp/build_output.log
             exit 1
           fi
 
-          # Check for missing schemas by looking at the actual count
-          MISSING_SCHEMAS_COUNT=$(echo "$OUTPUT" | grep "missing schemas" | tail -1 | grep -o "[0-9]* missing schemas" | grep -o "[0-9]*")
-          if [ ! -z "$MISSING_SCHEMAS_COUNT" ] && [ "$MISSING_SCHEMAS_COUNT" -gt 0 ]; then
-            echo "❌ Validation failed! Found $MISSING_SCHEMAS_COUNT missing schemas in the output"
-            echo "$OUTPUT" | grep "schemas does not exist"
+          # Check for failure cases summary lines across the entire output
+          FAILURE_CASES=$(grep -E "([1-9][0-9]*) failure cases" /tmp/build_output.log)
+          if [ ! -z "$FAILURE_CASES" ]; then
+            echo "❌ Validation failed! Found failure cases in the output:"
+            echo "$FAILURE_CASES"
             exit 1
           fi
+
+          # Check for missing schemas across the entire output
+          MISSING_SCHEMAS=$(grep -E "([1-9][0-9]*) missing schemas" /tmp/build_output.log)
+          if [ ! -z "$MISSING_SCHEMAS" ]; then
+            echo "❌ Validation failed! Found missing schemas in the output:"
+            echo "$MISSING_SCHEMAS"
+            exit 1
+          fi
+
+          # Clean up the temporary file
+          rm /tmp/build_output.log
 
           echo "✅ Validation completed successfully"
 
