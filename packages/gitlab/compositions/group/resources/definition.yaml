@@ -130,4 +130,4 @@ spec:
             type: object
             properties:
               groupId:
-                type: string
+                type: integer
