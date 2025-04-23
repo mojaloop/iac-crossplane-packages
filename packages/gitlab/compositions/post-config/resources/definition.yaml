@@ -69,6 +69,7 @@ spec:
                     type: string
                     description: |-
                       The fqdn for vault api.
+                    default: vault.cluster.mojaloop.io
                   privateRepoUser:
                     type: string
                     description: |-

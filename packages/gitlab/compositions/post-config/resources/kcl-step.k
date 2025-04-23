@@ -33,7 +33,7 @@ _groupAccessToken = {
             groupId = ocds["iac"]?.Resource?.status?.groupId
             name = "gitlab ci pat"
             accessLevel = 50
-            expiresAt = 99999
+            expiresAt = "2040-03-15T08:00:00Z"
             scopes = ["api"]
         }
         providerConfigRef = {
