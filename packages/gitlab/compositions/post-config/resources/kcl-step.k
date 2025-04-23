@@ -33,7 +33,7 @@ _groupIAC = {
     spec = {
         parameters = {
             group = {
-                name = "xiac"
+                name = "iac"
             }
         }
         managementPolicies = spec.managementPolicies
@@ -218,7 +218,7 @@ _groupTenancy = {
     spec = {
         parameters = {
             group = {
-                name = "xtenancy-internal"
+                name = "tenancy-internal"
             }
         }
         managementPolicies = spec.managementPolicies
