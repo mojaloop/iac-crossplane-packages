@@ -60,35 +60,57 @@ jobs:
         working-directory: ${{ inputs.CROSSPLANE_PACKAGES_DIR }}
         run: |
           echo "🔍 Preparing package for ${{ inputs.SUBPATH }}"
+          # Set up temp file paths
+          BUILD_OUTPUT="${{ runner.temp }}/build_output.log"
+          SUMMARY_LINES="${{ runner.temp }}/summary_lines.log"
+
           # Run make all and display output in real-time
           set -o pipefail  # Ensure the pipeline returns non-zero if make fails
-          make all PACKAGE_NAME=${{ inputs.SUBPATH }} 2>&1 | tee build_output.log
+          make all PACKAGE_NAME=${{ inputs.SUBPATH }} 2>&1 | tee "$BUILD_OUTPUT"
+
+          echo "📋 Build output saved. File size: $(wc -l "$BUILD_OUTPUT" | awk '{print $1}') lines"
 
           # Extract all resource summary lines for detailed inspection
-          grep "Total .* resources:" build_output.log > summary_lines.log
+          grep "Total .* resources:" "$BUILD_OUTPUT" > "$SUMMARY_LINES" || true
+
+          echo "📋 Summary lines extracted. File size: $(wc -l "$SUMMARY_LINES" | awk '{print $1}') lines"
+          echo "📋 Summary lines content:"
+          cat "$SUMMARY_LINES"
+
+          # Debug: Check for the specific pattern we're looking for
+          echo "🔍 Searching for failure cases pattern..."
+          grep -E "[0-9]+ success cases, ([1-9][0-9]*) failure cases" "$SUMMARY_LINES" || echo "No matches found"
 
           # Check if any summary line contains non-zero failure cases
-          if grep -q -E "[0-9]+ success cases, ([1-9][0-9]*) failure cases" summary_lines.log; then
+          if grep -q -E "[0-9]+ success cases, ([1-9][0-9]*) failure cases" "$SUMMARY_LINES"; then
             echo "❌ Validation failed! Found summary lines with failure cases"
             echo "Failure Case Summaries:"
-            grep -E "[0-9]+ success cases, ([1-9][0-9]*) failure cases" summary_lines.log
+            grep -E "[0-9]+ success cases, ([1-9][0-9]*) failure cases" "$SUMMARY_LINES"
+            exit 1
+          else
+            echo "✅ No failure cases found in summary lines"
+          fi
+
+          # Debug: Alternative search directly in build output
+          echo "🔍 Alternative search in full build output..."
+          grep -E "Total .* resources:.*[0-9]+ success cases, ([1-9][0-9]*) failure cases" "$BUILD_OUTPUT" || echo "No matches found in build output"
+
+          if grep -q -E "Total .* resources:.*[0-9]+ success cases, ([1-9][0-9]*) failure cases" "$BUILD_OUTPUT"; then
+            echo "❌ Validation failed! Found failure cases in direct build output search"
+            grep -E "Total .* resources:.*[0-9]+ success cases, ([1-9][0-9]*) failure cases" "$BUILD_OUTPUT"
             exit 1
           fi
 
           # Check if any summary line contains non-zero missing schemas
-          if grep -q -E "([1-9][0-9]*) missing schemas" summary_lines.log; then
+          if grep -q -E "([1-9][0-9]*) missing schemas" "$SUMMARY_LINES"; then
             echo "❌ Validation failed! Found summary lines with missing schemas"
             echo "Missing Schema Summaries:"
-            grep -E "([1-9][0-9]*) missing schemas" summary_lines.log
+            grep -E "([1-9][0-9]*) missing schemas" "$SUMMARY_LINES"
             exit 1
           fi
 
-          # Show all summary lines for debugging
-          echo "Summary lines processed:"
-          cat summary_lines.log
-
           # Clean up the temporary files
-          rm build_output.log summary_lines.log
+          rm -f "$BUILD_OUTPUT" "$SUMMARY_LINES"
 
           echo "✅ Validation completed successfully"
 
