@@ -79,4 +79,4 @@ spec:
                     operatorSyncWave:
                       type: string
                       description: Sync wave for operator deployment.
-                      default: 0
+                      default: "0"
