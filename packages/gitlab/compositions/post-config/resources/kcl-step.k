@@ -24,6 +24,8 @@ _groupIAC = {
     }
 }
 
+
+
 _groupAccessToken = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind: "AccessToken"
@@ -34,7 +36,7 @@ _groupAccessToken = {
             name = "gitlab ci pat"
             accessLevel = 50
             # TODO this shouldnt be static
-            expiresAt = "2026-03-30T08:00:00Z"
+            expiresAt = '2026-03-23'
             scopes = ["api"]
         }
         providerConfigRef = {
