@@ -20,7 +20,7 @@ calculateExpireAt = lambda -> str {
   y = int(_y) + 1
   m = int(_m) - 1 if int(_m) > 1 else 1
 
-  "{}-{}-01T00.00.00Z".format(y,"{:02d}".format(m))
+  "{}-{:02d}-01T00:00:00Z".format(y, m)
 }
 
 
@@ -43,15 +43,11 @@ _groupIAC = {
     }
 }
 
-_dxrExpire = None
 _statusExpireAt = status?.tokenExpireAt
-if _statusExpireAt == None:
-  _statusExpireAt = calculateExpireAt
+_expireAt = None
 
-  _dxrExpire = {
-    **oxr
-    status.tokenExpireAt = _statusExpireAt
-  }
+if _statusExpireAt == None:
+  _expireAt = calculateExpireAt()
 
 _groupAccessToken = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
@@ -62,7 +58,7 @@ _groupAccessToken = {
             groupId = ocds["iac"]?.Resource?.status?.groupId
             name = "gitlab ci pat"
             accessLevel = 50
-            expiresAt = _statusExpireAt
+            expiresAt = _statusExpireAt if _statusExpireAt != None else _expireAt
             scopes = ["api"]
         }
         providerConfigRef = {
@@ -263,6 +259,13 @@ _items += [
     _groupTenancy
     _projDocs
 ]
-dxr = {**oxr}
-dxrs = [dxr, _dxrExpire] if _dxrExpire != None else [dxr]
-items = _items + [dxrs]
+dxr = {
+    **oxr
+}
+
+finalDxr = {
+    **dxr
+    status.tokenExpireAt = _expireAt
+} if _statusExpireAt == None else dxr
+
+items = _items + [finalDxr]
