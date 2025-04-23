@@ -64,24 +64,31 @@ jobs:
           set -o pipefail  # Ensure the pipeline returns non-zero if make fails
           make all PACKAGE_NAME=${{ inputs.SUBPATH }} 2>&1 | tee /tmp/build_output.log
 
-          # Check for any summary lines with non-zero failure cases
-          if grep -q -E "([1-9][0-9]*) failure cases" /tmp/build_output.log; then
+          # Extract all resource summary lines for detailed inspection
+          grep "Total .* resources:" /tmp/build_output.log > /tmp/summary_lines.log
+
+          # Check if any summary line contains non-zero failure cases
+          if grep -q -E "[0-9]+ success cases, ([1-9][0-9]*) failure cases" /tmp/summary_lines.log; then
             echo "❌ Validation failed! Found summary lines with failure cases"
             echo "Failure Case Summaries:"
-            grep -E "([1-9][0-9]*) failure cases" /tmp/build_output.log
+            grep -E "[0-9]+ success cases, ([1-9][0-9]*) failure cases" /tmp/summary_lines.log
             exit 1
           fi
 
-          # Check for any summary lines with non-zero missing schemas
-          if grep -q -E "([1-9][0-9]*) missing schemas" /tmp/build_output.log; then
+          # Check if any summary line contains non-zero missing schemas
+          if grep -q -E "([1-9][0-9]*) missing schemas" /tmp/summary_lines.log; then
             echo "❌ Validation failed! Found summary lines with missing schemas"
             echo "Missing Schema Summaries:"
-            grep -E "([1-9][0-9]*) missing schemas" /tmp/build_output.log
+            grep -E "([1-9][0-9]*) missing schemas" /tmp/summary_lines.log
             exit 1
           fi
 
-          # Clean up the temporary file
-          rm /tmp/build_output.log
+          # Show all summary lines for debugging
+          echo "Summary lines processed:"
+          cat /tmp/summary_lines.log
+
+          # Clean up the temporary files
+          rm /tmp/build_output.log /tmp/summary_lines.log
 
           echo "✅ Validation completed successfully"
 
