@@ -6,3 +6,12 @@ metadata:
 status:
   atProvider:
     id: 1000
+---
+apiVersion: gitlab.mojaloop.io/v1alpha1
+kind: Group
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: tenancy-internal
+status:
+  atProvider:
+    id: 1001
