@@ -12,6 +12,7 @@ spec:
     operatorArgoAppSourceURL: https://github.com/mojaloop/iac-modules/gitops/applications/base/netbird-operator
     operatorArgoAppSourceRevision: "feat/np-op-install"
     operatorKubeapiGroupName: "cluster-k8s"
+    operatorClusterName: storage-cluster
   providerConfigsRef:
     scK8sProviderName: "sc-kubernetes-provider"
   managementPolicies:
