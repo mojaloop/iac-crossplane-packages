@@ -274,8 +274,11 @@ _nameserver = {
 # Add the resources to the items list
 _items += [
   _zitadel_project_id_secret,
-  _account,
 ]
+if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
+    _items += [
+      _account,
+    ]
 
 if readyBasedOnConditions(ocds["nb-account"]):
     _items += [

@@ -252,15 +252,19 @@ _k8s_policy = {
 # Add the resources to the items list
 _items += [
     _zitadel_project_id_secret
-    _external_access_group
-    _kubernetes_group
-    _service_user
-    _access_token
-    _k8s_policy
 ]
 
-if parameters.accessToken.destinationType == "sc":
-    _items += [_sc_netbird_namespace, _sc_access_token_secret_copy]
+if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
+    _items += [
+        _external_access_group
+        _kubernetes_group
+        _service_user
+        _access_token
+        _k8s_policy
+    ]
+    if parameters.accessToken.destinationType == "sc":
+        _items += [_sc_netbird_namespace, _sc_access_token_secret_copy]
+
 
 # elif parameters.accessToken.destinationType == "tenantVault":
 #     _items += [_tenant_vault_access_token_secret_copy] # TODO: Implement tenant vault stuff
