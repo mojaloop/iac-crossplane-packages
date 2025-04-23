@@ -73,7 +73,9 @@ spec:
                     type: string
                     description: |-
                       Repo user name for private iac repo.
+                    default: platform
                   privateRepo:
                     type: string
                     description: |-
                       Repo location for private iac.
+                    default: platform
