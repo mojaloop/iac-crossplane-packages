@@ -36,7 +36,7 @@ _groupAccessToken = {
             name = "gitlab ci pat"
             accessLevel = 50
             # TODO this shouldnt be static
-            expiresAt = "2025-04-23 12:24:27"
+            expiresAt = "2026-03-30T08:00:00Z"
             scopes = ["api"]
         }
         providerConfigRef = {
