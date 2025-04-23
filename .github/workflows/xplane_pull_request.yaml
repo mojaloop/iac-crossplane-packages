@@ -61,30 +61,22 @@ jobs:
         run: |
           echo "🔍 Preparing package for ${{ inputs.SUBPATH }}"
           # Run make all and display output in real-time
+          set -o pipefail  # Ensure the pipeline returns non-zero if make fails
           make all PACKAGE_NAME=${{ inputs.SUBPATH }} 2>&1 | tee /tmp/build_output.log
 
-          # Check for any validation failures across the entire output
-          FAILURE_LINES=$(grep -c "\[x\]" /tmp/build_output.log)
-          if [ "$FAILURE_LINES" -gt 0 ]; then
-            echo "❌ Validation failed! Found $FAILURE_LINES failure lines in the output"
-            echo "Validation Failures:"
-            grep "\[x\]" /tmp/build_output.log
+          # Check for any summary lines with non-zero failure cases
+          if grep -q -E "([1-9][0-9]*) failure cases" /tmp/build_output.log; then
+            echo "❌ Validation failed! Found summary lines with failure cases"
+            echo "Failure Case Summaries:"
+            grep -E "([1-9][0-9]*) failure cases" /tmp/build_output.log
             exit 1
           fi
 
-          # Check for failure cases summary lines across the entire output
-          FAILURE_CASES=$(grep -E "([1-9][0-9]*) failure cases" /tmp/build_output.log)
-          if [ ! -z "$FAILURE_CASES" ]; then
-            echo "❌ Validation failed! Found failure cases in the output:"
-            echo "$FAILURE_CASES"
-            exit 1
-          fi
-
-          # Check for missing schemas across the entire output
-          MISSING_SCHEMAS=$(grep -E "([1-9][0-9]*) missing schemas" /tmp/build_output.log)
-          if [ ! -z "$MISSING_SCHEMAS" ]; then
-            echo "❌ Validation failed! Found missing schemas in the output:"
-            echo "$MISSING_SCHEMAS"
+          # Check for any summary lines with non-zero missing schemas
+          if grep -q -E "([1-9][0-9]*) missing schemas" /tmp/build_output.log; then
+            echo "❌ Validation failed! Found summary lines with missing schemas"
+            echo "Missing Schema Summaries:"
+            grep -E "([1-9][0-9]*) missing schemas" /tmp/build_output.log
             exit 1
           fi
 
