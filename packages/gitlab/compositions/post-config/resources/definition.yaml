@@ -80,3 +80,8 @@ spec:
                     description: |-
                       Repo location for private iac.
                     default: platform
+          status:
+            type: object
+            properties:
+              tokenExpireAt:
+                type: string

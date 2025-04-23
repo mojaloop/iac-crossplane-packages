@@ -1,3 +1,6 @@
+import datetime
+import regex
+
 # Read the XR
 oxr = option("params").oxr
 ocds = option("params").ocds
@@ -5,6 +8,22 @@ ocds = option("params").ocds
 spec = oxr.spec
 status = oxr.status
 p = spec.parameters
+
+calculateExpireAt = lambda -> str {
+  now = datetime.today()
+  date = regex.split(now, " ")[0]
+
+  _y = regex.split(date, "-")[0]
+  _m = regex.split(date, "-")[1]
+  _d = regex.split(date, "-")[2]
+
+  y = int(_y) + 1
+  m = int(_m) - 1 if int(_m) > 1 else 1
+
+  "{}-{}-01T00.00.00Z".format(y,"{:02d}".format(m))
+}
+
+
 #render members
 _items = []
 _groupIAC = {
@@ -24,7 +43,15 @@ _groupIAC = {
     }
 }
 
+_dxrExpire = None
+_statusExpireAt = status?.tokenExpireAt
+if _statusExpireAt == None:
+  _statusExpireAt = calculateExpireAt
 
+  _dxrExpire = {
+    **oxr
+    status.tokenExpireAt = _statusExpireAt
+  }
 
 _groupAccessToken = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
@@ -35,8 +62,7 @@ _groupAccessToken = {
             groupId = ocds["iac"]?.Resource?.status?.groupId
             name = "gitlab ci pat"
             accessLevel = 50
-            # TODO this shouldnt be static
-            expiresAt = "2026-03-30T08:00:00Z"
+            expiresAt = _statusExpireAt
             scopes = ["api"]
         }
         providerConfigRef = {
@@ -238,4 +264,5 @@ _items += [
     _projDocs
 ]
 dxr = {**oxr}
-items = _items + [dxr]
+dxrs = [dxr, _dxrExpire] if _dxrExpire != None else [dxr]
+items = _items + [dxrs]
