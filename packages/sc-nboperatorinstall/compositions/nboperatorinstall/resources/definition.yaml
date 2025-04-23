@@ -76,3 +76,7 @@ spec:
                     operatorKubeapiGroupName:
                       type: string
                       description: Group name to associate with netbird kubeapi resource.
+                    operatorSyncWave:
+                      type: string
+                      description: Sync wave for operator deployment.
+                      default: 0

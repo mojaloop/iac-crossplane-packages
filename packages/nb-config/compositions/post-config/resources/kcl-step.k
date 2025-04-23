@@ -8,6 +8,13 @@ parameters = spec.parameters
 # Initialize the items list
 _items = []
 
+readyBasedOnConditions = lambda o: any -> bool {
+    # Get conditions directly from status
+    conditions = o?.Resource?.status?.conditions or []
+    # Simply check if all conditions are True
+    len(conditions) > 0 and all_true([c.status == "True" for c in conditions])
+}
+
 _zitadel_project_id_secret = {
   apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
@@ -268,12 +275,16 @@ _nameserver = {
 _items += [
   _zitadel_project_id_secret,
   _account,
-  _all_group,
-  _admin_group,
-  _external_access_group,
-  _build_server_setup_key,
-  _nameserver,
 ]
+
+if readyBasedOnConditions(ocds["nb-account"]):
+    _items += [
+      _all_group,
+      _admin_group,
+      _external_access_group,
+      _build_server_setup_key,
+      _nameserver,
+    ]
 
 dxr = {
   **oxr
