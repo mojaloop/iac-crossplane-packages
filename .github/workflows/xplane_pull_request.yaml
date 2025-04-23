@@ -62,33 +62,33 @@ jobs:
           echo "🔍 Preparing package for ${{ inputs.SUBPATH }}"
           # Run make all and display output in real-time
           set -o pipefail  # Ensure the pipeline returns non-zero if make fails
-          make all PACKAGE_NAME=${{ inputs.SUBPATH }} 2>&1 | tee /tmp/build_output.log
+          make all PACKAGE_NAME=${{ inputs.SUBPATH }} 2>&1 | tee build_output.log
 
           # Extract all resource summary lines for detailed inspection
-          grep "Total .* resources:" /tmp/build_output.log > /tmp/summary_lines.log
+          grep "Total .* resources:" build_output.log > summary_lines.log
 
           # Check if any summary line contains non-zero failure cases
-          if grep -q -E "[0-9]+ success cases, ([1-9][0-9]*) failure cases" /tmp/summary_lines.log; then
+          if grep -q -E "[0-9]+ success cases, ([1-9][0-9]*) failure cases" summary_lines.log; then
             echo "❌ Validation failed! Found summary lines with failure cases"
             echo "Failure Case Summaries:"
-            grep -E "[0-9]+ success cases, ([1-9][0-9]*) failure cases" /tmp/summary_lines.log
+            grep -E "[0-9]+ success cases, ([1-9][0-9]*) failure cases" summary_lines.log
             exit 1
           fi
 
           # Check if any summary line contains non-zero missing schemas
-          if grep -q -E "([1-9][0-9]*) missing schemas" /tmp/summary_lines.log; then
+          if grep -q -E "([1-9][0-9]*) missing schemas" summary_lines.log; then
             echo "❌ Validation failed! Found summary lines with missing schemas"
             echo "Missing Schema Summaries:"
-            grep -E "([1-9][0-9]*) missing schemas" /tmp/summary_lines.log
+            grep -E "([1-9][0-9]*) missing schemas" summary_lines.log
             exit 1
           fi
 
           # Show all summary lines for debugging
           echo "Summary lines processed:"
-          cat /tmp/summary_lines.log
+          cat summary_lines.log
 
           # Clean up the temporary files
-          rm /tmp/build_output.log /tmp/summary_lines.log
+          rm build_output.log summary_lines.log
 
           echo "✅ Validation completed successfully"
 
