@@ -36,8 +36,8 @@ _groupIAC = {
             description = "iac group"
         }
         managementPolicies = spec.managementPolicies
-        providerConfigsRef = {
-            gitlabProvider = spec?.providerConfigsRef?.gitlabProvider
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.gitlabProvider
         }
     }
 }
@@ -61,8 +61,8 @@ _groupAccessToken = {
             scopes = ["api"]
         }
         managementPolicies = spec.managementPolicies
-        providerConfigsRef = {
-            gitlabProvider = spec?.providerConfigsRef?.gitlabProvider
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.gitlabProvider
         }
     }
 }
@@ -221,8 +221,8 @@ _groupTenancy = {
             description = "tenancy-internal"
         }
         managementPolicies = spec.managementPolicies
-        providerConfigsRef = {
-            gitlabProvider = spec?.providerConfigsRef?.gitlabProvider
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.gitlabProvider
         }
     }
 }
