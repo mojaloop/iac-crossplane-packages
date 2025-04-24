@@ -86,10 +86,6 @@ _sc_argocd_operator_app_install = {
                   {
                     name = "netbird_operator_kubeapi_group"
                     value = parameters.operatorKubeapiGroupName
-                  },
-                  {
-                    name = "netbird_operator_sync_wave"
-                    value = parameters.operatorSyncWave
                   }
                 ]
               }

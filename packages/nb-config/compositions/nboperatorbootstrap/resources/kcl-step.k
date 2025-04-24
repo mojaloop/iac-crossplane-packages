@@ -220,7 +220,7 @@ _k8s_policy = {
             rules = [
                 {
                     action = "accept"
-                    bidirectional = False
+                    bidirectional = True
                     description = "k8s accept"
                     name = "k8s-accept-rule"
                     enabled = True
