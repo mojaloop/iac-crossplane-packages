@@ -8,6 +8,7 @@ spec:
     - "*"
   providerConfigsRef:
       awsProviderConfigName: "aws-provider"
+      ccK8sProviderName: "provider-kubernetes"
   parameters:
     allowMajorVersionUpgrade: false
     applyImmediately: false
