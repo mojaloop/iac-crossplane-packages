@@ -79,6 +79,10 @@ spec:
                     operatorKubeapiGroup:
                       type: string
                       description: group name to give access to kubeapi
+                    operatorNamespace:
+                      type: string
+                      description: Namespace for operator install.
+                      default: "netbird-op"
                     zitadelProjectIdSecret:
                       type: object
                       properties:
