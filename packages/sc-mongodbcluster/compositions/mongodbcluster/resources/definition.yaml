@@ -238,14 +238,9 @@ spec:
                         type: boolean
                       image:
                         type: string
-                      pitr:
-                        type: object
-                        properties:
-                          enabled:
-                            type: boolean
-                          oplogOnly:
-                            type: boolean
-                          compressionType:
-                            type: string
-                          compressionLevel:
-                            type: integer
+                      bucket:
+                        type: string
+                      credentialsSecret:
+                        type: string
+                      region:
+                        type: string

@@ -124,11 +124,15 @@ _MongodbCluster = {
                     backup = {
                         enabled = parameters?.backup?.enabled
                         image = parameters?.backup?.image
-                        pitr = {
-                            enabled = parameters?.backup?.pitr?.enabled
-                            oplogOnly = parameters?.backup?.pitr?.oplogOnly
-                            compressionType = parameters?.backup?.pitr?.compressionType
-                            compressionLevel = parameters?.backup?.pitr?.compressionLevel
+                        storages = {
+                            "s3-backup-storage" = {
+                                    type = "s3"
+                                    s3 = {
+                                        bucket = parameters?.backup?.bucket
+                                        credentialsSecret = parameters?.backup?.credentialsSecret
+                                        region = parameters?.backup?.region
+                                    }
+                            }
                         }
                     }
                 }
