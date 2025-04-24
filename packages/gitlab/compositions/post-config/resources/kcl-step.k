@@ -27,14 +27,13 @@ calculateExpireAt = lambda -> str {
 #render members
 _items = []
 _groupIAC = {
-    apiVersion = "gitlab.mojaloop.io/v1alpha1"
-    kind = "XGroup"
+    apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
+    kind = "Group"
     metadata.annotations: {"krm.kcl.dev/composition-resource-name" = "iac"}
     spec = {
-        parameters = {
-            group = {
-                name = "iac"
-            }
+        forProvider = {
+            name = "iac"
+            description = "iac group"
         }
         managementPolicies = spec.managementPolicies
         providerConfigsRef = {
@@ -61,8 +60,9 @@ _groupAccessToken = {
             expiresAt = _statusExpireAt if _statusExpireAt != None else _expireAt
             scopes = ["api"]
         }
-        providerConfigRef = {
-            name = spec?.providerConfigsRef?.gitlabProvider
+        managementPolicies = spec.managementPolicies
+        providerConfigsRef = {
+            gitlabProvider = spec?.providerConfigsRef?.gitlabProvider
         }
     }
 }
@@ -212,14 +212,13 @@ _groupVarPrivateRepoTokenVaultPath = {
 }
 
 _groupTenancy = {
-    apiVersion = "gitlab.mojaloop.io/v1alpha1"
-    kind = "XGroup"
+    apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
+    kind = "Group"
     metadata.annotations: {"krm.kcl.dev/composition-resource-name" = "tenancy-internal"}
     spec = {
-        parameters = {
-            group = {
-                name = "tenancy-internal"
-            }
+        forProvider = {
+            name = "tenancy-internal"
+            description = "tenancy-internal"
         }
         managementPolicies = spec.managementPolicies
         providerConfigsRef = {
@@ -227,7 +226,6 @@ _groupTenancy = {
         }
     }
 }
-
 _projDocs = {
     apiVersion = "gitlab.mojaloop.io/v1alpha1"
     kind = "XProject"
