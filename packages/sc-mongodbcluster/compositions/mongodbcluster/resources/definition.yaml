@@ -229,6 +229,8 @@ spec:
                           expose:
                             type: object
                             properties:
+                              enabled:
+                                type: boolean
                               type:
                                 type: string
                   backup:

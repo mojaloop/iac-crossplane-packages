@@ -77,11 +77,6 @@ spec:
           requests:
             cpu: "300m"
             memory: "0.5G"
-        volumeSpec:
-          persistentVolumeClaim:
-            resources:
-              requests:
-                storage: 3Gi
 
   providerConfigsRef:
     scK8sProviderName: sc-provider
