@@ -55,7 +55,7 @@ _groupAccessToken = {
     metadata.annotations: {"krm.kcl.dev/composition-resource-name" = "access-token"}
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.groupId
+            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             name = "gitlab ci pat"
             accessLevel = 50
             expiresAt = _statusExpireAt if _statusExpireAt != None else _expireAt
@@ -76,7 +76,7 @@ _projBootstrap = {
         parameters = {
             project = {
                 name = "bootstrap"
-                groupId = ocds["iac"]?.Resource?.status?.groupId
+                groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             }
         }
         managementPolicies = spec.managementPolicies
@@ -94,7 +94,7 @@ _groupVarVaultAuthPath = {
     }
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.groupId
+            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             key = "VAULT_AUTH_PATH"
             value = p?.gitlabRunnerJwtPath
             protected = True
@@ -115,7 +115,7 @@ _groupVarVaultAuthRole = {
     }
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.groupId
+            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             key = "VAULT_AUTH_ROLE"
             value = p?.gitlabRunnerRoleName
             protected = True
@@ -136,7 +136,7 @@ _groupVarVaultFqdn = {
     }
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.groupId
+            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             key = "VAULT_FQDN"
             value = p?.vaultFqdn
             protected = True
@@ -157,7 +157,7 @@ _groupVarPrivateRepoUser = {
     }
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.groupId
+            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             key = "PRIVATE_REPO_USER"
             value = p?.privateRepoUser
             protected = True
@@ -178,7 +178,7 @@ _groupVarPrivateRepo = {
     }
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.groupId
+            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             key = "PRIVATE_REPO"
             value = p?.privateRepo
             protected = True
@@ -199,7 +199,7 @@ _groupVarPrivateRepoTokenVaultPath = {
     }
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.groupId
+            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
             key = "PRIVATE_REPO_TOKEN_PATH"
             value = p?.privateRepo
             protected = True
@@ -236,7 +236,7 @@ _projDocs = {
         parameters = {
             project = {
                 name = "tenancy-docs"
-                groupId = ocds["tenancy-internal"]?.Resource?.status?.groupId
+                groupId = ocds["tenancy-internal"]?.Resource?.status?.atProvider?.id
             }
         }
         managementPolicies = spec.managementPolicies
