@@ -188,7 +188,7 @@ if parameters.accessToken.destinationType == "sc":
                 }
                 destination = {
                     name = "nb-operator-api-key"
-                    namespace = "nb-op"
+                    namespace = parameters.operatorNamespace
                     secretType = "Opaque"
                 }
             }
