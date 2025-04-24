@@ -53,41 +53,32 @@ _sc_argocd_operator_app_install = {
               namespace = parameters.operatorNamespace
             }
             source = {
-              repoURL = parameters.operatorArgoAppSourceURL
-              targetRevision = parameters.operatorArgoAppSourceRevision
-              path = "gitops/applications/base/netbird-operator"
-              plugin = {
-                name = "envsubst"
-                env = [
-                  {
-                    name = "netbird_operator_api_key_secret"
-                    value = "nb-operator-api-key"
-                  },
-                  {
-                    name = "netbird_operator_management_url"
-                    value = parameters.nbManagmentURI
-                  },
-                  {
-                    name = "netbird_operator_namespace"
-                    value = parameters.operatorNamespace
-                  },
-                  {
-                    name = "netbird_operator_helm_version"
-                    value = parameters.operatorHelmVersion
-                  },
-                  {
-                    name = "netbird_operator_app_name"
-                    value = parameters.operatorArgoAppName
-                  },
-                  {
-                    name = "netbird_operator_cluster_name"
-                    value = parameters.operatorClusterName
-                  },
-                  {
-                    name = "netbird_operator_kubeapi_group"
-                    value = parameters.operatorKubeapiGroupName
+              chart = "kubernetes-operator"
+              repoURL = "https://netbirdio.github.io/kubernetes-operator"
+              targetRevision = parameters.operatorHelmVersion
+              helm = {
+                valuesObject = {
+                  crds = {
+                    enabled = True
                   }
-                ]
+                  cluster = {
+                    name = parameters.operatorClusterName
+                  }
+                  ingress = {
+                    enabled = True
+                    router = {
+                      enabled = True
+                    }
+                    kubernetesAPI = {
+                      enabled = True
+                      groups = [parameters.operatorKubeapiGroupName]
+                    }
+                  }
+                  netbirdAPI = {
+                    keyFromSecret = "nb-operator-api-key"
+                  }
+                  managementURL = parameters.nbManagmentURI
+                }
               }
             }
           }
