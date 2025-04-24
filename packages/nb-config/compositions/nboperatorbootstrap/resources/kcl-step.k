@@ -113,7 +113,7 @@ _service_user = {
 # NB Service User Access Token
 if parameters.accessToken.destinationType == "local":
     _access_token_secret_name = parameters.accessToken.localSecretName
-    _access_token_secret_namespace = oxr.metadata.namespace or "crossplane-system"
+    _access_token_secret_namespace = parameters.accessToken.localSecretNamespace or oxr.metadata.namespace or "crossplane-system"
 else:
     _access_token_secret_name = "{}-access-token".format(oxr.metadata.name)
     _access_token_secret_namespace = oxr.metadata.namespace or "crossplane-system"

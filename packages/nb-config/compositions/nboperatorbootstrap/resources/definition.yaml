@@ -113,6 +113,9 @@ spec:
                         localSecretName:
                           type: string
                           description: "token secret name"
+                        localSecretNamespace:
+                          type: string
+                          description: "token secret namespace"
                         destinationType:
                           type: string
                           description: The type of destination to store the access token.
