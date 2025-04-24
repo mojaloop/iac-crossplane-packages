@@ -1,3 +1,4 @@
+import base64
 # Read the XR and the OCDs
 oxr = option("params").oxr
 ocds = option("params").ocds
@@ -41,7 +42,7 @@ _zitadel_project_id_secret = {
     }
 }
 
-zitadel_project_id = ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or ""] or ""
+zitadel_project_id = base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or ""] or "bm9uZQo=")
 admin_group_name = "{}:{}".format(zitadel_project_id, parameters.groupNames.admin)
 external_access_group_name = "{}:{}".format(zitadel_project_id, parameters.groupNames.externalAccess)
 
