@@ -33,6 +33,7 @@ _groupIAC = {
     spec = {
         forProvider = {
             name = "iac"
+            path = "iac"
             description = "iac group"
         }
         managementPolicies = spec.managementPolicies
@@ -234,6 +235,7 @@ _projDocs = {
         parameters = {
             project = {
                 name = "tenancy-docs"
+                path = "tenancy-docs"
                 groupId = ocds["tenancy-internal"]?.Resource?.status?.groupId
             }
         }
