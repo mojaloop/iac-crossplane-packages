@@ -260,11 +260,14 @@ if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
         _kubernetes_group
         _service_user
         _access_token
-        _k8s_policy
     ]
     if parameters.accessToken.destinationType == "sc":
         _items += [_sc_netbird_namespace, _sc_access_token_secret_copy]
 
+if readyBasedOnConditions(ocds["external-access-group"]):
+    _items += [
+        _k8s_policy
+    ]
 
 # elif parameters.accessToken.destinationType == "tenantVault":
 #     _items += [_tenant_vault_access_token_secret_copy] # TODO: Implement tenant vault stuff
