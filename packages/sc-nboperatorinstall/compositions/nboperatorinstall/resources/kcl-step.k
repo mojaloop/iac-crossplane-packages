@@ -72,6 +72,7 @@ _sc_argocd_operator_app_install = {
                     kubernetesAPI = {
                       enabled = True
                       groups = [parameters.operatorKubeapiGroupName]
+                      resourceName: "{}-kube-api".format(parameters.operatorClusterName)
                     }
                   }
                   netbirdAPI = {
