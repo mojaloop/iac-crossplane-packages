@@ -75,38 +75,81 @@ spec:
                   appNamespace:
                     type: string
                     description: Namespace for the consumer application
-                  mongodb:
+                  crVersion:
+                    type: string
+                  image:
+                    type: string
+                  imagePullPolicy:
+                    type: string
+                  secrets:
                     type: object
                     properties:
-                      crVersion:
+                      users:
                         type: string
-                      image:
+                  replsets:
+                    type: object
+                    properties:
+                      name:
                         type: string
-                      imagePullPolicy:
-                        type: string
-                      secrets:
+                      size:
+                        type: integer
+                      affinity:
                         type: object
                         properties:
-                          users:
+                          antiAffinityTopologyKey:
                             type: string
-                      replsets:
+                      expose:
                         type: object
                         properties:
-                          name:
+                          enabled:
+                            type: boolean
+                          type:
                             type: string
+                      resources:
+                        type: object
+                        properties:
+                          limits:
+                            type: object
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                          requests:
+                            type: object
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                      volumeSpec:
+                        type: object
+                        properties:
+                          persistentVolumeClaim:
+                            type: object
+                            properties:
+                              resources:
+                                type: object
+                                properties:
+                                  requests:
+                                    type: object
+                                    properties:
+                                      storage:
+                                        type: string
+                  sharding:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                      configsvrReplSet:
+                        type: object
+                        properties:
                           size:
                             type: integer
                           affinity:
                             type: object
                             properties:
                               antiAffinityTopologyKey:
-                                type: string
-                          expose:
-                            type: object
-                            properties:
-                              enabled:
-                                type: boolean
-                              type:
                                 type: string
                           resources:
                             type: object
@@ -125,6 +168,18 @@ spec:
                                     type: string
                                   memory:
                                     type: string
+                          podDisruptionBudget:
+                            type: object
+                            properties:
+                              maxUnavailable:
+                                type: integer
+                          expose:
+                            type: object
+                            properties:
+                              enabled:
+                                type: boolean
+                              type:
+                                type: string
                           volumeSpec:
                             type: object
                             properties:
@@ -139,116 +194,58 @@ spec:
                                         properties:
                                           storage:
                                             type: string
-                      sharding:
+                      mongos:
                         type: object
                         properties:
-                          enabled:
-                            type: boolean
-                          configsvrReplSet:
+                          size:
+                            type: integer
+                          affinity:
                             type: object
                             properties:
-                              size:
-                                type: integer
-                              affinity:
-                                type: object
-                                properties:
-                                  antiAffinityTopologyKey:
-                                    type: string
-                              resources:
-                                type: object
-                                properties:
-                                  limits:
-                                    type: object
-                                    properties:
-                                      cpu:
-                                        type: string
-                                      memory:
-                                        type: string
-                                  requests:
-                                    type: object
-                                    properties:
-                                      cpu:
-                                        type: string
-                                      memory:
-                                        type: string
-                              podDisruptionBudget:
-                                type: object
-                                properties:
-                                  maxUnavailable:
-                                    type: integer
-                              expose:
-                                type: object
-                                properties:
-                                  enabled:
-                                    type: boolean
-                                  type:
-                                    type: string
-                              volumeSpec:
-                                type: object
-                                properties:
-                                  persistentVolumeClaim:
-                                    type: object
-                                    properties:
-                                      resources:
-                                        type: object
-                                        properties:
-                                          requests:
-                                            type: object
-                                            properties:
-                                              storage:
-                                                type: string
-                          mongos:
-                            type: object
-                            properties:
-                              size:
-                                type: integer
-                              affinity:
-                                type: object
-                                properties:
-                                  antiAffinityTopologyKey:
-                                    type: string
-                              resources:
-                                type: object
-                                properties:
-                                  limits:
-                                    type: object
-                                    properties:
-                                      cpu:
-                                        type: string
-                                      memory:
-                                        type: string
-                                  requests:
-                                    type: object
-                                    properties:
-                                      cpu:
-                                        type: string
-                                      memory:
-                                        type: string
-                              podDisruptionBudget:
-                                type: object
-                                properties:
-                                  maxUnavailable:
-                                    type: integer
-                              expose:
-                                type: object
-                                properties:
-                                  type:
-                                    type: string
-                      backup:
-                        type: object
-                        properties:
-                          enabled:
-                            type: boolean
-                          image:
-                            type: string
-                          pitr:
-                            type: object
-                            properties:
-                              enabled:
-                                type: boolean
-                              oplogOnly:
-                                type: boolean
-                              compressionType:
+                              antiAffinityTopologyKey:
                                 type: string
-                              compressionLevel:
+                          resources:
+                            type: object
+                            properties:
+                              limits:
+                                type: object
+                                properties:
+                                  cpu:
+                                    type: string
+                                  memory:
+                                    type: string
+                              requests:
+                                type: object
+                                properties:
+                                  cpu:
+                                    type: string
+                                  memory:
+                                    type: string
+                          podDisruptionBudget:
+                            type: object
+                            properties:
+                              maxUnavailable:
                                 type: integer
+                          expose:
+                            type: object
+                            properties:
+                              type:
+                                type: string
+                  backup:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      pitr:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                          oplogOnly:
+                            type: boolean
+                          compressionType:
+                            type: string
+                          compressionLevel:
+                            type: integer

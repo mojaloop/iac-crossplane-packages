@@ -26,38 +26,38 @@ _MongodbCluster = {
                     namespace = parameters.clusterName
                 }
                 spec = {
-                    crVersion = parameters?.mongodb?.crVersion
-                    image = parameters?.mongodb?.image
-                    imagePullPolicy = parameters?.mongodb?.imagePullPolicy
+                    crVersion = parameters?.crVersion
+                    image = parameters?.image
+                    imagePullPolicy = parameters?.imagePullPolicy
                     secrets = {
-                        users = parameters?.mongodb?.secrets?.users
+                        users = parameters?.secrets?.users
                     }
                     replsets = [
                         {
                             name = "rs0"
-                            size = parameters?.mongodb?.replsets?.size
+                            size = parameters?.replsets?.size
                             affinity = {
                                 antiAffinityTopologyKey = "kubernetes.io/hostname"
                             }
                             expose = {
-                                enabled = parameters?.mongodb?.replsets?.expose?.enabled
-                                type = parameters?.mongodb?.replsets?.expose?.type
+                                enabled = parameters?.replsets?.expose?.enabled
+                                type = parameters?.replsets?.expose?.type
                             }
                             resources = {
                                 limits = {
-                                    cpu = parameters?.mongodb?.replsets?.resources?.limits?.cpu
-                                    memory = parameters?.mongodb?.replsets?.resources?.limits?.memory
+                                    cpu = parameters?.replsets?.resources?.limits?.cpu
+                                    memory = parameters?.replsets?.resources?.limits?.memory
                                 }
                                 requests = {
-                                    cpu = parameters?.mongodb?.replsets?.resources?.requests?.cpu
-                                    memory = parameters?.mongodb?.replsets?.resources?.requests?.memory
+                                    cpu = parameters?.replsets?.resources?.requests?.cpu
+                                    memory = parameters?.replsets?.resources?.requests?.memory
                                 }
                             }
                             volumeSpec = {
                                 persistentVolumeClaim = {
                                     resources = {
                                         requests = {
-                                            storage = parameters?.mongodb?.replsets?.volumeSpec?.persistentVolumeClaim?.resources?.requests?.storage
+                                            storage = parameters?.replsets?.volumeSpec?.persistentVolumeClaim?.resources?.requests?.storage
                                         }
                                     }
                                 }
@@ -65,70 +65,70 @@ _MongodbCluster = {
                         }
                     ]
                     sharding = {
-                        enabled = parameters?.mongodb?.sharding?.enabled
+                        enabled = parameters?.sharding?.enabled
                         configsvrReplSet = {
-                            size = parameters?.mongodb?.sharding?.configsvrReplSet?.size
+                            size = parameters?.sharding?.configsvrReplSet?.size
                             affinity = {
                                 antiAffinityTopologyKey = "kubernetes.io/hostname"
                             }
                             resources = {
                                 limits = {
-                                    cpu = parameters?.mongodb?.sharding?.configsvrReplSet?.resources?.limits?.cpu
-                                    memory = parameters?.mongodb?.sharding?.configsvrReplSet?.resources?.limits?.memory
+                                    cpu = parameters?.sharding?.configsvrReplSet?.resources?.limits?.cpu
+                                    memory = parameters?.sharding?.configsvrReplSet?.resources?.limits?.memory
                                 }
                                 requests = {
-                                    cpu = parameters?.mongodb?.sharding?.configsvrReplSet?.resources?.requests?.cpu
-                                    memory = parameters?.mongodb?.sharding?.configsvrReplSet?.resources?.requests?.memory
+                                    cpu = parameters?.sharding?.configsvrReplSet?.resources?.requests?.cpu
+                                    memory = parameters?.sharding?.configsvrReplSet?.resources?.requests?.memory
                                 }
                             }
                             podDisruptionBudget = {
-                                maxUnavailable = parameters?.mongodb?.sharding?.configsvrReplSet?.podDisruptionBudget?.maxUnavailable
+                                maxUnavailable = parameters?.sharding?.configsvrReplSet?.podDisruptionBudget?.maxUnavailable
                             }
                             expose = {
-                                enabled = parameters?.mongodb?.sharding?.configsvrReplSet?.expose?.enabled
-                                type = parameters?.mongodb?.sharding?.configsvrReplSet?.expose?.type
+                                enabled = parameters?.sharding?.configsvrReplSet?.expose?.enabled
+                                type = parameters?.sharding?.configsvrReplSet?.expose?.type
                             }
                             volumeSpec = {
                                 persistentVolumeClaim = {
                                     resources = {
                                         requests = {
-                                            storage = parameters?.mongodb?.sharding?.configsvrReplSet?.volumeSpec?.persistentVolumeClaim?.resources?.requests?.storage
+                                            storage = parameters?.sharding?.configsvrReplSet?.volumeSpec?.persistentVolumeClaim?.resources?.requests?.storage
                                         }
                                     }
                                 }
                             }
                         }
                         mongos = {
-                            size = parameters?.mongodb?.sharding?.mongos?.size
+                            size = parameters?.sharding?.mongos?.size
                             affinity = {
                                 antiAffinityTopologyKey = "kubernetes.io/hostname"
                             }
                             resources = {
                                 limits = {
-                                    cpu = parameters?.mongodb?.sharding?.mongos?.resources?.limits?.cpu
-                                    memory = parameters?.mongodb?.sharding?.mongos?.resources?.limits?.memory
+                                    cpu = parameters?.sharding?.mongos?.resources?.limits?.cpu
+                                    memory = parameters?.sharding?.mongos?.resources?.limits?.memory
                                 }
                                 requests = {
-                                    cpu = parameters?.mongodb?.sharding?.mongos?.resources?.requests?.cpu
-                                    memory = parameters?.mongodb?.sharding?.mongos?.resources?.requests?.memory
+                                    cpu = parameters?.sharding?.mongos?.resources?.requests?.cpu
+                                    memory = parameters?.sharding?.mongos?.resources?.requests?.memory
                                 }
                             }
                             podDisruptionBudget = {
-                                maxUnavailable = parameters?.mongodb?.sharding?.mongos?.podDisruptionBudget?.maxUnavailable
+                                maxUnavailable = parameters?.sharding?.mongos?.podDisruptionBudget?.maxUnavailable
                             }
                             expose = {
-                                type = parameters?.mongodb?.sharding?.mongos?.expose?.type
+                                type = parameters?.sharding?.mongos?.expose?.type
                             }
                         }
                     }
                     backup = {
-                        enabled = parameters?.mongodb?.backup?.enabled
-                        image = parameters?.mongodb?.backup?.image
+                        enabled = parameters?.backup?.enabled
+                        image = parameters?.backup?.image
                         pitr = {
-                            enabled = parameters?.mongodb?.backup?.pitr?.enabled
-                            oplogOnly = parameters?.mongodb?.backup?.pitr?.oplogOnly
-                            compressionType = parameters?.mongodb?.backup?.pitr?.compressionType
-                            compressionLevel = parameters?.mongodb?.backup?.pitr?.compressionLevel
+                            enabled = parameters?.backup?.pitr?.enabled
+                            oplogOnly = parameters?.backup?.pitr?.oplogOnly
+                            compressionType = parameters?.backup?.pitr?.compressionType
+                            compressionLevel = parameters?.backup?.pitr?.compressionLevel
                         }
                     }
                 }
@@ -322,11 +322,11 @@ _Secret = {
         parameters = {
             objectType = "Secret"
             source = {
-                name = parameters?.mongodb?.dbSecret
+                name = parameters?.dbSecret
                 namespace = parameters?.clusterName
             }
             destination = {
-                name = parameters?.mongodb?.dbSecret
+                name = parameters?.dbSecret
                 namespace = parameters?.appNamespace
             }
         }
