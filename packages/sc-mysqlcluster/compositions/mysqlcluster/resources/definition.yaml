@@ -60,12 +60,6 @@ spec:
               parameters:
                 type: object
                 properties:
-                  consumerClusterType:
-                    type: string
-                    description: Type of consumer cluster
-                    enum:
-                      - controlcenter
-                      - environment
                   clusterName:
                     type: string
                     description: Name for the consumer cluster
@@ -75,154 +69,151 @@ spec:
                   appNamespace:
                     type: string
                     description: Namespace for the consumer application
-                  mysql:
+                  crVersion:
+                    type: string
+                    description: Type of object to be synced
+                    default: "2.5.0"
+                  dbSecret:
+                    type: string
+                    description: Type of object to be synced
+                  dbUsername:
+                    type: string
+                    description: Name of the database user to be created
+                  dbName:
+                    type: string
+                    description: Name of the database to be created
+                  pxc:
                     type: object
                     properties:
-                      crVersion:
+                      image:
                         type: string
-                        description: Type of object to be synced
-                        default: "2.5.0"
-                      dbSecret:
+                        description: PXC image
+                      storageSize:
                         type: string
-                        description: Type of object to be synced
-                      dbUsername:
-                        type: string
-                        description: Name of the database user to be created
-                      dbName:
-                        type: string
-                        description: Name of the database to be created
-                      pxc:
+                        description: Size of storage requested for PXC
+                        default: 10Gi
+                      replicas:
+                        type: number
+                        description: Number of PXC replicas
+                        default: 1
+                      resources:
                         type: object
+                        description: The resources for pxc
                         properties:
-                          imageVersion:
-                            type: string
-                            description: PXC image version
-                          storageSize:
-                            type: string
-                            description: Size of storage requested for PXC
-                            default: 10Gi
-                          replicas:
-                            type: number
-                            description: Number of PXC replicas
-                            default: 1
-                          resources:
+                          requests:
                             type: object
-                            description: The resources for pxc
+                            description: the resources requests for pxc
                             properties:
-                              requests:
-                                type: object
-                                description: the resources requests for pxc
-                                properties:
-                                  memory:
-                                    type: string
-                                    description: Memory request for pxc
-                                  cpu:
-                                    type: string
-                                    description: CPU request for pxc
-                              limit:
-                                type: object
-                                description: the resources limit for pxc
-                                properties:
-                                  memory:
-                                    type: string
-                                    description: Memory limit for pxc
-                                  cpu:
-                                    type: string
-                                    description: CPU limit for pxc
-                          configuration:
-                            type: string
-                            description: Configuration for PXC
-                      haproxy:
-                        type: object
-                        properties:
-                          replicas:
-                            type: number
-                            description: Number of HAProxy replicas
-                            default: 1
-                          imageVersion:
-                            type: string
-                            description: HAProxy image version
-                          expose:
-                            type: boolean
-                            description: Expose HAProxy service
-                          resources:
+                              memory:
+                                type: string
+                                description: Memory request for pxc
+                              cpu:
+                                type: string
+                                description: CPU request for pxc
+                          limit:
                             type: object
-                            description: The resources for haproxy
+                            description: the resources limit for pxc
                             properties:
-                              requests:
-                                type: object
-                                description: the resources requests for haproxy
-                                properties:
-                                  memory:
-                                    type: string
-                                    description: Memory request for haproxy
-                                  cpu:
-                                    type: string
-                                    description: CPU request for haproxy
-                              limit:
-                                type: object
-                                description: the resources limit for haproxy
-                                properties:
-                                  memory:
-                                    type: string
-                                    description: Memory limit for haproxy
-                                  cpu:
-                                    type: string
-                                    description: CPU limit for haproxy
-                      logcollector:
+                              memory:
+                                type: string
+                                description: Memory limit for pxc
+                              cpu:
+                                type: string
+                                description: CPU limit for pxc
+                      configuration:
+                        type: string
+                        description: Configuration for PXC
+                  haproxy:
+                    type: object
+                    properties:
+                      replicas:
+                        type: number
+                        description: Number of HAProxy replicas
+                        default: 1
+                      image:
+                        type: string
+                        description: HAProxy image
+                      expose:
+                        type: boolean
+                        description: Expose HAProxy service
+                      resources:
                         type: object
+                        description: The resources for haproxy
                         properties:
-                          imageVersion:
-                            type: string
-                            description: LogCollector image version
-                          resources:
+                          requests:
                             type: object
-                            description: The resources for LogCollector
+                            description: the resources requests for haproxy
                             properties:
-                              requests:
-                                type: object
-                                description: the resources requests for LogCollector
-                                properties:
-                                  memory:
-                                    type: string
-                                    description: Memory request for LogCollector
-                                  cpu:
-                                    type: string
-                                    description: CPU request for LogCollector
-                              limit:
-                                type: object
-                                description: the resources limit for LogCollector
-                                properties:
-                                  memory:
-                                    type: string
-                                    description: Memory limit for LogCollector
-                                  cpu:
-                                    type: string
-                                    description: CPU limit for LogCollector
-                      backup:
+                              memory:
+                                type: string
+                                description: Memory request for haproxy
+                              cpu:
+                                type: string
+                                description: CPU request for haproxy
+                          limit:
+                            type: object
+                            description: the resources limit for haproxy
+                            properties:
+                              memory:
+                                type: string
+                                description: Memory limit for haproxy
+                              cpu:
+                                type: string
+                                description: CPU limit for haproxy
+                  logcollector:
+                    type: object
+                    properties:
+                      image:
+                        type: string
+                        description: LogCollector image
+                      resources:
                         type: object
+                        description: The resources for LogCollector
                         properties:
-                          imageVersion:
-                            type: string
-                            description: Backup image version.
-                          verifyTLS:
-                            type: boolean
-                            description: Verify TLS for S3.
-                          bucket:
-                            type: string
-                            description: S3 bucket name.
-                          credentialsSecret:
-                            type: string
-                            description: S3 credentials secret name.
-                          bucketRegion:
-                            type: string
-                            description: S3 bucket region.
-                          scheduleName:
-                            type: string
-                            description: Name of the backup schedule.
-                          cronScheduleExpression:
-                            type: string
-                            description: Cron expression for the backup schedule.
-                          backupRetention:
-                            type: integer
-                            description: Number of backups to retain.
+                          requests:
+                            type: object
+                            description: the resources requests for LogCollector
+                            properties:
+                              memory:
+                                type: string
+                                description: Memory request for LogCollector
+                              cpu:
+                                type: string
+                                description: CPU request for LogCollector
+                          limit:
+                            type: object
+                            description: the resources limit for LogCollector
+                            properties:
+                              memory:
+                                type: string
+                                description: Memory limit for LogCollector
+                              cpu:
+                                type: string
+                                description: CPU limit for LogCollector
+                  backup:
+                    type: object
+                    properties:
+                      image:
+                        type: string
+                        description: Backup image
+                      verifyTLS:
+                        type: boolean
+                        description: Verify TLS for S3.
+                      bucket:
+                        type: string
+                        description: S3 bucket name.
+                      credentialsSecret:
+                        type: string
+                        description: S3 credentials secret name.
+                      bucketRegion:
+                        type: string
+                        description: S3 bucket region.
+                      scheduleName:
+                        type: string
+                        description: Name of the backup schedule.
+                      cronScheduleExpression:
+                        type: string
+                        description: Cron expression for the backup schedule.
+                      backupRetention:
+                        type: integer
+                        description: Number of backups to retain.
