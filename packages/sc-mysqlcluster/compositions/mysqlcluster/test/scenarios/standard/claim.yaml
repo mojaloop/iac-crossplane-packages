@@ -2,12 +2,12 @@ apiVersion: sc.mojaloop.io/v1alpha1
 kind: XMysqlCluster
 metadata:
   name: my-mysql-cluster
-  namespace: my-namespace
+  namespace: env
 spec:
   parameters:
-    clusterName: my-cluster
+    clusterName: env
     externalServiceName: my-cluster-service
-    appNamespace: my-app
+    appNamespace: env
     crVersion: "1.16.1"
     dbSecret: my-db-secret
     dbUsername: my-user
@@ -68,7 +68,7 @@ spec:
       cronScheduleExpression: "0 0 * * *"
       backupRetention: 7
   providerConfigsRef:
-    scK8sProviderName: sc-provider
-    ccK8sProviderName: cc-provider
+    scK8sProviderName: sc-kubernetes-provider
+    ccK8sProviderName: kubernetes-provider
   managementPolicies:
     - "*"

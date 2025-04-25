@@ -26,12 +26,12 @@ _MysqlCluster = {
                     namespace = parameters.clusterName
                 }
                 spec = {
-                    crVersion = parameters?.mysql?.crVersion
+                    crVersion = parameters?.crVersion
                     allowUnsafeConfigurations = True
                     imagePullPolicy = "IfNotPresent"
                     pxc = {
-                            size = parameters?.mysql?.pxc?.replicas
-                            image = parameters?.mysql?.pxc?.image
+                            size = parameters?.pxc?.replicas
+                            image = parameters?.pxc?.image
                             affinity = {
                                 antiAffinityTopologyKey = "kubernetes.io/hostname"
                             }
@@ -48,7 +48,7 @@ _MysqlCluster = {
                                 persistentVolumeClaim = {
                                     resources = {
                                         requests =  {
-                                            storage = parameters?.mysql?.pxc?.storageSize
+                                            storage = parameters?.pxc?.storageSize
                                         }
                                     }
                                 }
@@ -56,21 +56,21 @@ _MysqlCluster = {
 
                             resources = {
                                 requests =  {
-                                    cpu = parameters?.mysql?.pxc?.resources?.requests?.cpu
-                                    memory = parameters?.mysql?.pxc?.resources?.requests?.memory
+                                    cpu = parameters?.pxc?.resources?.requests?.cpu
+                                    memory = parameters?.pxc?.resources?.requests?.memory
                                 }
                                 limits = {
-                                    cpu = parameters?.mysql?.pxc?.resources?.limits?.cpu
-                                    memory = parameters?.mysql?.pxc?.resources?.limits?.memory
+                                    cpu = parameters?.pxc?.resources?.limits?.cpu
+                                    memory = parameters?.pxc?.resources?.limits?.memory
                                 }
                             }
 
-                            configuration = parameters?.mysql?.pxc?.configuration
+                            configuration = parameters?.pxc?.configuration
                         }
                     haproxy = {
                         enabled = True
-                        size = parameters?.mysql?.haproxy?.replicas
-                        image = parameters?.mysql?.haproxy?.image
+                        size = parameters?.haproxy?.replicas
+                        image = parameters?.haproxy?.image
                         affinity = {
                             antiAffinityTopologyKey = "kubernetes.io/hostname"
                         }
@@ -78,54 +78,54 @@ _MysqlCluster = {
                             maxUnavailable = 1
                         }
                         exposePrimary = {
-                            enabled = parameters?.mysql?.haproxy?.expose
+                            enabled = parameters?.haproxy?.expose
                         }
                         gracePeriod = 30
                         resources = {
                             requests = {
-                                cpu = parameters?.mysql?.haproxy?.resources?.requests?.cpu
-                                memory = parameters?.mysql?.haproxy?.resources?.requests?.memory
+                                cpu = parameters?.haproxy?.resources?.requests?.cpu
+                                memory = parameters?.haproxy?.resources?.requests?.memory
                             }
                             limit = {
-                                cpu = parameters?.mysql?.haproxy?.resources?.limit?.cpu
-                                memory = parameters?.mysql?.haproxy?.resources?.limit?.memory
+                                cpu = parameters?.haproxy?.resources?.limit?.cpu
+                                memory = parameters?.haproxy?.resources?.limit?.memory
                             }
                         }
                     }
                     logcollector = {
                         enabled = True
-                        image = parameters?.mysql?.logcollector?.image
+                        image = parameters?.logcollector?.image
                         resources = {
                             requests = {
-                                cpu = parameters?.mysql?.logcollector?.resources?.requests?.cpu
-                                memory = parameters?.mysql?.logcollector?.resources?.requests?.memory
+                                cpu = parameters?.logcollector?.resources?.requests?.cpu
+                                memory = parameters?.logcollector?.resources?.requests?.memory
                             }
 
                             limit = {
-                                cpu = parameters?.mysql?.logcollector?.resources?.limit?.cpu
-                                memory = parameters?.mysql?.logcollector?.resources?.limit?.memory
+                                cpu = parameters?.logcollector?.resources?.limit?.cpu
+                                memory = parameters?.logcollector?.resources?.limit?.memory
                             }
 
                         }
                     }
                     backup = {
-                    image = parameters?.mysql?.backup?.image
+                    image = parameters?.backup?.image
                     storages = {
                         "s3-backup-storage" = {
                             type = "s3"
-                            verifyTLS = parameters?.mysql?.backup?.verifyTLS
+                            verifyTLS = parameters?.backup?.verifyTLS
                             s3 = {
-                                bucket = parameters?.mysql?.backup?.bucket
-                                credentialsSecret = parameters?.mysql?.backup?.credentialsSecret
-                                region = parameters?.mysql?.backup?.bucketRegion
+                                bucket = parameters?.backup?.bucket
+                                credentialsSecret = parameters?.backup?.credentialsSecret
+                                region = parameters?.backup?.bucketRegion
                             }
                         }
                     }
                     schedule = [
                         {
-                            name = parameters?.mysql?.backup?.scheduleName
-                            schedule = parameters?.mysql?.backup?.cronScheduleExpression
-                            keep = parameters?.mysql?.backup?.backupRetention
+                            name = parameters?.backup?.scheduleName
+                            schedule = parameters?.backup?.cronScheduleExpression
+                            keep = parameters?.backup?.backupRetention
                             storageName = "s3-backup-storage"
                         }
                     ]
@@ -150,11 +150,11 @@ _Secret = {
         parameters = {
             objectType = "Secret"
             source = {
-                name = parameters?.mysql?.dbSecret
+                name = parameters?.dbSecret
                 namespace = parameters?.clusterName
             }
             destination = {
-                name = parameters?.mysql?.dbSecret
+                name = parameters?.dbSecret
                 namespace = parameters?.appNamespace
             }
         }

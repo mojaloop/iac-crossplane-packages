@@ -2,12 +2,12 @@ apiVersion: sc.mojaloop.io/v1alpha1
 kind: XMongodbCluster
 metadata:
   name: my-mongodb-cluster
-  namespace: my-namespace
+  namespace: env
 spec:
   parameters:
-    clusterName: my-cluster
+    clusterName: env
     externalServiceName: my-cluster-service
-    appNamespace: my-app
+    appNamespace: env
     crVersion: "1.19.1"
     image: percona/percona-server-mongodb:7.0.15-9-multi
     imagePullPolicy: IfNotPresent
@@ -78,7 +78,7 @@ spec:
             memory: "0.5G"
 
   providerConfigsRef:
-    scK8sProviderName: sc-provider
-    ccK8sProviderName: cc-provider
+    scK8sProviderName: sc-kubernetes-provider
+    ccK8sProviderName: kubernetes-provider
   managementPolicies:
     - "*"
