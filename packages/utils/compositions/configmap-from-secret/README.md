@@ -30,7 +30,7 @@ spec:
 
 ### Provider Configuration
 
-Both provider configurations must be present on the cluster where the claim is deployed:
+Local Kubernetes provider configurations must be present on the cluster where the claim is deployed:
 
 ```yaml
 providerConfigsRef:
