@@ -10,24 +10,22 @@ The following test scenarios demonstrate how to use:
 
 ## Configuration
 
-### Source Configuration
+### Parameters
 
-Specifies the original resource to be synchronized:
-
-```yaml
-source:
-  namespace: testa  # Source namespace
-  name: example-secret  # Source object name
-```
-
-### Destination Configuration
-
-Specifies where the synchronized resource should be created:
+Specifies the source secret, and destination configmap and keys.
 
 ```yaml
-destination:
-  namespace: testa  # Target namespace
-  name: example-secret  # Target object name
+spec:
+  parameters:
+    keyMappings:
+      - sourceKey: example-secret-source-key
+        destinationKey: example-destination-cm-key
+    sourceSecret:
+      namespace: secret-source-namespace
+      name: example-secret-name
+    destinationConfigMap:
+      namespace: destinaton-cm-namespace
+      name: example-configmap-name
 ```
 
 ### Provider Configuration
@@ -36,12 +34,5 @@ Both provider configurations must be present on the cluster where the claim is d
 
 ```yaml
 providerConfigsRef:
-  sourceK8sProviderName: SOURCE_KUBERNETES_PROVIDER
-  destinationK8sProviderName: DESTINATION_KUBERNETES_PROVIDER
+  k8sProviderName: KUBERNETES_PROVIDER
 ```
-
-#### Provider Permissions
-
-- **Source Provider**: Requires read-only access to source resources
-- **Destination Provider**: Requires read and write access to target resources
-
