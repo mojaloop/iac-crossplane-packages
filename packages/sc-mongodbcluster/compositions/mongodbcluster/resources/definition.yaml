@@ -60,12 +60,6 @@ spec:
               parameters:
                 type: object
                 properties:
-                  consumerClusterType:
-                    type: string
-                    description: Type of consumer cluster
-                    enum:
-                      - controlcenter
-                      - environment
                   clusterName:
                     type: string
                     description: Name for the consumer cluster
@@ -75,17 +69,15 @@ spec:
                   appNamespace:
                     type: string
                     description: Namespace for the consumer application
+                  dbSecret:
+                    type: string
+                    description: Secret name for the database credentials
                   crVersion:
                     type: string
                   image:
                     type: string
                   imagePullPolicy:
                     type: string
-                  secrets:
-                    type: object
-                    properties:
-                      users:
-                        type: string
                   replsets:
                     type: object
                     properties:

@@ -5,15 +5,13 @@ metadata:
   namespace: my-namespace
 spec:
   parameters:
-    consumerClusterType: environment
     clusterName: my-cluster
     externalServiceName: my-cluster-service
     appNamespace: my-app
     crVersion: "1.19.1"
     image: percona/percona-server-mongodb:7.0.15-9-multi
     imagePullPolicy: IfNotPresent
-    secrets:
-         users: my-db-secret
+    dbSecret: my-db-secret
     backup:
       enabled: false
       image: percona/percona-backup-mongodb:2.8.0-multi
@@ -40,6 +38,7 @@ spec:
             requests:
               storage: 3Gi
     sharding:
+      enabled: true
       configsvrReplSet:
         size: 3
         affinity:
