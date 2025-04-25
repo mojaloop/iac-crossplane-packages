@@ -65,6 +65,10 @@ _groupAccessToken = {
         providerConfigRef = {
             name = spec?.providerConfigsRef?.gitlabProvider
         }
+        writeConnectionSecretToRef = {
+          name = "gitlab-ci-pat"
+          namespace = "gitlab"
+        }
     }
 }
 
