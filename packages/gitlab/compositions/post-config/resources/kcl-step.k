@@ -10,31 +10,31 @@ status = oxr.status
 p = spec.parameters
 
 calculateExpireAt = lambda -> str {
-  now = datetime.today()
-  date = regex.split(now, " ")[0]
+    now = datetime.today()
+    date = regex.split(now, " ")[0]
 
-  _y = regex.split(date, "-")[0]
-  _m = regex.split(date, "-")[1]
-  _d = regex.split(date, "-")[2]
+    _y = regex.split(date, "-")[0]
+    _m = regex.split(date, "-")[1]
+    _d = regex.split(date, "-")[2]
 
-  y = int(_y) + 1
-  m = int(_m) - 1 if int(_m) > 1 else 1
+    y = int(_y) + 1
+    m = int(_m) - 1 if int(_m) > 1 else 1
 
-  "{}-{:02d}-01T00:00:00Z".format(y, m)
+    "{}-{:02d}-01T00:00:00Z".format(y, m)
 }
-
-
 #render members
 _items = []
 _groupIAC = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "Group"
-    metadata.annotations: {"krm.kcl.dev/composition-resource-name" = "iac"}
+    metadata.annotations: {
+        "krm.kcl.dev/composition-resource-name" = p?.iacGroupName
+    }
     spec = {
         forProvider = {
-            name = "iac"
-            path = "iac"
-            description = "iac group"
+            name = p?.iacGroupName
+            path = p?.iacGroupName
+            description = p?.iacGroupName
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
@@ -47,15 +47,17 @@ _statusExpireAt = status?.tokenExpireAt
 _expireAt = None
 
 if _statusExpireAt == None:
-  _expireAt = calculateExpireAt()
+    _expireAt = calculateExpireAt()
 
 _groupAccessToken = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind: "AccessToken"
-    metadata.annotations: {"krm.kcl.dev/composition-resource-name" = "access-token"}
+    metadata.annotations: {
+        "krm.kcl.dev/composition-resource-name" = "access-token"
+    }
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
+            groupId = ocds[p?.iacGroupName]?.Resource?.status?.atProvider?.id
             name = "gitlab ci pat"
             accessLevel = 50
             expiresAt = _statusExpireAt if _statusExpireAt != None else _expireAt
@@ -66,8 +68,8 @@ _groupAccessToken = {
             name = spec?.providerConfigsRef?.gitlabProvider
         }
         writeConnectionSecretToRef = {
-          name = "gitlab-ci-pat"
-          namespace = "gitlab"
+            name = "gitlab-ci-pat"
+            namespace = "gitlab"
         }
     }
 }
@@ -75,12 +77,14 @@ _groupAccessToken = {
 _projBootstrap = {
     apiVersion = "gitlab.mojaloop.io/v1alpha1"
     kind = "XProject"
-    metadata.annotations: {"krm.kcl.dev/composition-resource-name" = "bootstrap"}
+    metadata.annotations: {
+        "krm.kcl.dev/composition-resource-name" = "bootstrap"
+    }
     spec = {
         parameters = {
             project = {
                 name = "bootstrap"
-                groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
+                groupId = ocds[p?.iacGroupName]?.Resource?.status?.atProvider?.id
             }
         }
         managementPolicies = spec.managementPolicies
@@ -98,7 +102,7 @@ _groupVarVaultAuthPath = {
     }
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
+            groupId = ocds[p?.iacGroupName]?.Resource?.status?.atProvider?.id
             key = "VAULT_AUTH_PATH"
             value = p?.gitlabRunnerJwtPath
             protected = True
@@ -119,7 +123,7 @@ _groupVarVaultAuthRole = {
     }
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
+            groupId = ocds[p?.iacGroupName]?.Resource?.status?.atProvider?.id
             key = "VAULT_AUTH_ROLE"
             value = p?.gitlabRunnerRoleName
             protected = True
@@ -140,7 +144,7 @@ _groupVarVaultFqdn = {
     }
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
+            groupId = ocds[p?.iacGroupName]?.Resource?.status?.atProvider?.id
             key = "VAULT_FQDN"
             value = p?.vaultFqdn
             protected = True
@@ -161,7 +165,7 @@ _groupVarPrivateRepoUser = {
     }
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
+            groupId = ocds[p?.iacGroupName]?.Resource?.status?.atProvider?.id
             key = "PRIVATE_REPO_USER"
             value = p?.privateRepoUser
             protected = True
@@ -182,7 +186,7 @@ _groupVarPrivateRepo = {
     }
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
+            groupId = ocds[p?.iacGroupName]?.Resource?.status?.atProvider?.id
             key = "PRIVATE_REPO"
             value = p?.privateRepo
             protected = True
@@ -203,7 +207,7 @@ _groupVarPrivateRepoTokenVaultPath = {
     }
     spec = {
         forProvider = {
-            groupId = ocds["iac"]?.Resource?.status?.atProvider?.id
+            groupId = ocds[p?.iacGroupName]?.Resource?.status?.atProvider?.id
             key = "PRIVATE_REPO_TOKEN_PATH"
             value = p?.privateRepo
             protected = True
@@ -219,12 +223,12 @@ _groupVarPrivateRepoTokenVaultPath = {
 _groupTenancy = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "Group"
-    metadata.annotations: {"krm.kcl.dev/composition-resource-name" = "tenancy-internal"}
+    metadata.annotations: {"krm.kcl.dev/composition-resource-name" = p?.tenancyGroupName}
     spec = {
         forProvider = {
-            name = "tenancy-internal"
-            path = "tenancy-internal"
-            description = "tenancy-internal"
+            name = p?.tenancyGroupName
+            path = p?.tenancyGroupName
+            description = p?.tenancyGroupName
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
@@ -232,6 +236,7 @@ _groupTenancy = {
         }
     }
 }
+
 _projDocs = {
     apiVersion = "gitlab.mojaloop.io/v1alpha1"
     kind = "XProject"
@@ -240,7 +245,7 @@ _projDocs = {
         parameters = {
             project = {
                 name = "tenancy-docs"
-                groupId = ocds["tenancy-internal"]?.Resource?.status?.atProvider?.id
+                groupId = ocds[p?.tenancyGroupName]?.Resource?.status?.atProvider?.id
             }
         }
         managementPolicies = spec.managementPolicies

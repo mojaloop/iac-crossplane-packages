@@ -6,5 +6,7 @@ metadata:
 spec:
   parameters:
     privateRepo: foo
+    tenancyGroupName: tenancy-internal
+    iacGroupName: iac
   providerConfigsRef:
     gitlabProvider: gitlab-provider

@@ -55,6 +55,16 @@ spec:
               parameters:
                 type: object
                 properties:
+                  iacGroupName:
+                    type: string
+                    description: |-
+                      The name of the iac gitlab group.
+                    default: iac
+                  tenancyGroupName:
+                    type: string
+                    description: |-
+                      The name of the tenancy gitlab group.
+                    default: tenancy-internal
                   gitlabRunnerRoleName:
                     type: string
                     description: |-
