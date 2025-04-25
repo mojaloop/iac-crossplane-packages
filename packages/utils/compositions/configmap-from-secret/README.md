@@ -18,14 +18,14 @@ Specifies the source secret, and destination configmap and keys.
 spec:
   parameters:
     keyMappings:
-      - sourceKey: example-secret-source-key
-        destinationKey: example-destination-cm-key
+      - sourceKey: secret-source-key
+        destinationKey: destination-cm-key
     sourceSecret:
       namespace: secret-source-namespace
-      name: example-secret-name
+      name: secret-name
     destinationConfigMap:
       namespace: destinaton-cm-namespace
-      name: example-configmap-name
+      name: configmap-name
 ```
 
 ### Provider Configuration
