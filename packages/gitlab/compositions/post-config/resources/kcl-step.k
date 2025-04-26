@@ -22,13 +22,16 @@ calculateExpireAt = lambda -> str {
 
     "{}-{:02d}-01T00:00:00Z".format(y, m)
 }
-#render members
+
 _items = []
 _groupIAC = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "Group"
-    metadata.annotations: {
-        "krm.kcl.dev/composition-resource-name" = p?.iacGroupName
+    metadata = {
+        name = "{}-group-iac".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = p?.iacGroupName
+        }
     }
     spec = {
         forProvider = {
@@ -51,9 +54,12 @@ if _statusExpireAt == None:
 
 _groupAccessToken = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
-    kind: "AccessToken"
-    metadata.annotations: {
-        "krm.kcl.dev/composition-resource-name" = "access-token"
+    kind = "AccessToken"
+    metadata = {
+        name = "{}-token-iac".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "access-token"
+        }
     }
     spec = {
         forProvider = {
@@ -68,8 +74,63 @@ _groupAccessToken = {
             name = spec?.providerConfigsRef?.gitlabProvider
         }
         writeConnectionSecretToRef = {
-            name = "gitlab-ci-pat"
-            namespace = "gitlab"
+            name = "{}-ci-token".format(oxr.metadata.name)
+            namespace = oxr.metadata.namespace
+        }
+    }
+}
+
+_pushSecret = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-push-secret".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "push-secret"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "external-secrets.io/v1alpha1"
+                kind = "PushSecret"
+                metadata = {
+                    name = "{}-iac-pat-push-secret".format(oxr.metadata.name)
+                    namespace = oxr.metadata.namespace
+                }
+                spec = {
+                    updatePolicy = "Replace"
+                    deletionPolicy = "Delete"
+                    refreshInterval = "1m"
+                    secretStoreRefs = [
+                        {
+                            name = "vault-secret-store"
+                            kind = "ClusterSecretStore"
+
+                        }
+                    ]
+                    selector = {
+                        secret = {
+                            name = "{}-ci-token".format(oxr.metadata.name)
+                            namespace = oxr.metadata.namespace
+                        }
+                    }
+                    data = [
+                        {
+                            match = {
+                                secretKey = "token"
+                                remoteRef = {
+                                    remoteKey = p?.ciTokenVaultPath
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.gitlabProvider
         }
     }
 }
@@ -77,8 +138,11 @@ _groupAccessToken = {
 _projBootstrap = {
     apiVersion = "gitlab.mojaloop.io/v1alpha1"
     kind = "XProject"
-    metadata.annotations: {
-        "krm.kcl.dev/composition-resource-name" = "bootstrap"
+    metadata = {
+        name = "{}-proj-bootstrap".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "bootstrap"
+        }
     }
     spec = {
         parameters = {
@@ -97,8 +161,11 @@ _projBootstrap = {
 _groupVarVaultAuthPath = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "Variable"
-    metadata.annotations = {
-        "krm.kcl.dev/composition-resource-name" = "vault-auth-path"
+    metadata = {
+        name = "{}-var-vault-path".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "vault-auth-path"
+        }
     }
     spec = {
         forProvider = {
@@ -118,8 +185,11 @@ _groupVarVaultAuthPath = {
 _groupVarVaultAuthRole = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "Variable"
-    metadata.annotations = {
-        "krm.kcl.dev/composition-resource-name" = "vault-auth-role"
+    metadata = {
+        name = "{}-var-vault-role".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "vault-auth-role"
+        }
     }
     spec = {
         forProvider = {
@@ -139,8 +209,11 @@ _groupVarVaultAuthRole = {
 _groupVarVaultFqdn = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "Variable"
-    metadata.annotations = {
-        "krm.kcl.dev/composition-resource-name" = "vault-fqdn"
+    metadata = {
+        name = "{}-var-vault-fqdn".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "vault-fqdn"
+        }
     }
     spec = {
         forProvider = {
@@ -160,8 +233,11 @@ _groupVarVaultFqdn = {
 _groupVarPrivateRepoUser = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "Variable"
-    metadata.annotations = {
-        "krm.kcl.dev/composition-resource-name" = "private-repo-user"
+    metadata = {
+        name = "{}-var-private-repo-user".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "private-repo-user"
+        }
     }
     spec = {
         forProvider = {
@@ -181,8 +257,11 @@ _groupVarPrivateRepoUser = {
 _groupVarPrivateRepo = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "Variable"
-    metadata.annotations = {
-        "krm.kcl.dev/composition-resource-name" = "private-repo"
+    metadata = {
+        name = "{}-var-private-repo".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "private-repo"
+        }
     }
     spec = {
         forProvider = {
@@ -202,8 +281,11 @@ _groupVarPrivateRepo = {
 _groupVarPrivateRepoTokenVaultPath = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "Variable"
-    metadata.annotations = {
-        "krm.kcl.dev/composition-resource-name" = "private-repo-token-vault-path"
+    metadata = {
+        name = "{}-var-private-repo-token-vault-path".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "private-repo-token-vault-path"
+        }
     }
     spec = {
         forProvider = {
@@ -223,7 +305,12 @@ _groupVarPrivateRepoTokenVaultPath = {
 _groupTenancy = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "Group"
-    metadata.annotations: {"krm.kcl.dev/composition-resource-name" = p?.tenancyGroupName}
+    metadata = {
+        name = "{}-group-tenancy".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = p?.tenancyGroupName
+        }
+    }
     spec = {
         forProvider = {
             name = p?.tenancyGroupName
@@ -240,7 +327,12 @@ _groupTenancy = {
 _projDocs = {
     apiVersion = "gitlab.mojaloop.io/v1alpha1"
     kind = "XProject"
-    metadata.annotations: {"krm.kcl.dev/composition-resource-name" = "tenancy-docs"}
+    metadata = {
+        name = "{}-proj-tenancy-docs".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "tenancy-docs"
+        }
+    }
     spec = {
         parameters = {
             project = {
@@ -258,6 +350,7 @@ _projDocs = {
 _items += [
     _groupIAC
     _groupAccessToken
+    _pushSecret
     _projBootstrap
     _groupVarVaultAuthPath
     _groupVarVaultAuthRole
