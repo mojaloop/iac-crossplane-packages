@@ -75,7 +75,8 @@ _groupAccessToken = {
         }
         writeConnectionSecretToRef = {
             name = "{}-ci-token".format(oxr.metadata.name)
-            namespace = oxr.metadata.namespace
+            #todo why oxr.metadata.namespace doesnt work?
+            namespace = "gitlab"
         }
     }
 }
