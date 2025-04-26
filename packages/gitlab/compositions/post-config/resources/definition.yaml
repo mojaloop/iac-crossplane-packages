@@ -47,7 +47,7 @@ spec:
                   The name of the provider config to use for the gitlab providers.
                 required:
                   - gitlabProvider
-                  - k8sProvider
+                  - kubernetesProvider
                 properties:
                   gitlabProvider:
                     type: string

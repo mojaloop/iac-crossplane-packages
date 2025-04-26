@@ -96,7 +96,8 @@ _pushSecret = {
                 kind = "PushSecret"
                 metadata = {
                     name = "{}-iac-pat-push-secret".format(oxr.metadata.name)
-                    namespace = oxr.metadata.namespace
+                    #todo why oxr.metadata.namespace doesnt work?
+                    namespace = "gitlab"
                 }
                 spec = {
                     updatePolicy = "Replace"

@@ -10,3 +10,4 @@ spec:
     iacGroupName: iac
   providerConfigsRef:
     gitlabProvider: gitlab-provider
+    kubernetesProvider: kubernetes-provider
