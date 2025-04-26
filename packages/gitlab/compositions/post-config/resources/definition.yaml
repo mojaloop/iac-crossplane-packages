@@ -47,11 +47,18 @@ spec:
                   The name of the provider config to use for the gitlab providers.
                 required:
                   - gitlabProvider
+                  - k8sProvider
                 properties:
                   gitlabProvider:
                     type: string
                     description: |-
                       The name of the provider config to use for the gitlab provider.
+                    default: gitlab-provider
+                  kubernetesProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the kubernetes provider.
+                    default: kubernetes-provider
               parameters:
                 type: object
                 properties:

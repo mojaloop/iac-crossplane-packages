@@ -130,7 +130,7 @@ _pushSecret = {
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
-            name = spec?.providerConfigsRef?.gitlabProvider
+            name = spec?.providerConfigsRef?.kubernetesProvider
         }
     }
 }
