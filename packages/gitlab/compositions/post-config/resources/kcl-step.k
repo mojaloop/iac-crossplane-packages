@@ -120,7 +120,6 @@ _pushSecret = {
                     data = [
                         {
                             match = {
-                                secretKey = "token"
                                 remoteRef = {
                                     remoteKey = p?.ciTokenVaultPath
                                 }
