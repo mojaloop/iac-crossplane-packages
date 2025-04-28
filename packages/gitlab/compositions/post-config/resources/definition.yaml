@@ -59,6 +59,11 @@ spec:
                     description: |-
                       The name of the provider config to use for the kubernetes provider.
                     default: kubernetes-provider
+                  vaultProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the vault provider.
+                    default: vault-provider
               parameters:
                 type: object
                 properties:

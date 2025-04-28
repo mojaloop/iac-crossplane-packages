@@ -8,6 +8,8 @@ spec:
     privateRepo: foo
     tenancyGroupName: tenancy-internal
     iacGroupName: iac
+    gitlabRunnerRoleName: gitlab-runner-role
   providerConfigsRef:
     gitlabProvider: gitlab-provider
     kubernetesProvider: kubernetes-provider
+    vaultProvider: vault-provider

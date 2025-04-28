@@ -108,7 +108,6 @@ _pushSecret = {
                         {
                             name = "vault-secret-store"
                             kind = "ClusterSecretStore"
-
                         }
                     ]
                     selector = {
@@ -348,6 +347,83 @@ _projDocs = {
     }
 }
 
+_vaultJwtAuthBackend = {
+    apiVersion = "jwt.vault.upbound.io/v1alpha1"
+    kind = "AuthBackend"
+    metadata = {
+        name = "{}-vault-jwt-auth-backend".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "vault-jwt-auth-backend"
+        }
+    }
+    spec = {
+        forProvider = {
+            path = p?.gitlabRunnerJwtPath
+            description = "Gitlab JWT for external secrets"
+            oidcDiscoveryUrl = "https://{}".format(p?.vaultFqdn)
+            boundIssuer = "https://{}".format(p?.vaultFqdn)
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.vaultProvider
+        }
+    }
+}
+
+_vaultPolicy = {
+    apiVersion = "vault.vault.upbound.io/v1alpha1"
+    kind = "Policy"
+    metadata = {
+        name = "{}-vault-policy".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "vault-policy"
+        }
+    }
+    spec = {
+        forProvider = {
+            name = "gitlab-ci-runner"
+            policy = '''
+path "{}/*" {{
+  capabilities = ["read", "list"]
+}}
+'''.format(p?.ciTokenVaultPath)
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.vaultProvider
+        }
+    }
+}
+
+_vaultJwtAuthRole = {
+    apiVersion = "jwt.vault.upbound.io/v1alpha1"
+    kind = "AuthBackendRole"
+    metadata = {
+        name = "{}-vault-jwt-role".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "vault-jwt-role"
+        }
+    }
+    spec = {
+        forProvider = {
+            backend = p?.gitlabRunnerJwtPath
+            roleName = p?.gitlabRunnerRoleName
+            boundAudiences = ["https://{}".format(p?.vaultFqdn)]
+            tokenPolicies = ["gitlab-ci-runner"]
+            boundClaimsType = "glob"
+            boundClaims = {
+                ref_protected = "true"
+            }
+            userClaim = "user_email"
+            roleType = "jwt"
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.vaultProvider
+        }
+    }
+}
+
 _items += [
     _groupIAC
     _groupAccessToken
@@ -361,6 +437,9 @@ _items += [
     _groupVarPrivateRepoTokenVaultPath
     _groupTenancy
     _projDocs
+    _vaultJwtAuthBackend
+    _vaultPolicy
+    _vaultJwtAuthRole
 ]
 dxr = {
     **oxr
