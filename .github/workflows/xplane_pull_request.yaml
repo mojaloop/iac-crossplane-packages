@@ -68,12 +68,35 @@ jobs:
           set -o pipefail  # Ensure the pipeline returns non-zero if make fails
           make all PACKAGE_NAME=${{ inputs.SUBPATH }} 2>&1 | tee "$BUILD_OUTPUT"
 
-          # Debug the output
-          echo "Checking for validation errors in the build output..."
+          # Debug - print file size
+          echo "📋 Debug: Build output file size: $(wc -c "$BUILD_OUTPUT" | awk '{print $1}') bytes"
+
+          # Debug - print last 200 lines for examination
+          echo "📋 Debug: Last 200 lines of build output:"
+          tail -n 200 "$BUILD_OUTPUT"
+
+          # Extract all lines containing 'Total' for a broader search
+          echo "📋 Debug: Extracting all lines with 'Total'"
+          grep "Total" "$BUILD_OUTPUT" > "$SUMMARY_LINES" || echo "No 'Total' lines found"
+          echo "Summary lines content:"
+          cat "$SUMMARY_LINES"
+
+          # Look directly for failure patterns with different approaches
+          echo "📋 Debug: Searching for 'failure cases' (case insensitive)"
+          grep -i "failure cases" "$BUILD_OUTPUT" || echo "No 'failure cases' found"
+
+          echo "📋 Debug: Searching for lines with [x] indicating errors"
+          grep "\\[x\\]" "$BUILD_OUTPUT" || echo "No [x] lines found"
+
+          # Try different grep options that might be more lenient
+          echo "📋 Debug: Searching with -F flag (fixed strings)"
+          grep -F "failure cases" "$BUILD_OUTPUT" || echo "No fixed string matches"
+
+          echo "📋 Debug: Searching with word boundaries"
+          grep -w "failure" "$BUILD_OUTPUT" || echo "No 'failure' word found"
 
           # Look for failure indicators more broadly
           if grep -q "failure cases" "$BUILD_OUTPUT"; then
-            # Extract the specific lines for better visibility
             echo "❌ Found potential validation failures:"
             grep -B2 -A2 "failure cases" "$BUILD_OUTPUT"
 
@@ -84,13 +107,18 @@ jobs:
             fi
           fi
 
-          # Another approach - count total number of [x] lines which indicate failures
+          # Count total number of [x] lines which indicate failures
           FAILURE_COUNT=$(grep -c "\\[x\\]" "$BUILD_OUTPUT" || echo "0")
           if [ "$FAILURE_COUNT" -gt 0 ]; then
             echo "❌ Validation failed! Found $FAILURE_COUNT validation errors in the output"
             grep "\\[x\\]" "$BUILD_OUTPUT"
             exit 1
           fi
+
+          # Final fallback - write the entire build output to a GitHub Actions artifact for inspection
+          echo "DEBUG: Saving build output for inspection"
+          mkdir -p ./debug-artifacts
+          cp "$BUILD_OUTPUT" ./debug-artifacts/build_output.log
 
           echo "✅ Validation completed successfully"
 
