@@ -54,7 +54,7 @@ jobs:
           echo "Base version: ${VERSION}"
 
   pull-request-package:
-    uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_pull_request.yaml@main
+    uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_pull_request.yaml@chore/test-cicd-branch
     name: 🧪 PR Preview Package
     needs: [calculate-version]
     if: ${{ github.ref_type != 'tag' && github.ref != 'refs/heads/main' }}
