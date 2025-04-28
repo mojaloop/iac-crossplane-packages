@@ -1,0 +1,21 @@
+apiVersion: objectstore.mojaloop.io/v1alpha1
+kind: XCephBucket
+metadata:
+  name: test-bucket1
+spec:
+  providerConfigsRef:
+    scK8sProviderName: sc-kubernetes-provider
+    ccK8sProviderName: kubernetes-provider
+  parameters:
+    bucket:
+      bucketName: "my-example-bucket"
+      storageClassName: "ceph-bucket"
+      maxSize: "10Gi"
+      # maxObjects: "5000"
+    secret:
+      scNamespace: "rook-ceph"
+      name: "my-example-bucket"
+      ccNamespace: "temp"
+      esoPushSecret: true
+      vaultSecretStore: "vault-backend"
+      vaultSecretPath: "mutai/my_example_bucket2"
