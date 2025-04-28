@@ -66,7 +66,7 @@ jobs:
       NEXT_VERSION: ${{ needs.calculate-version.outputs.next_version }}  # Already includes 'v'
 
   release-package:
-    uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_pull_request.yaml@main
+    uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_pull_request.yaml@chore/test-cicd-branch
     name: 🚀 Release Package
     needs: [calculate-version]
     if: ${{ github.ref == 'refs/heads/main' }}
