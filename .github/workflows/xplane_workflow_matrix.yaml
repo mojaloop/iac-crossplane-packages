@@ -1,152 +1,108 @@
-name: 📦 Crossplane Package Pipeline
+name: 🔄 Crossplane Matrix Pipeline
 
 on:
-  workflow_call:
-    inputs:
-      CROSSPLANE_PACKAGES_DIR:
-        required: true
-        type: string
-        description: "Directory containing Crossplane packages"
-
-      CROSSPLANE_REGISTRY_URL:
-        required: true
-        type: string
-        description: "URL of the container registry for Crossplane packages"
-
-      SUBPATH:
-        required: true
-        type: string
-        description: "Composition subpath to package"
-
-      NEXT_VERSION:
-        required: true
-        type: string
-        description: "Version tag for the package"
-
-    secrets:
-      REGISTRY_USERNAME:
-        description: "Username for container registry to login"
-        required: true
-
-      REGISTRY_PASSWORD:
-        description: "Password for container registry to login"
-        required: true
+  pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - 'main'
 
 jobs:
-  # Package crossplane composition
-  package-composition:
-    name: 📦 Package Crossplane Composition
+  check-commit:
+    name: 📝 Check Commit Message
     runs-on: ubuntu-latest
-
     steps:
-      - name: 📥 Checkout Code
+      - name: 📅 Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: '0'
+          fetch-depth: 0
 
-      - name: 🔑 Login to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ inputs.CROSSPLANE_REGISTRY_URL }}
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
-
-      - name: 🛠️ Setup Crossplane CLI
+      - name: 🔍 Check Commit Messages
         run: |
-          curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh
-          sudo mv crossplane /usr/local/bin/
-
-      - name: ✅ Validate and Prepare
-        working-directory: ${{ inputs.CROSSPLANE_PACKAGES_DIR }}
-        run: |
-          echo "🔍 Preparing package for ${{ inputs.SUBPATH }}"
-          # Set up temp file paths
-          BUILD_OUTPUT="${{ runner.temp }}/build_output.log"
-
-          # Run make all and display output in real-time
-          set -o pipefail  # Ensure the pipeline returns non-zero if make fails
-          make all PACKAGE_NAME=${{ inputs.SUBPATH }} 2>&1 | tee "$BUILD_OUTPUT"
-
-          # Look for failure cases
-          if grep -q "failure cases" "$BUILD_OUTPUT"; then
-            echo "🔎 Checking for validation failures..."
-
-            # Find lines with non-zero failure cases
-            if grep -E "[1-9][0-9]* failure cases" "$BUILD_OUTPUT"; then
-              echo "❌ Validation failed! Found non-zero failure cases"
-              exit 1
-            fi
+          # Get only the last commit
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            COMMIT_MSG=$(git log -1 --format=%s ${{ github.event.pull_request.head.sha }})
+          else
+            # For push events, get the last commit
+            COMMIT_MSG=$(git log -1 --format=%s HEAD)
           fi
 
-          # Check for validation errors marked with [x]
-          FAILURE_COUNT=$(grep -c "\\[x\\]" "$BUILD_OUTPUT" || echo "0")
-          if [ "$FAILURE_COUNT" -gt 0 ]; then
-            echo "❌ Validation failed! Found $FAILURE_COUNT validation errors"
-            grep "\\[x\\]" "$BUILD_OUTPUT"
+          # Conventional commit regex pattern
+          # Format: type(scope): description
+          PATTERN='^((build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9-]+\))?: .+|Merge .+)'
+
+          if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
+            echo "❌ Error: Found commit that doesn't follow conventional format:"
+            echo "   $COMMIT_MSG"
+            echo "   Expected format: type(scope): description"
             exit 1
+          else
+            echo "✅ Valid commit message: $COMMIT_MSG"
           fi
 
-          # Clean up the temporary file
-          rm -f "$BUILD_OUTPUT"
-
-          echo "✅ Validation completed successfully"
-
-      - name: 📦 Create Package
-        working-directory: ${{ inputs.CROSSPLANE_PACKAGES_DIR }}
-        run: |
-          echo "📦 Packaging ${{ inputs.SUBPATH }} version ${{ inputs.NEXT_VERSION }}"
-          # Create package directory if it doesn't exist
-          mkdir -p ${{ inputs.SUBPATH }}/package
-          crossplane xpkg build --package-root=${{ inputs.SUBPATH }}/configuration -o ${{ inputs.SUBPATH }}/package/${{ inputs.SUBPATH }}-${{ inputs.NEXT_VERSION }}.xpkg
-
-      - name: 📤 Upload Package Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.SUBPATH }}-package
-          path: ${{ inputs.CROSSPLANE_PACKAGES_DIR }}/${{ inputs.SUBPATH }}/package/${{ inputs.SUBPATH }}-${{ inputs.NEXT_VERSION }}.xpkg
-          if-no-files-found: error
-          retention-days: 1
-
-  # publish crossplane package
-  publish-package:
-    name: 📡 Publish Crossplane Package
+  detect-changes:
+    name: 🔍 Detect Changed Packages
+    needs: check-commit
     runs-on: ubuntu-latest
-    needs:
-      - package-composition
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has_changes: ${{ steps.set-matrix.outputs.has_changes }}
     steps:
-      - name: 📥 Checkout
+      - name: 📅 Checkout Repository
         uses: actions/checkout@v4
-
-      - name: 📥 Download Package Artifact
-        uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.SUBPATH }}-package
-          path: ./artifacts
+          fetch-depth: 0
 
-      - name: 🛠️ Setup Crossplane CLI
-        run: "curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh"
-
-      - name: 🔑 Login to Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ inputs.CROSSPLANE_REGISTRY_URL }}
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
-
-      - name: 🚀 Push Package to Registry
+      - name: 🔎 Determine Changed Packages
+        id: set-matrix
+        env:
+          PR_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+          PR_BASE: ${{ github.event.pull_request.base.sha || '' }}
+          BEFORE: ${{ github.event.before || '' }}
         run: |
-          echo "📡 Publishing ${{ inputs.SUBPATH }} version ${{ inputs.NEXT_VERSION }} to registry"
-          ./crossplane --verbose xpkg push -f ./artifacts/${{ inputs.SUBPATH }}-${{ inputs.NEXT_VERSION }}.xpkg ${{ inputs.CROSSPLANE_REGISTRY_URL }}/${{ inputs.SUBPATH }}:${{ inputs.NEXT_VERSION }}
+          CROSSPLANE_PACKAGES_DIR="packages"
+          DIRECTORIES=$(find ${CROSSPLANE_PACKAGES_DIR}/* -maxdepth 0 -type d -not -name '\.*' 2>/dev/null || echo "")
+          CHANGED_DIRS=""
+          BASE=""
 
-      - name: 🏷️ Create and Push Git Tag
-        if: ${{ !contains(inputs.NEXT_VERSION, '-pr') }}
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "${{ inputs.SUBPATH }}/${{ inputs.NEXT_VERSION }}" -m "Release ${{ inputs.SUBPATH }}/v${{ inputs.NEXT_VERSION }}"
-          git push origin "${{ inputs.SUBPATH }}/${{ inputs.NEXT_VERSION }}"
+          if [[ "${GITHUB_REF}" == 'refs/heads/main' ]]; then
+            # On main branch, compare with previous commit
+            BASE="${BEFORE:-HEAD^}"
+          else
+            # On any other branch, compare with main
+            BASE="origin/main"
+          fi
 
-      - name: ✨ Summary
-        run: |
-          echo "✅ Successfully published ${{ inputs.SUBPATH }} version ${{ inputs.NEXT_VERSION }} to ${{ inputs.CROSSPLANE_REGISTRY_URL }}"
-          echo "✅ Created and pushed git tag ${{ inputs.SUBPATH }}/${{ inputs.NEXT_VERSION }}"
+          for DIR in $DIRECTORIES; do
+            if git diff --name-only $BASE HEAD | grep -q "^$DIR/"; then
+              PACKAGE_NAME=$(basename "$DIR")
+              CHANGED_DIRS="$PACKAGE_NAME;$CHANGED_DIRS"
+            fi
+          done
+
+          if [ -z "$CHANGED_DIRS" ]; then
+            echo "matrix=[]" >> $GITHUB_OUTPUT
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            MATRIX="[$(echo $CHANGED_DIRS | sed -r 's/([^;.]*);/{\"directory\": \"\1\"},/g' | sed 's/,$//g')]"
+            echo "matrix={\"include\": $MATRIX}" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+  process-packages:
+    name: 📦 Process Packages
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.has_changes == 'true' }}
+    strategy:
+      matrix: ${{fromJson(needs.detect-changes.outputs.matrix)}}
+      fail-fast: false
+    uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_workflow.yaml@main
+    secrets:
+      REGISTRY_USERNAME: ${{ github.actor }}
+      REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      registry: ghcr.io/${{ github.repository }}
+      package: ${{ matrix.directory }}
+      release_name: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+      packages_dir: packages
