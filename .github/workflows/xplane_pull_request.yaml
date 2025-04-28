@@ -59,67 +59,35 @@ jobs:
       - name: ✅ Validate and Prepare
         working-directory: ${{ inputs.CROSSPLANE_PACKAGES_DIR }}
         run: |
-          echo "TEST BRANCH CICD"
           echo "🔍 Preparing package for ${{ inputs.SUBPATH }}"
           # Set up temp file paths
           BUILD_OUTPUT="${{ runner.temp }}/build_output.log"
-          SUMMARY_LINES="${{ runner.temp }}/summary_lines.log"
 
           # Run make all and display output in real-time
           set -o pipefail  # Ensure the pipeline returns non-zero if make fails
           make all PACKAGE_NAME=${{ inputs.SUBPATH }} 2>&1 | tee "$BUILD_OUTPUT"
 
-          # Debug - print file size
-          echo "📋 Debug: Build output file size: $(wc -c "$BUILD_OUTPUT" | awk '{print $1}') bytes"
-
-          # Debug - print last 200 lines for examination
-          echo "📋 Debug: Last 200 lines of build output:"
-          tail -n 200 "$BUILD_OUTPUT"
-
-          # Extract all lines containing 'Total' for a broader search
-          echo "📋 Debug: Extracting all lines with 'Total'"
-          grep "Total" "$BUILD_OUTPUT" > "$SUMMARY_LINES" || echo "No 'Total' lines found"
-          echo "Summary lines content:"
-          cat "$SUMMARY_LINES"
-
-          # Look directly for failure patterns with different approaches
-          echo "📋 Debug: Searching for 'failure cases' (case insensitive)"
-          grep -i "failure cases" "$BUILD_OUTPUT" || echo "No 'failure cases' found"
-
-          echo "📋 Debug: Searching for lines with [x] indicating errors"
-          grep "\\[x\\]" "$BUILD_OUTPUT" || echo "No [x] lines found"
-
-          # Try different grep options that might be more lenient
-          echo "📋 Debug: Searching with -F flag (fixed strings)"
-          grep -F "failure cases" "$BUILD_OUTPUT" || echo "No fixed string matches"
-
-          echo "📋 Debug: Searching with word boundaries"
-          grep -w "failure" "$BUILD_OUTPUT" || echo "No 'failure' word found"
-
-          # Look for failure indicators more broadly
+          # Look for failure cases
           if grep -q "failure cases" "$BUILD_OUTPUT"; then
-            echo "❌ Found potential validation failures:"
-            grep -B2 -A2 "failure cases" "$BUILD_OUTPUT"
+            echo "🔎 Checking for validation failures..."
 
-            # Extract all lines with counts of failure cases > 0
+            # Find lines with non-zero failure cases
             if grep -E "[1-9][0-9]* failure cases" "$BUILD_OUTPUT"; then
-              echo "❌ Validation failed! Found lines with non-zero failure cases"
+              echo "❌ Validation failed! Found non-zero failure cases"
               exit 1
             fi
           fi
 
-          # Count total number of [x] lines which indicate failures
+          # Check for validation errors marked with [x]
           FAILURE_COUNT=$(grep -c "\\[x\\]" "$BUILD_OUTPUT" || echo "0")
           if [ "$FAILURE_COUNT" -gt 0 ]; then
-            echo "❌ Validation failed! Found $FAILURE_COUNT validation errors in the output"
+            echo "❌ Validation failed! Found $FAILURE_COUNT validation errors"
             grep "\\[x\\]" "$BUILD_OUTPUT"
             exit 1
           fi
 
-          # Final fallback - write the entire build output to a GitHub Actions artifact for inspection
-          echo "DEBUG: Saving build output for inspection"
-          mkdir -p ./debug-artifacts
-          cp "$BUILD_OUTPUT" ./debug-artifacts/build_output.log
+          # Clean up the temporary file
+          rm -f "$BUILD_OUTPUT"
 
           echo "✅ Validation completed successfully"
 
