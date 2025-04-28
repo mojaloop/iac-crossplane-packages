@@ -71,7 +71,7 @@ spec:
                     type: string
                     description: |-
                       The path in vault where to push the gitlab ci token.
-                    default: xgitlab/xgitlab_ci_pat
+                    default: gitlab/gitlab_ci_pat
                   tenancyGroupName:
                     type: string
                     description: |-
