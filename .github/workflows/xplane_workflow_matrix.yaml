@@ -97,7 +97,7 @@ jobs:
     strategy:
       matrix: ${{fromJson(needs.detect-changes.outputs.matrix)}}
       fail-fast: false
-    uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_workflow.yaml@chore/test-cicd-branch
+    uses: mojaloop/iac-crossplane-packages/.github/workflows/xplane_workflow.yaml@main
     secrets:
       REGISTRY_USERNAME: ${{ github.actor }}
       REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
