@@ -59,6 +59,7 @@ jobs:
       - name: ✅ Validate and Prepare
         working-directory: ${{ inputs.CROSSPLANE_PACKAGES_DIR }}
         run: |
+          echo "TEST BRANCH CICD"
           echo "🔍 Preparing package for ${{ inputs.SUBPATH }}"
           # Set up temp file paths
           BUILD_OUTPUT="${{ runner.temp }}/build_output.log"
