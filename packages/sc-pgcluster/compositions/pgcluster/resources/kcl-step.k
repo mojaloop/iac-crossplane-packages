@@ -31,6 +31,7 @@ _PGCluster = {
                     postgresVersion = parameters?.pgVersion
                     port = 5432
                     imagePullPolicy = "IfNotPresent"
+                    openshift = False
                     pause = False
                     standby = {
                         enabled = False

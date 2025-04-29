@@ -1,14 +1,14 @@
 apiVersion: sc.mojaloop.io/v1alpha1
 kind: XPGCluster
 metadata:
-  name: db_name
-  namespace: namespace
+  name: gitlab
+  namespace: gitlab
 spec:
   parameters:
-    clusterName: cluster_name  # TODO: Replace with your consumer cluster name
+    clusterName: gitlab  # TODO: Replace with your consumer cluster name
     externalServiceName: externalservice-name
     appNamespace: foo
-    crVersion: "2.5.0"
+    crVersion: "2.6.0"
     pgVersion: 16
     dbSecret: db-secret
     dbUsername: dbuser
@@ -16,7 +16,7 @@ spec:
     replicas: 1
     storageSize: 10Gi  # Replace with desired PVC size
 
-    image: percona/percona-postgresql-operator:2.5.0-ppg16.4-postgres
+    image: percona/percona-postgresql-operator:2.6.0-ppg16.8-postgres
 
     resources:
       limits:
@@ -31,7 +31,7 @@ spec:
     tolerations: []
 
     backup:
-      image: percona/percona-postgresql-operator:2.5.0-ppg16.4-pgbackrest2.53-1
+      image: percona/percona-postgresql-operator:2.6.0-ppg16.8-pgbackrest2.54.2
       objectStoreEndpoint: s3.endpoint.example.com
       bucket: example-bucket
       bucketRegion: us-east-1
