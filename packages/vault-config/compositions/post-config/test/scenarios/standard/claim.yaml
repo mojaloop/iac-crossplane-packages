@@ -5,6 +5,11 @@ metadata:
 spec:
   parameters:
     name: example-postconfig
+    kvPath: "secret"
+    k8sAdminAuthPath: "kubernetes/admin"
+    k8sAdminRoleName: "vault-admin"
+    adminPolicyName: "vault-admin"
+    readKvSecretsPolicyName: "read-all-kv-secrets"
   providerConfigsRef:
     vaultProviderName: vault-provider
   managementPolicies:
