@@ -359,7 +359,7 @@ _vaultJwtAuthBackend = {
     spec = {
         forProvider = {
             path = p?.gitlabRunnerJwtPath
-            description = "Gitlab JWT for external secrets"
+            description = "JWT for Gitlab Runner"
             oidcDiscoveryUrl = "https://{}".format(p?.vaultFqdn)
             boundIssuer = "https://{}".format(p?.vaultFqdn)
         }
