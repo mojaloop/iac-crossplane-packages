@@ -1,0 +1,11 @@
+apiVersion: vaultconfig.mojaloop.io/v1alpha1
+kind: XPostConfig
+metadata:
+  name: example-postconfig-claim
+spec:
+  parameters:
+    name: example-postconfig
+  providerConfigsRef:
+    vaultProviderName: vault-provider
+  managementPolicies:
+    - "*"
