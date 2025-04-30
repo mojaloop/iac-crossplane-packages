@@ -1,0 +1,13 @@
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-family-aws
+spec:
+  package: xpkg.upbound.io/upbound/provider-family-aws:v1
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-aws-route53
+spec:
+  package: xpkg.upbound.io/upbound/provider-aws-route53:v1
