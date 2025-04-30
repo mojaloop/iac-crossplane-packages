@@ -67,18 +67,18 @@ _external_access_group = {
     }
 }
 # Kubernetes Group
-_kubernetes_group = {
+_network_resource_group = {
     apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
     kind = "NbGroup"
     metadata = {
-        name = "{}-kubernetes-group".format(oxr.metadata.name)
+        name = "{}-network-resource-group".format(oxr.metadata.name)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "kubernetes-group"
+            "krm.kcl.dev/composition-resource-name": "network-resource-group"
         }
     }
     spec = {
         forProvider = {
-            name = parameters.groupNames.kubeapiResourceGroup
+            name = parameters.groupNames.networkResourceGroup
         }
         providerConfigRef = {
             name = spec?.providerConfigsRef?.netbirdProviderConfigName
@@ -203,41 +203,35 @@ if parameters.accessToken.destinationType == "sc":
 
 # elif parameters.accessToken.destinationType == "tenantVault":
 #     # TODO: Implement tenant vault stuff
-_k8s_policy = {
+_internal_network_policy = {
     apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
     kind = "NbPolicy"
     metadata = {
-        name = "{}-k8s-policy".format(oxr.metadata.name)
+        name = "{}-internal-network-policy".format(oxr.metadata.name)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "k8s-policy"
+            "krm.kcl.dev/composition-resource-name": "internal-network-policy"
         }
     }
     spec = {
         forProvider = {
-            name = "{}-k8s-policy".format(oxr.metadata.name)
+            name = "{}-internal-network-policy".format(oxr.metadata.name)
             enabled = True
             description = "Policy for connecting to kubeapi for {}".format(oxr.metadata.name)
             rules = [
                 {
                     action = "accept"
                     bidirectional = True
-                    description = "k8s accept"
-                    name = "k8s-accept-rule"
+                    description = "internal network accept"
+                    name = "internal-network-accept-rule"
                     enabled = True
                     destinations = [
                         {
-                            id = ocds["kubernetes-group"]?.Resource?.status?.atProvider?.id or ""
+                            id = ocds["network-resource-group"]?.Resource?.status?.atProvider?.id or ""
                         }
                     ]
                     sources = [
                         {
                             id = ocds["external-access-group"]?.Resource?.status?.atProvider?.id or ""
-                        }
-                    ]
-                    port_ranges = [
-                        {
-                            start = 443
-                            end = 443
                         }
                     ]
                     protocol = "tcp"
@@ -258,16 +252,16 @@ _items += [
 if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
     _items += [
         _external_access_group
-        _kubernetes_group
+        _network_resource_group
         _service_user
         _access_token
     ]
     if parameters.accessToken.destinationType == "sc":
         _items += [_sc_netbird_namespace, _sc_access_token_secret_copy]
 
-if readyBasedOnConditions(ocds["external-access-group"]):
+if readyBasedOnConditions(ocds["external-access-group"]) and readyBasedOnConditions(ocds["kubernetes-group"]):
     _items += [
-        _k8s_policy
+        _internal_network_policy
     ]
 
 # elif parameters.accessToken.destinationType == "tenantVault":

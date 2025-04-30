@@ -12,7 +12,7 @@ spec:
     groupNames:
       admin: techops-admin
       externalAccess: techops-users
-      kubeapiResourceGroup: k8s
+      networkResourceGroup: k8s-internal
     serviceUserName: testserviceuser
     accessTokenExpiresInDays: 5
     operatorKubeapiGroup: testgroup

@@ -1,0 +1,17 @@
+apiVersion: nb.mojaloop.io/v1alpha1
+kind: XOperatorPostConfig
+metadata:
+  name: example-op-post-config
+  namespace: testa
+spec:
+  parameters:
+    networkResource:
+      name: testnetwork-internal
+      CIDR: "10.10.126.0/24"
+      networkName: testnetwork
+    groupNames:
+      networkResourceGroup: k8s-cluster-group
+  providerConfigsRef:
+    netbirdProviderConfigName: "netbird-provider-config"
+  managementPolicies:
+    - "*"

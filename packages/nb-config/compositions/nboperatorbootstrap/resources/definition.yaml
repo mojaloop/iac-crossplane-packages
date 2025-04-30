@@ -104,9 +104,9 @@ spec:
                         externalAccess:
                           type: string
                           description: The name of the external access group to use for the post-config.
-                        kubeapiResourceGroup:
+                        networkResourceGroup:
                           type: string
-                          description: The name of the group to give to kubeapi netbird resource.
+                          description: The name of the group to give to internal network netbird resource.
                     accessToken:
                       type: object
                       properties:
