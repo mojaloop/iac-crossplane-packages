@@ -1,0 +1,30 @@
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  labels:
+    scbootstrap.sc.mojaloop.io/argocd-pods-collection: name
+status:
+  atProvider:
+    manifest:
+      status:
+        conditions:
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:37Z"
+          status: "True"
+          type: PodReadyToStartContainers
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: Initialized
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: Ready
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: ContainersReady
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: PodScheduled
