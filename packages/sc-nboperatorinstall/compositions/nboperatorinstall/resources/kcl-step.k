@@ -65,7 +65,7 @@ _sc_argocd_operator_app_install = {
                     name = parameters.operatorClusterName
                   }
                   ingress = {
-                    enabled = False
+                    enabled = True
                     router = {
                       enabled = True
                     }
