@@ -28,12 +28,6 @@ CROSSPLANE_RENDER_CMD := $(shell if crossplane render --help > /dev/null 2>&1; t
 EXTRA_RENDER_ARGS ?=
 EXTRA_VALIDATE_ARGS ?=
 
-ifneq ("$(wildcard $(EXTRA_RESOURCES_FILE))","")
-	EXTRA_RESOURCES := --extra-resources $(EXTRA_RESOURCES_FILE)
-else
-    EXTRA_RESOURCES ?=
-endif
-
 # =============================================================================
 
 # Default target
@@ -146,7 +140,15 @@ define render_specific_claim
 		echo "📊 Including global runtime state"; \
 		observed="-o $(OBSERVED_FILE)"; \
 	fi; \
-	$(CROSSPLANE_RENDER_CMD) "$(1)" $(COMPOSITION_OUTPUT) $(FUNCTIONS_FILE) $$observed $(EXTRA_RESOURCES) -x $(EXTRA_RENDER_ARGS) > "$$output_file" 2>&1 || { cat "$$output_file" >&2; exit 1; }; \
+	extra_resources=""; \
+	if [ -f "$(dir $(1))extra.yaml" ]; then \
+		echo "📋 Including scenario extra resources"; \
+		extra_resources="--extra-resources $(dir $(1))extra.yaml"; \
+	elif [ -f "$(EXTRA_RESOURCES_FILE)" ]; then \
+		echo "📋 Including global extra resources"; \
+		extra_resources="--extra-resources $(EXTRA_RESOURCES_FILE)"; \
+	fi; \
+	$(CROSSPLANE_RENDER_CMD) "$(1)" $(COMPOSITION_OUTPUT) $(FUNCTIONS_FILE) $$observed $$extra_resources -x $(EXTRA_RENDER_ARGS) > "$$output_file" 2>&1 || { cat "$$output_file" >&2; exit 1; }; \
 	echo "💾 Template output: $$output_file"
 endef
 
