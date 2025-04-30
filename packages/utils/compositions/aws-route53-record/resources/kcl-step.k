@@ -17,7 +17,7 @@ _Record = {
     }
     spec = {
         forProvider = {
-            name   = "{}-sg".format(oxr.metadata.name)
+            name   = parameters?.name
             region = parameters?.region
             ttl  = parameters?.ttl
             type = parameters?.type
