@@ -65,18 +65,26 @@ _sc_argocd_operator_app_install = {
                     name = parameters.operatorClusterName
                   }
                   ingress = {
-                    enabled = True
+                    enabled = False
                     router = {
                       enabled = True
                     }
                     kubernetesAPI = {
-                      enabled = True
-                      groups = [parameters.operatorKubeapiGroupName]
-                      resourceName: "{}-kube-api".format(parameters.operatorClusterName)
+                      enabled = False
                     }
                   }
                   netbirdAPI = {
                     keyFromSecret = "nb-operator-api-key"
+                  }
+                  operator = {
+                    podSecurityContext = {
+                      sysctls = [
+                        {
+                          name = "net.ipv4.ip_forward"
+                          value = "1"
+                        }
+                      ]
+                    }
                   }
                   managementURL = parameters.nbManagmentURI
                 }
