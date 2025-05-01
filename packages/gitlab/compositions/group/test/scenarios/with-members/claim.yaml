@@ -1,0 +1,17 @@
+apiVersion: gitlab.mojaloop.io/v1alpha1
+kind: XGroup
+metadata:
+  name: group
+  namespace: default
+spec:
+  parameters:
+    group:
+      name: group
+      parentId: 1
+      members:
+      - gitlabUserID: 1
+        role: 50
+      - gitlabUserID: 2
+        role: 50
+  providerConfigsRef:
+    gitlabProvider: gitlab-provider
