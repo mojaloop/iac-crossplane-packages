@@ -11,7 +11,7 @@ This project provides a collection of Crossplane composition packages designed t
 - [Utils](packages/utils/README.md) - Common utility compositions
 - [Storage Cluster Bootstrap](packages/sc-bootstrap/README.md) - Storage Cluster Bootstrap composition
 - [Storage Cluster Postgres Cluster](packages/sc-pgcluster/README.md) - Storage Cluster Postgres Cluster composition
-- [AWS DocDbCluster](packages/aws-docdbcluster/README.md) - Storage Cluster Postgres Cluster composition
+- [AWS DocDbCluster](packages/aws-docdbcluster/README.md) - AWS DocumentDB Cluster composition
 - [AWS S3 & Ceph Buckets](packages/objectstores) - Objectstore compositions for Ceph and AWS S3 Buckets Creation
 - Additional packages coming soon...
 
