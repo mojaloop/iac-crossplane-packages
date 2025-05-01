@@ -96,9 +96,16 @@ jobs:
 
           # Check for missing schemas
           if grep -q "missing schemas" "$BUILD_OUTPUT"; then
-            echo "❌ Validation failed! Found missing schemas"
-            grep "schemas does not exist" "$BUILD_OUTPUT"
-            exit 1
+            # Only fail if there's an actual error related to schemas
+            # not just the normal "downloading schemas" messages
+            if grep -q "error.*schema" "$BUILD_OUTPUT"; then
+              echo "❌ Validation failed! Found schema errors"
+              grep "error.*schema" "$BUILD_OUTPUT"
+              exit 1
+            else
+              echo "ℹ️ Downloading missing schemas..."
+              grep "schemas does not exist, downloading:" "$BUILD_OUTPUT"
+            fi
           fi
 
           # Check for any other crossplane validation errors
