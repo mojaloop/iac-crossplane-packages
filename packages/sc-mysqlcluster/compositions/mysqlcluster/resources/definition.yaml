@@ -177,8 +177,22 @@ spec:
                         description: Image pull policy for PXC
                         default: IfNotPresent
                       expose:
-                        type: boolean
+                        type: object
                         description: Expose HAProxy service
+                        properties:
+                          type:
+                            type: string
+                            description: Type of service to expose (e.g., LoadBalancer, NodePort)
+                          annotations:
+                            type: object
+                            additionalProperties:
+                              type: string
+                            description: Annotations for the service
+                          labels:
+                            type: object
+                            additionalProperties:
+                              type: string
+                            description: Labels for the service
                       resources:
                         type: object
                         description: The resources for haproxy

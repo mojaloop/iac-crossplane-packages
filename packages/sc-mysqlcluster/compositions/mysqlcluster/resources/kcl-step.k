@@ -87,7 +87,9 @@ _MysqlCluster = {
                         } if parameters?.pxc?.podDisruptionBudget else {}
 
                         exposePrimary = {
-                            enabled = parameters?.haproxy?.expose
+                            type = parameters?.haproxy?.expose?.type
+                            annotations = parameters?.haproxy?.expose?.annotations
+                            labels = parameters?.haproxy?.expose?.labels
                         }
                         gracePeriod = 30
                         resources = {
@@ -185,7 +187,7 @@ _ip = ocds["percona-sql-db"]?.Resource?.status?.atProvider?.manifest?.status?.ho
 
 _DnsRecord = {
     apiVersion = "utils.aws.mojaloop.io/v1alpha1"
-    kind = "AWSRoute53Record"
+    kind = "XAWSRoute53Record"
     metadata = {
         name = "{}-dnsrecord".format(oxr.metadata.name)
     }

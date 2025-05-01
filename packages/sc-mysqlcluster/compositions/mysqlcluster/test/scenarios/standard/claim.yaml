@@ -1,14 +1,14 @@
 apiVersion: sc.mojaloop.io/v1alpha1
 kind: XMysqlCluster
 metadata:
-  name: my-mysql-cluster
+  name: mysqlpxc
   namespace: env
 spec:
   parameters:
     clusterName: env
     externalServiceName: my-cluster-service
     appNamespace: env
-    crVersion: "1.16.1"
+    crVersion: "1.16.0"
     dbSecret: my-db-secret
     dbUsername: my-user
     dbName: my-database
@@ -39,21 +39,15 @@ spec:
         max_connections=2000
         innodb_buffer_pool_size=2147483648
         wsrep_auto_increment_control=OFF
-      tolerations:
-        - key: "node-role.kubernetes.io/master"
-          operator: "Exists"
-          effect: "NoSchedule"
-        - key: "node-role.kubernetes.io/worker"
-          operator: "Exists"
-          effect: "NoSchedule"
-      podDisruptionBudget:
-        maxUnavailable: 1
-        minAvailable: 1
+      tolerations: []
       priorityClassName: ""
     haproxy:
       image: "percona/haproxy:2.8.11" #example
       imagePullPolicy: IfNotPresent
-      expose: false
+      expose:
+        type: LoadBalancer
+        annotations: {}
+        labels: {}
       replicas: 2
       resources:
         requests:
@@ -63,10 +57,9 @@ spec:
           memory: 2Gi
           cpu: "1"
       tolerations: []
-      podDisruptionBudget: {}
       priorityClassName: ""
     logcollector:
-      image: "percona/percona-xtradb-cluster-operator:1.16.1-logcollector-fluentbit3.2.2" #example
+      image: "perconalab/percona-xtradb-cluster-operator:main-logcollector" #example
       imagePullPolicy: IfNotPresent
       resources:
         requests:
@@ -76,7 +69,7 @@ spec:
           memory: 500Mi
           cpu: 200m
     backup:
-      image: "percona/percona-xtradb-cluster-operator:1.14.0" # example
+      image: "percona/percona-xtradb-cluster-operator:1.16.0-logcollector-fluentbit3.2.2" # example
       imagePullPolicy: IfNotPresent
       verifyTLS: true
       bucket: "s3-bucket-name"
@@ -94,6 +87,6 @@ spec:
   providerConfigsRef:
     scK8sProviderName: sc-kubernetes-provider
     ccK8sProviderName: kubernetes-provider
-    awsProviderName: aws-provider
+    awsProviderName: aws-provider-config
   managementPolicies:
     - "*"
