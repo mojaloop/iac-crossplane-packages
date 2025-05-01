@@ -1,0 +1,111 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xgitlabpostconfig.gitlab.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: gitlab.mojaloop.io
+  names:
+    kind: XGitlabPostConfig
+    plural: xgitlabpostconfig
+  claimNames:
+    kind: GitlabPostConfig
+    plural: gitlabpostconfig
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the gitlab providers.
+                properties:
+                  gitlabProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the gitlab provider.
+                    default: gitlab-provider
+                  kubernetesProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the kubernetes provider.
+                    default: kubernetes-provider
+                  vaultProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the vault provider.
+                    default: vault-provider
+              parameters:
+                type: object
+                properties:
+                  iacGroupName:
+                    type: string
+                    description: |-
+                      The name of the iac gitlab group.
+                    default: iac
+                  ciTokenVaultPath:
+                    type: string
+                    description: |-
+                      The path in vault where to push the gitlab ci token.
+                    default: gitlab/gitlab_ci_pat
+                  tenancyGroupName:
+                    type: string
+                    description: |-
+                      The name of the tenancy gitlab group.
+                    default: tenancy-internal
+                  gitlabRunnerRoleName:
+                    type: string
+                    description: |-
+                      The name of the role to assign the gitlab runners.
+                    default: gitlab-runner-role
+                  gitlabRunnerJwtPath:
+                    type: string
+                    description: |-
+                      Vault jwt path for gitlab secrets integration.
+                    default: gitlab_secrets_jwt
+                  vaultFqdn:
+                    type: string
+                    description: |-
+                      The fqdn for vault api.
+                    default: vault.cluster.mojaloop.io
+                  privateRepoUser:
+                    type: string
+                    description: |-
+                      Repo user name for private iac repo.
+                    default: platform
+                  privateRepo:
+                    type: string
+                    description: |-
+                      Repo location for private iac.
+                    default: platform
+          status:
+            type: object
+            properties:
+              tokenExpireAt:
+                type: string

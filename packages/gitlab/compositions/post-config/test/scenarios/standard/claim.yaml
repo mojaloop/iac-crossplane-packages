@@ -1,0 +1,15 @@
+apiVersion: gitlab.mojaloop.io/v1alpha1
+kind: XGitlabPostConfig
+metadata:
+  name: post
+  namespace: default
+spec:
+  parameters:
+    privateRepo: foo
+    tenancyGroupName: tenancy-internal
+    iacGroupName: iac
+    gitlabRunnerRoleName: gitlab-runner-role
+  providerConfigsRef:
+    gitlabProvider: gitlab-provider
+    kubernetesProvider: kubernetes-provider
+    vaultProvider: vault-provider

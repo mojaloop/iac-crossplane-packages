@@ -11,6 +11,25 @@ spec:
   mode: Pipeline
   pipeline:
 
+    - step: get-extra-resources
+      functionRef:
+        name: function-extra-resources
+      input:
+        apiVersion: extra-resources.fn.crossplane.io/v1beta1
+        kind: Input
+        spec:
+          extraResources:
+            - kind: Object
+              into: argocdpods
+              apiVersion: kubernetes.crossplane.io/v1alpha2
+              type: Selector
+              selector:
+                minMatch: 0
+                matchLabels:
+                  - key: "scbootstrap.sc.mojaloop.io/argocd-pods-collection"
+                    type: FromCompositeFieldPath
+                    valueFromFieldPath: metadata.name
+
     - step: kcl
       functionRef:
         name: function-kcl
