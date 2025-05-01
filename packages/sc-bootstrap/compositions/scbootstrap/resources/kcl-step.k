@@ -1,6 +1,7 @@
 # Read the XR and the OCDs
 oxr = option("params").oxr
 ocds = option("params").ocds
+extra = option("params")?.ctx["apiextensions.crossplane.io/extra-resources"]
 
 spec = oxr.spec
 parameters = spec.parameters
@@ -21,9 +22,17 @@ daemonsetReady = lambda o: any -> bool {
     status?.desiredNumberScheduled == status?.numberAvailable and (status?.numberAvailable or 0) > 0
 }
 
-print(ocds["daemon-set"]?.Resource?.status?.atProvider?.manifest?.status?.desiredNumberScheduled)
-print(ocds["daemon-set"]?.Resource?.status?.atProvider?.manifest?.status?.numberAvailable)
-
+# Method to check if the argocd pods are ready
+argocdPodsReady = lambda pods: [any] -> bool {
+    pods and all_true([
+        all_true([
+            c.status == "True"
+            for c in (pod?.status?.atProvider?.manifest?.status?.conditions or [])
+            if c.type in ["Ready", "ContainersReady"]
+        ])
+        for pod in pods
+    ])
+}
 
 # Initialize the items list
 _items = []
@@ -535,6 +544,40 @@ _argocdHelmChart = {
     }
 }
 
+# ArgoCD Pods ObservedObjectCollection
+_argocdPodsCollection = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha1"
+    kind = "ObservedObjectCollection"
+    metadata = {
+        name = "{}-argocd-pods".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "argocd-pods-collection"
+        }
+    }
+    spec = {
+        objectTemplate = {
+            metadata = {
+                labels = {
+                    "scbootstrap.sc.mojaloop.io/argocd-pods-collection" = oxr.metadata.name
+                }
+            }
+        }
+        observeObjects = {
+            apiVersion = "v1"
+            kind = "Pod"
+            namespace = "argocd"
+            selector = {
+                matchLabels = {
+                    "app.kubernetes.io/part-of" = "argocd"
+                }
+            }
+        }
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.scK8sProviderName
+        }
+    }
+}
+
 # ArgoCD Root application install
 _Application = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -609,9 +652,12 @@ _items += [
     _daemonSet
 ]
 
-# # Install ArgoCD only if the DaemonSet is ready
+# Install ArgoCD only if the DaemonSet is ready
 if daemonsetReady(ocds["daemon-set"]):
-    _items += [_argocdHelmChart, _Application]
+    _items += [_argocdHelmChart, _argocdPodsCollection]
+
+if argocdPodsReady(extra?.argocdpods):
+    _items += [_Application]
 
 dxr = {
     **oxr
