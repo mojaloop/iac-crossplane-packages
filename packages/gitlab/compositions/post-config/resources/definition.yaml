@@ -45,9 +45,6 @@ spec:
                 type: object
                 description: |-
                   The name of the provider config to use for the gitlab providers.
-                required:
-                  - gitlabProvider
-                  - kubernetesProvider
                 properties:
                   gitlabProvider:
                     type: string

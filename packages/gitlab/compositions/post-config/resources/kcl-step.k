@@ -351,25 +351,41 @@ _projDocs = {
     }
 }
 
+# This is a workaround for the issue in https://github.com/upbound/provider-vault/issues/83
 _vaultJwtAuthBackend = {
-    apiVersion = "jwt.vault.upbound.io/v1alpha1"
-    kind = "AuthBackend"
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
     metadata = {
         name = "{}-vault-jwt-auth-backend".format(oxr.metadata.name)
         annotations = {
-            "krm.kcl.dev/composition-resource-name" = "vault-jwt-auth-backend"
+            "krm.kcl.dev/composition-resource-name": "{}-vault-jwt-auth-backend".format(oxr.metadata.name)
         }
     }
     spec = {
         forProvider = {
-            path = p?.gitlabRunnerJwtPath
-            description = "JWT for Gitlab Runner"
-            oidcDiscoveryUrl = "https://{}".format(p?.vaultFqdn)
-            boundIssuer = "https://{}".format(p?.vaultFqdn)
+            manifest = {
+                apiVersion = "jwt.vault.upbound.io/v1alpha1"
+                kind = "AuthBackend"
+                metadata = {
+                    name = "vault-jwt-auth-backend-object"
+                }
+                spec = {
+                    forProvider = {
+                        path = p?.gitlabRunnerJwtPath
+                        description = "JWT for Gitlab Runner"
+                        oidcDiscoveryUrl = "https://{}".format(p?.vaultFqdn)
+                        boundIssuer = "https://{}".format(p?.vaultFqdn)
+                    }
+                    managementPolicies = spec.managementPolicies
+                    providerConfigRef = {
+                        name = spec?.providerConfigsRef?.vaultProvider
+                    }
+                }
+            }
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
-            name = spec?.providerConfigsRef?.vaultProvider
+            name = spec?.providerConfigsRef?.kubernetesProvider
         }
     }
 }
