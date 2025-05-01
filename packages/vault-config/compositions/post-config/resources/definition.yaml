@@ -55,10 +55,6 @@ spec:
               parameters:
                 type: object
                 properties:
-                  name:
-                    type: string
-                    description: |-
-                      The name of the vault config to create.
                   kvPath:
                     type: string
                     description: |-
