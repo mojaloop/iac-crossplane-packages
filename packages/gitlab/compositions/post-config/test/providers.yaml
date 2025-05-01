@@ -4,18 +4,18 @@ kind: Provider
 metadata:
   name: provider-kubernetes
 spec:
-  package: xpkg.upbound.io/upbound/provider-kubernetes:v0
+  package: ghcr.io/mojaloop/infra/crossplane-contrib/provider-kubernetes:v0.15.0
 ---
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
   name: provider-gitlab
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/provider-gitlab:v0.10.3
+  package: ghcr.io/mojaloop/infra/crossplane-contrib/provider-gitlab:v0.10.3
 ---
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
   name: provider-vault
 spec:
-  package: xpkg.upbound.io/upbound/provider-vault:v2
+  package: ghcr.io/mojaloop/infra/upbound/provider-vault:v2.1.3
