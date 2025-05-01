@@ -21,9 +21,8 @@ This package includes the following compositions:
 
 1. [ObjectSyncer](compositions/object-syncer/README.md)
 2. [RemoteNamespace](compositions/remote-namespace/README.md)
+3. [ConfigMapfromSecret](compositions/configmap-from-secret/README.md)
 
 ## Usage
-
-### Example Usage
 
 Example claims are placed withing test scenarious of each composition
