@@ -48,6 +48,7 @@ spec:
                 required:
                   - scK8sProviderName
                   - ccK8sProviderName
+                  - awsProviderName
                 properties:
                   ccK8sProviderName:
                     type: string
@@ -57,6 +58,10 @@ spec:
                     type: string
                     description: |-
                       The name of the provider config to use for the remote k8s provider.
+                  awsProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the AWS provider.
               parameters:
                 type: object
                 properties:
@@ -88,6 +93,10 @@ spec:
                       image:
                         type: string
                         description: PXC image
+                      imagePullPolicy:
+                        type: string
+                        description: Image pull policy for PXC
+                        default: IfNotPresent
                       storageSize:
                         type: string
                         description: Size of storage requested for PXC
@@ -123,6 +132,36 @@ spec:
                       configuration:
                         type: string
                         description: Configuration for PXC
+                      priorityClassName:
+                        type: string
+                        description: Priority class name for PXC
+                      tolerations:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                              description: Toleration key
+                            operator:
+                              type: string
+                              description: Toleration operator
+                            value:
+                              type: string
+                              description: Toleration value
+                            effect:
+                              type: string
+                              description: Toleration effect
+                        podDisruptionBudget:
+                          type: object
+                          properties:
+                            minAvailable:
+                              type: number
+                              description: Minimum number of available pods
+                            maxUnavailable:
+                              type: number
+                              description: Maximum number of unavailable pods
+
                   haproxy:
                     type: object
                     properties:
@@ -133,6 +172,10 @@ spec:
                       image:
                         type: string
                         description: HAProxy image
+                      imagePullPolicy:
+                        type: string
+                        description: Image pull policy for PXC
+                        default: IfNotPresent
                       expose:
                         type: boolean
                         description: Expose HAProxy service
@@ -160,12 +203,45 @@ spec:
                               cpu:
                                 type: string
                                 description: CPU limit for haproxy
+                      priorityClassName:
+                        type: string
+                        description: Priority class name for HAProxy
+                      tolerations:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                              description: Toleration key
+                            operator:
+                              type: string
+                              description: Toleration operator
+                            value:
+                              type: string
+                              description: Toleration value
+                            effect:
+                              type: string
+                              description: Toleration effect
+                        podDisruptionBudget:
+                          type: object
+                          properties:
+                            minAvailable:
+                              type: number
+                              description: Minimum number of available pods
+                            maxUnavailable:
+                              type: number
+                              description: Maximum number of unavailable pods
                   logcollector:
                     type: object
                     properties:
                       image:
                         type: string
                         description: LogCollector image
+                      imagePullPolicy:
+                        type: string
+                        description: Image pull policy for PXC
+                        default: IfNotPresent
                       resources:
                         type: object
                         description: The resources for LogCollector
@@ -196,6 +272,10 @@ spec:
                       image:
                         type: string
                         description: Backup image
+                      imagePullPolicy:
+                        type: string
+                        description: Image pull policy for PXC
+                        default: IfNotPresent
                       verifyTLS:
                         type: boolean
                         description: Verify TLS for S3.
@@ -217,3 +297,26 @@ spec:
                       backupRetention:
                         type: integer
                         description: Number of backups to retain.
+                  dns:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: The name of the DNS record
+                      region:
+                        type: string
+                        description: AWS Region where the DNS record is created
+                      ttl:
+                        type: integer
+                        description: TTL (Time to Live) of the DNS record
+                      type:
+                        type: string
+                        description: Type of the DNS record (e.g., A, CNAME)
+                      records:
+                        type: array
+                        items:
+                          type: string
+                        description: List of DNS record values (e.g., IP addresses)
+                      zoneId:
+                        type: string
+                        description: Route53 Hosted Zone ID

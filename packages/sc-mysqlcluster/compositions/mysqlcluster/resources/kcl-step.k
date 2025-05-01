@@ -11,7 +11,7 @@ _MysqlCluster = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "{}-ss".format(oxr.metadata.name)
+        name = "{}-pxc".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "percona-sql-db"
         }
@@ -32,12 +32,14 @@ _MysqlCluster = {
                     pxc = {
                             size = parameters?.pxc?.replicas
                             image = parameters?.pxc?.image
+                            imagePullPolicy = parameters?.pxc?.imagePullPolicy
                             affinity = {
                                 antiAffinityTopologyKey = "kubernetes.io/hostname"
                             }
                             podDisruptionBudget = {
-                               maxUnavailable = 1
-                            }
+                                maxUnavailable = parameters?.pxc?.podDisruptionBudget?.maxUnavailable
+                                minAvailable = parameters?.pxc?.podDisruptionBudget?.minAvailable
+                            } if parameters?.pxc?.podDisruptionBudget else {}
 
                             gracePeriod = 600
 
@@ -66,17 +68,24 @@ _MysqlCluster = {
                             }
 
                             configuration = parameters?.pxc?.configuration
+
+                            priorityClassName = parameters?.pxc?.priorityClassName
+
+                            tolerations = parameters?.pxc?.tolerations
                         }
                     haproxy = {
                         enabled = True
                         size = parameters?.haproxy?.replicas
                         image = parameters?.haproxy?.image
+                        imagePullPolicy = parameters?.haproxy?.imagePullPolicy
                         affinity = {
                             antiAffinityTopologyKey = "kubernetes.io/hostname"
                         }
                         podDisruptionBudget = {
-                            maxUnavailable = 1
-                        }
+                            maxUnavailable = parameters?.haproxy?.podDisruptionBudget?.maxUnavailable
+                            minAvailable = parameters?.haproxy?.podDisruptionBudget?.minAvailable
+                        } if parameters?.pxc?.podDisruptionBudget else {}
+
                         exposePrimary = {
                             enabled = parameters?.haproxy?.expose
                         }
@@ -91,10 +100,15 @@ _MysqlCluster = {
                                 memory = parameters?.haproxy?.resources?.limit?.memory
                             }
                         }
+
+                        priorityClassName = parameters?.haproxy?.priorityClassName
+
+                        tolerations = parameters?.haproxy?.tolerations
                     }
                     logcollector = {
                         enabled = True
                         image = parameters?.logcollector?.image
+                        imagePullPolicy = parameters?.logcollector?.imagePullPolicy
                         resources = {
                             requests = {
                                 cpu = parameters?.logcollector?.resources?.requests?.cpu
@@ -110,6 +124,7 @@ _MysqlCluster = {
                     }
                     backup = {
                     image = parameters?.backup?.image
+                    imagePullPolicy = parameters?.backup?.imagePullPolicy
                     storages = {
                         "s3-backup-storage" = {
                             type = "s3"
@@ -166,7 +181,31 @@ _Secret = {
     }
 }
 
-_items += [_MysqlCluster, _Secret]
+_ip = ocds["percona-sql-db"]?.Resource?.status?.atProvider?.manifest?.status?.host if ocds["percona-sql-db"]?.Resource?.status?.atProvider?.manifest?.status?.host else ""
+
+_DnsRecord = {
+    apiVersion = "utils.aws.mojaloop.io/v1alpha1"
+    kind = "AWSRoute53Record"
+    metadata = {
+        name = "{}-dnsrecord".format(oxr.metadata.name)
+    }
+
+    spec = {
+        parameters = {
+            name = parameters?.dns?.name
+            region = parameters?.dns?.region
+            ttl =  parameters?.dns?.ttl
+            type =  parameters?.dns?.type
+            records = [_ip]
+            zoneId = parameters?.dns?.zoneId
+        }
+        providerConfigsRef = {
+            awsProviderConfigName = spec?.providerConfigsRef?.awsProviderName
+        }
+    }
+}
+
+_items += [_MysqlCluster, _Secret, _DnsRecord]
 dxr = {
     **oxr
 }
