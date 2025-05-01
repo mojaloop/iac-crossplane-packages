@@ -1,5 +1,5 @@
-apiVersion: vaultconfig.mojaloop.io/v1alpha1
-kind: XPostConfig
+apiVersion: vault.mojaloop.io/v1alpha1
+kind: XVaultPostConfig
 metadata:
   name: example-postconfig-claim
 spec:

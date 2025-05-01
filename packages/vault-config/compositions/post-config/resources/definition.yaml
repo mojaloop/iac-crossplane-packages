@@ -1,16 +1,16 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xpostconfig.vaultconfig.mojaloop.io
+  name: xvaultpostconfig.vault.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
-  group: vaultconfig.mojaloop.io
+  group: vault.mojaloop.io
   names:
-    kind: XPostConfig
-    plural: xpostconfig
+    kind: XVaultPostConfig
+    plural: xvaultpostconfig
   claimNames:
-    kind: PostConfig
-    plural: postconfig
+    kind: VaultPostConfig
+    plural: vaultpostconfig
   versions:
   - name: v1alpha1
     served: true

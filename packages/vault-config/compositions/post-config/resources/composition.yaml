@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: postconfig
+  name: vaultpostconfig
   labels:
-    crossplane.io/xrd: xpostconfig.vaultconfig.mojaloop.io
+    crossplane.io/xrd: xvaultpostconfig.vault.mojaloop.io
 spec:
   compositeTypeRef:
-    apiVersion: vaultconfig.mojaloop.io/v1alpha1
-    kind: XPostConfig
+    apiVersion: vault.mojaloop.io/v1alpha1
+    kind: XVaultPostConfig
   mode: Pipeline
   pipeline:
 
