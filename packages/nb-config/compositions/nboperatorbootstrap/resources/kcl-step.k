@@ -259,7 +259,7 @@ if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
     if parameters.accessToken.destinationType == "sc":
         _items += [_sc_netbird_namespace, _sc_access_token_secret_copy]
 
-if readyBasedOnConditions(ocds["external-access-group"]) and readyBasedOnConditions(ocds["kubernetes-group"]):
+if readyBasedOnConditions(ocds["external-access-group"]) and readyBasedOnConditions(ocds["network-resource-group"]):
     _items += [
         _internal_network_policy
     ]
