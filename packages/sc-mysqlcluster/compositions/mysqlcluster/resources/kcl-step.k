@@ -29,6 +29,7 @@ _MysqlCluster = {
                     crVersion = parameters?.crVersion
                     allowUnsafeConfigurations = True
                     imagePullPolicy = "IfNotPresent"
+                    secretsName = parameters?.dbSecret
                     pxc = {
                             size = parameters?.pxc?.replicas
                             image = parameters?.pxc?.image
@@ -168,7 +169,7 @@ _Secret = {
             objectType = "Secret"
             source = {
                 name = parameters?.dbSecret
-                namespace = parameters?.clusterName
+                namespace = parameters?.appNamespace
             }
             destination = {
                 name = parameters?.dbSecret
