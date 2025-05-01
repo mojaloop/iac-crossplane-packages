@@ -87,6 +87,6 @@ spec:
   providerConfigsRef:
     scK8sProviderName: sc-kubernetes-provider
     ccK8sProviderName: kubernetes-provider
-    awsProviderName: aws-provider-config
+    awsProviderName: aws-cp-upbound-provider-config
   managementPolicies:
     - "*"
