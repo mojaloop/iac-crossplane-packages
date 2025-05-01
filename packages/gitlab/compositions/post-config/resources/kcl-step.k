@@ -128,6 +128,10 @@ _pushSecret = {
                 }
             }
         }
+        readiness = {
+            policy = "DeriveFromCelQuery"
+            celQuery = '"status" in object && "conditions" in object.status && object.status.conditions.exists(c, c.type == "Ready" && c.status == "True" )'
+        }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
             name = spec?.providerConfigsRef?.kubernetesProvider
