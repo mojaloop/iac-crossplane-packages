@@ -9,11 +9,15 @@ parameters = spec.parameters
 _items = []
 ## Adding resources
 
+_fqdn  = ocds["record"]?.Resource?.status?.atProvider?.fqdn or ""
 _Record = {
     apiVersion = "route53.aws.upbound.io/v1beta2"
     kind = "Record"
     metadata = {
         name = "{}-record".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "record"
+        }
     }
     spec = {
         forProvider = {
@@ -35,8 +39,12 @@ _items += [_Record]
 
 print(_items)
 
+# Update the XR with status fields
 dxr = {
-**oxr
+    **oxr
+    status = {
+        fqdn = _fqdn
+    }
 }
 
 items = _items + [dxr]
