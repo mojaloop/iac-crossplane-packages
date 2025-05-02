@@ -221,7 +221,7 @@ if parameters.accessToken.destinationType == "sc":
                             "policies.kyverno.io/title": "Add security context to nbrouter deployment"
                             "policies.kyverno.io/category": "Default Policies"
                             "policies.kyverno.io/severity": "medium"
-                            "policies.kyverno.io/subject:": "*platform.com"
+                            "policies.kyverno.io/subject": "*platform.com"
                             "policies.kyverno.io/description": "This policy updates pod security context of nbrouter deployment"
                         }
                     }
