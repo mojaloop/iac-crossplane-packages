@@ -42,10 +42,6 @@ _zitadel_project_id_secret = {
     }
 }
 
-zitadel_project_id = base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or ""] or "bm9uZQo=")
-admin_group_name = "{}:{}".format(zitadel_project_id, parameters.groupNames.admin)
-external_access_group_name = "{}:{}".format(zitadel_project_id, parameters.groupNames.externalAccess)
-
 # Get Netbird Account ID
 ## HTTP Provider call to get account id
 
@@ -69,8 +65,8 @@ _account = {
         }
         groups_propagation_enabled = True
         jwt_allow_groups = [
-          admin_group_name,
-          external_access_group_name
+          "{}:{}".format(base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or "unknown"]), parameters.groupNames.admin),
+          "{}:{}".format(base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or "unknown"]), parameters.groupNames.externalAccess)
         ]
         jwt_groups_claim_name = "zitadel:grants"
         jwt_groups_enabled = True
@@ -125,12 +121,12 @@ _admin_group = {
     name = "{}-admin-group".format(oxr.metadata.name)
     annotations = {
       "krm.kcl.dev/composition-resource-name": "admin-group"
-      "crossplane.io/external-name": admin_group_name
+      "crossplane.io/external-name": "{}:{}".format(base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or "unknown"]), parameters.groupNames.admin)
     }
   }
   spec = {
     forProvider = {
-      name = admin_group_name
+      name = "{}:{}".format(base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or "unknown"]), parameters.groupNames.admin)
     }
     providerConfigRef = {
       name = spec?.providerConfigsRef?.netbirdProviderConfigName
@@ -147,12 +143,12 @@ _external_access_group = {
     name = "{}-external-access-group".format(oxr.metadata.name)
     annotations = {
       "krm.kcl.dev/composition-resource-name": "external-access-group"
-      "crossplane.io/external-name": external_access_group_name
+      "crossplane.io/external-name": "{}:{}".format(base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or "unknown"]), parameters.groupNames.externalAccess)
     }
   }
   spec = {
     forProvider = {
-      name = external_access_group_name
+      name = "{}:{}".format(base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or "unknown"]), parameters.groupNames.externalAccess)
     }
     providerConfigRef = {
       name = spec?.providerConfigsRef?.netbirdProviderConfigName
