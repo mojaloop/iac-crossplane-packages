@@ -191,6 +191,9 @@ _DnsRecord = {
     kind = "XAWSRoute53Record"
     metadata = {
         name = "{}-dnsrecord".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "dns-record"
+        }
     }
 
     spec = {
@@ -208,7 +211,42 @@ _DnsRecord = {
     }
 }
 
-_items += [_MysqlCluster, _Secret, _DnsRecord]
+# TODO - clean up , this is not required this can be directly pushed to vault to share with env, keeping it because to make the code compatible with rds
+
+_externalName = ocds["dns-record"]?.Resource?.status?.atProvider?.fqdn or ""
+
+_ExternalService = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-en-svc".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "pxc-mysqlcluster-svc"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Service"
+                metadata = {
+                    name = parameters?.externalServiceName
+                    namespace = parameters?.appNamespace
+                }
+                spec = {
+                    type = "ExternalName"
+                    externalName = _externalName
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.ccK8sProviderName
+        }
+    }
+}
+
+_items += [_MysqlCluster, _Secret, _DnsRecord, _ExternalService]
 dxr = {
     **oxr
 }
