@@ -77,3 +77,9 @@ spec:
                   - type
                   - records
                   - zoneId
+          status:
+            type: object
+            properties:
+              fqdn:
+                type: string
+                description: FQDN of the external service object created

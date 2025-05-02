@@ -8,7 +8,6 @@ parameters = spec.parameters
 _items = []
 ## Adding resources
 
-_fqdn  = ocds["record"]?.Resource?.status?.atProvider?.fqdn or ""
 _Record = {
     apiVersion = "route53.aws.upbound.io/v1beta2"
     kind = "Record"
@@ -40,9 +39,7 @@ print(_items)
 
 dxr = {
     **oxr
-    status = {
-        fqdn = _fqdn
-    }
+    status.fqdn = ocds["record"]?.Resource?.status?.atProvider?.fqdn if ocds["record"]?.Resource?.status?.atProvider?.fqdn else ""
 }
 
 items = _items + [dxr]
