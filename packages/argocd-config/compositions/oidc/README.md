@@ -21,4 +21,5 @@ Provider configuration must be present on the cluster where the claim is deploye
 ```yaml
 providerConfigsRef:
   zitadelProviderName: ZITADEL_PROVIDER_CONFIG_NAME
+  kubernetesProviderName: KUBERNETES_PROVIDER_CONFIG_NAME
 ```
