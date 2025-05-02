@@ -39,7 +39,6 @@ _items += [_Record]
 
 print(_items)
 
-# Update the XR with status fields
 dxr = {
     **oxr
     status = {
