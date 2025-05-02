@@ -1,0 +1,26 @@
+apiVersion: nb.mojaloop.io/v1alpha1
+kind: XNBOperatorBootstrap
+metadata:
+  name: example-nboperatorbootstrap
+  namespace: testa
+spec:
+  parameters:
+    zitadelProjectIdSecret:
+      name: "zit-projid-secret-name"
+      namespace: "zit-projid-secret-namespace"
+      key: "zit-projid-secret-key"
+    groupNames:
+      admin: techops-admin
+      externalAccess: techops-users
+      networkResourceGroup: sc-internal
+    serviceUserName: testserviceuser
+    accessTokenExpiresInDays: 5
+    operatorKubeapiGroup: testgroup
+    accessToken:
+      destinationType: sc
+  providerConfigsRef:
+    netbirdProviderConfigName: "netbird-provider-config"
+    ccK8sProviderName: "cc-kubernetes-provider"
+    scK8sProviderName: "sc-kubernetes-provider"
+  managementPolicies:
+    - "*"
