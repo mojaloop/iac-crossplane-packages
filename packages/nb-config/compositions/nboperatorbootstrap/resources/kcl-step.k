@@ -219,9 +219,6 @@ if parameters.accessToken.destinationType == "sc":
                         namespace = parameters.operatorNamespace
                         annotations = {
                             "policies.kyverno.io/title": "Add security context to nbrouter deployment"
-                            "policies.kyverno.io/category": "Default Policies"
-                            "policies.kyverno.io/severity": "medium"
-                            "policies.kyverno.io/subject": "*platform.com"
                             "policies.kyverno.io/description": "This policy updates pod security context of nbrouter deployment"
                         }
                     }
@@ -304,9 +301,6 @@ if parameters.accessToken.destinationType == "sc":
                         namespace = parameters.operatorNamespace
                         annotations = {
                             "policies.kyverno.io/title": "Restart netbird operator pod on secret update"
-                            "policies.kyverno.io/category": "Default Policies"
-                            "policies.kyverno.io/severity": "medium"
-                            "policies.kyverno.io/subject": "*platform.com"
                             "policies.kyverno.io/description": "This policy requires the restart of netbird operator pod when the secret is updated"
                         }
                     }
