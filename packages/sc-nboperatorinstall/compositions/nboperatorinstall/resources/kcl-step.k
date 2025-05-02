@@ -74,7 +74,9 @@ _sc_argocd_operator_app_install = {
                     }
                   }
                   netbirdAPI = {
-                    keyFromSecret = "nb-operator-api-key"
+                    keyFromSecret = True
+                    keyFromSecretName = "nb-operator-api-key"
+                    keyFromSecretKey = "NB_API_KEY"
                   }
                   operator = {
                     podSecurityContext = {
