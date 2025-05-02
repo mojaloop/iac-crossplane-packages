@@ -285,6 +285,99 @@ if parameters.accessToken.destinationType == "sc":
         }
     }
 
+    _sc_nb_op_secret_update_kyverno_policy = {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-sc-nb-op-secret-update-kyverno-policy-install".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "sc-nb-op-secret-update-kyverno-policy-install"
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "kyverno.io/v1"
+                    kind = "ClusterPolicy"
+                    metadata = {
+                        name = "restart-netbird-operator"
+                        namespace = parameters.operatorNamespace
+                        annotations = {
+                            "policies.kyverno.io/title": "Restart netbird operator pod on secret update"
+                            "policies.kyverno.io/category": "Default Policies"
+                            "policies.kyverno.io/severity": "medium"
+                            "policies.kyverno.io/subject": "*platform.com"
+                            "policies.kyverno.io/description": "This policy requires the restart of netbird operator pod when the secret is updated"
+                        }
+                    }
+                    spec = {
+                        rules = [
+                            {
+                                name = "add-annotation-on-secret-update"
+                                match = {
+                                    "any" = [
+                                        {
+                                            resources = {
+                                                kinds = [
+                                                    "Secret"
+                                                ]
+                                                names = [
+                                                    "nb-operator-api-key"
+                                                ]
+                                                namespaces = [
+                                                    parameters.operatorNamespace
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                                mutate = {
+                                    patchStrategicMerge = {
+                                        spec = {
+                                            template = {
+                                                metadata = {
+                                                    annotations = {
+                                                        "kyverno.platform.eon.com/triggerrestart": "{{request.object.metadata.resourceVersion}}"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    targets = [
+                                        {
+                                            apiVersion = "apps/v1"
+                                            kind = "Deployment"
+                                            namespace = parameters.operatorNamespace
+                                            selector = {
+                                                matchLabels = {
+                                                    "app.kubernetes.io/name": "kubernetes-operator"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                                preconditions = {
+                                    "any" = [
+                                        {
+                                            key = "{{request.operation}}"
+                                            operator = "In"
+                                            value = ["UPDATE"]
+                                        }
+                                    ]
+                                }
+                                skipBackgroundRequests = True
+                            }
+                        ]
+                        validationFailureAction = "Audit"
+                    }
+                }
+            }
+            managementPolicies = spec?.managementPolicies
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.scK8sProviderName
+            }
+        }
+    }
 # elif parameters.accessToken.destinationType == "tenantVault":
 #     # TODO: Implement tenant vault stuff
 _internal_network_policy = {
@@ -341,7 +434,7 @@ if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
         _access_token
     ]
     if parameters.accessToken.destinationType == "sc":
-        _items += [_sc_netbird_namespace, _sc_access_token_secret_copy, _sc_nb_operator_kyverno_policy]
+        _items += [_sc_netbird_namespace, _sc_access_token_secret_copy, _sc_nb_operator_kyverno_policy, _sc_nb_op_secret_update_kyverno_policy]
 
 if readyBasedOnConditions(ocds["external-access-group"]) and readyBasedOnConditions(ocds["network-resource-group"]):
     _items += [
