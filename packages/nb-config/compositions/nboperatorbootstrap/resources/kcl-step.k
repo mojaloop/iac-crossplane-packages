@@ -200,6 +200,90 @@ if parameters.accessToken.destinationType == "sc":
             managementPolicies = spec?.managementPolicies
         }
     }
+    _sc_nb_operator_kyverno_policy = {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-sc-nb-operator-kyverno-policy-install".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "sc-nb-operator-policy-kyverno-install"
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "kyverno.io/v1"
+                    kind = "ClusterPolicy"
+                    metadata = {
+                        name = "nbrouter-add-security-context"
+                        namespace = parameters.operatorNamespace
+                        annotations = {
+                            "policies.kyverno.io/title": "Add security context to nbrouter deployment"
+                            "policies.kyverno.io/category": "Default Policies"
+                            "policies.kyverno.io/severity": "medium"
+                            "policies.kyverno.io/subject:": "*platform.com"
+                            "policies.kyverno.io/description": "This policy updates pod security context of nbrouter deployment"
+                        }
+                    }
+                    spec = {
+                        rules = [
+                            {
+                                name = "nbrouter-add-security-context"
+                                match = {
+                                    "any" = [
+                                        {
+                                            resources = {
+                                                kinds = [
+                                                    "Pod"
+                                                ]
+                                                namespaces = [
+                                                    parameters.operatorNamespace
+                                                ]
+                                                selector = {
+                                                    matchLabels = {
+                                                        "app.kubernetes.io/name": "netbird-router"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                                mutate = {
+                                    patchStrategicMerge = {
+                                        spec = {
+                                            securityContext = {
+                                                sysctls = [
+                                                    {
+                                                        name = "net.ipv4.ip_forward"
+                                                        value = "1"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                                preconditions = {
+                                    "any" = [
+                                        {
+                                            key = "{{request.operation}}"
+                                            operator = "In"
+                                            value = ["CREATE", "UPDATE"]
+                                        }
+                                    ]
+                                }
+                                skipBackgroundRequests = True
+                            }
+                        ]
+                        validationFailureAction = "Audit"
+                    }
+                }
+            }
+            managementPolicies = spec?.managementPolicies
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.scK8sProviderName
+            }
+        }
+    }
 
 # elif parameters.accessToken.destinationType == "tenantVault":
 #     # TODO: Implement tenant vault stuff
@@ -257,7 +341,7 @@ if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
         _access_token
     ]
     if parameters.accessToken.destinationType == "sc":
-        _items += [_sc_netbird_namespace, _sc_access_token_secret_copy]
+        _items += [_sc_netbird_namespace, _sc_access_token_secret_copy, _sc_nb_operator_kyverno_policy]
 
 if readyBasedOnConditions(ocds["external-access-group"]) and readyBasedOnConditions(ocds["network-resource-group"]):
     _items += [
