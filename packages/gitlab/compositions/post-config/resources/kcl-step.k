@@ -405,10 +405,10 @@ _vaultPolicy = {
         forProvider = {
             name = "gitlab-ci-runner"
             policy = '''
-path "{}/*" {{
+path "secret/*" {{
   capabilities = ["read", "list"]
 }}
-'''.format(p?.ciTokenVaultPath)
+'''
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
