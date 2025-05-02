@@ -38,6 +38,7 @@ _groupIAC = {
             name = p?.iacGroupName
             path = p?.iacGroupName
             description = p?.iacGroupName
+            requireTwoFactorAuthentication = True
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
@@ -320,6 +321,7 @@ _groupTenancy = {
             name = p?.tenancyGroupName
             path = p?.tenancyGroupName
             description = p?.tenancyGroupName
+            requireTwoFactorAuthentication = True
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
