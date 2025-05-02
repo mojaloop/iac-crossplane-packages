@@ -2,7 +2,7 @@
 apiVersion: meta.pkg.crossplane.io/v1alpha1
 kind: Configuration
 metadata:
-  name: argocd
+  name: argocd-config
 spec:
   dependsOn:
     - provider: ghcr.io/infitx-org/zitadel-crossplane-provider
