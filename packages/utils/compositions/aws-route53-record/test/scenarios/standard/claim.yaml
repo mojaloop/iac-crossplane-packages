@@ -1,5 +1,5 @@
 apiVersion: utils.aws.mojaloop.io/v1alpha1
-kind: AWSRoute53Record
+kind: XAWSRoute53Record
 metadata:
   name: my-examplen-record
 spec:
