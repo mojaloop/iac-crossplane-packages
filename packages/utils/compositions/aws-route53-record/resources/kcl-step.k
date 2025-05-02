@@ -1,5 +1,4 @@
 # Read the XR and the OCDs
-import regex
 oxr = option("params").oxr
 ocds = option("params").ocds
 
