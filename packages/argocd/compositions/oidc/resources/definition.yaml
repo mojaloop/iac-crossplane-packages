@@ -1,0 +1,102 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xargocdoidc.argocd.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: argocd.mojaloop.io
+  names:
+    kind: XArgocdOIDC
+    plural: xargocdoidc
+  claimNames:
+    kind: ArgocdOIDC
+    plural: argocdoidc
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the source and destination k8s providers.
+                required:
+                  - zitadelProviderName
+                  - kubernetesProviderName
+                properties:
+                  vaultProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the vault provider.
+                  zitadelProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the zitadel provider.
+                  kubernetesProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the kubernetes provider.
+              parameters:
+                type: object
+                required:
+                  - argocdFqdn
+                  - zitadelFqdn
+                  - argocdNamespace
+                  - zitadelAdminHumanUserId
+                properties:
+                  argocdFqdn:
+                    type: string
+                    description: |-
+                      FQDN for ArgoCD
+                  zitadelFqdn:
+                    type: string
+                    description: |-
+                      FQDN for Zitadel
+                  adminRbacGroup:
+                    type: string
+                    description: |-
+                      RBAC group in IDM for admin access via OIDC
+                    default: "argocd_administrators"
+                  userRbacGroup:
+                    type: string
+                    description: |-
+                      RBAC group in IDM for user access via OIDC
+                    default: "argocd_users"
+                  argocdNamespace:
+                    type: string
+                    description: |-
+                      Namespace where ArgoCD is installed
+                  oidcSecretName:
+                    type: string
+                    description: |-
+                      Name of OIDC secret for clientid/secret
+                    default: "argo-oidc-secret"
+                  zitadelAdminHumanUserId:
+                    type: string
+                    description: |-
+                      Admin Zitadel human user ID
