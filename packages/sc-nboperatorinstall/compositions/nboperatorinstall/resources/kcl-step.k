@@ -79,16 +79,6 @@ _sc_argocd_operator_app_install = {
                       key = "NB_API_KEY"
                     }
                   }
-                  operator = {
-                    podSecurityContext = {
-                      sysctls = [
-                        {
-                          name = "net.ipv4.ip_forward"
-                          value = "1"
-                        }
-                      ]
-                    }
-                  }
                   managementURL = parameters.nbManagmentURI
                 }
               }
