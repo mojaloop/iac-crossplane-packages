@@ -1,0 +1,92 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xmember.gitlab.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: gitlab.mojaloop.io
+  names:
+    kind: XMember
+    plural: xmember
+  claimNames:
+    kind: Member
+    plural: member
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the gitlab providers.
+                required:
+                  - gitlabProvider
+                properties:
+                  gitlabProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the gitlab provider.
+              parameters:
+                type: object
+                description: Membership parameters.
+                properties:
+                  scope:
+                    type: integer
+                    description: The Group or Project for managing membership.
+                  memberType:
+                    type: string
+                    description: Type of membership.
+                    enum:
+                      - group
+                      - project
+                  members:
+                    type: array
+                    items:
+                      type: object
+                      description: Member parameters.
+                      oneOf:
+                      - required: ["gitlabUserID"]
+                      - required: ["gitlabUserName"]
+                      properties:
+                        gitlabUserID:
+                          type: integer
+                          description: ID of the gitlab user in scope.
+                        gitlabUserName:
+                          type: string
+                          description: Username of the gitlab user in scope.
+                        role:
+                          type: integer
+                          description: The role of the user on the target scope.
+                          default: 30
+                          enum:
+                          - 10 #Guest
+                          - 20 #Reporter
+                          - 30 #Developer
+                          - 40 #Maintainer
+                          - 50 #Owner

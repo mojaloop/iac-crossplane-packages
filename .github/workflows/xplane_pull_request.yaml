@@ -60,8 +60,10 @@ jobs:
         working-directory: ${{ inputs.CROSSPLANE_PACKAGES_DIR }}
         run: |
           echo "🔍 Preparing package for ${{ inputs.SUBPATH }}"
-          # Set up temp file paths
+
+          # Set up temp file path
           BUILD_OUTPUT="${{ runner.temp }}/build_output.log"
+          echo "📝 Using temporary file: $BUILD_OUTPUT"
 
           # Run make all and display output in real-time
           set -o pipefail  # Ensure the pipeline returns non-zero if make fails
@@ -70,7 +72,6 @@ jobs:
           # Look for failure cases
           if grep -q "failure cases" "$BUILD_OUTPUT"; then
             echo "🔎 Checking for validation failures..."
-
             # Find lines with non-zero failure cases
             if grep -E "[1-9][0-9]* failure cases" "$BUILD_OUTPUT"; then
               echo "❌ Validation failed! Found non-zero failure cases"
@@ -83,6 +84,34 @@ jobs:
           if [ "$FAILURE_COUNT" -gt 0 ]; then
             echo "❌ Validation failed! Found $FAILURE_COUNT validation errors"
             grep "\\[x\\]" "$BUILD_OUTPUT"
+            exit 1
+          fi
+
+          # Check for composition validation errors
+          if grep -q "crossplane: error: composition's compositeTypeRef.kind" "$BUILD_OUTPUT"; then
+            echo "❌ Composition validation failed! Found mismatched compositeTypeRef.kind"
+            grep "crossplane: error: composition's compositeTypeRef.kind" "$BUILD_OUTPUT"
+            exit 1
+          fi
+
+          # Check for missing schemas
+          if grep -q "missing schemas" "$BUILD_OUTPUT"; then
+            # Only fail if there's an actual error related to schemas
+            # not just the normal "downloading schemas" messages
+            if grep -q "error.*schema" "$BUILD_OUTPUT"; then
+              echo "❌ Validation failed! Found schema errors"
+              grep "error.*schema" "$BUILD_OUTPUT"
+              exit 1
+            else
+              echo "ℹ️ Downloading missing schemas..."
+              grep "schemas does not exist, downloading:" "$BUILD_OUTPUT"
+            fi
+          fi
+
+          # Check for any other crossplane validation errors
+          if grep -q "crossplane: error:" "$BUILD_OUTPUT"; then
+            echo "❌ Crossplane validation failed! Found other validation errors"
+            grep "crossplane: error:" "$BUILD_OUTPUT"
             exit 1
           fi
 

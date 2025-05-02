@@ -1,0 +1,8 @@
+apiVersion: gitlab.mojaloop.io/v1alpha1
+kind: Group
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: group
+status:
+  atProvider:
+    id: 1000

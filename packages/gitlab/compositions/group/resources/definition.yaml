@@ -1,0 +1,133 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xgroup.gitlab.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: gitlab.mojaloop.io
+  names:
+    kind: XGroup
+    plural: xgroup
+  claimNames:
+    kind: Group
+    plural: group
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the gitlab providers.
+                required:
+                  - gitlabProvider
+                properties:
+                  gitlabProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the gitlab provider.
+              parameters:
+                type: object
+                properties:
+                  group:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      parentId:
+                        type: integer
+                      parentGroupName:
+                        type: string
+                      autoDevopsEnabled:
+                        type: boolean
+                        default: false
+                      description:
+                        type: string
+                      emailsDisabled:
+                        type: boolean
+                        default: false
+                      lfsEnabled:
+                        type: boolean
+                        default: false
+                      projectCreationLevel:
+                        type: string
+                        enum:
+                          - noone
+                          - maintainer
+                          - developer
+                        default: maintainer
+                      subgroupCreationLevel:
+                        type: string
+                        enum:
+                          - owner
+                          - maintainer
+                        default: maintainer
+                      visibility:
+                        type: string
+                        enum:
+                          - private
+                          - internal
+                          - public
+                        default: private
+                      extraLabels:
+                        type: object
+                        additionalProperties:
+                          type: string
+                      members:
+                        type: array
+                        items:
+                          type: object
+                          description: Member parameters.
+                          oneOf:
+                          - required: ["gitlabUserID"]
+                          - required: ["gitlabUserName"]
+                          properties:
+                            gitlabUserID:
+                              type: integer
+                              description: ID of the gitlab user in scope.
+                            gitlabUserName:
+                              type: string
+                              description: Username of the gitlab user in scope.
+                            role:
+                              type: integer
+                              description: The role of the user on the target scope.
+                              default: 30
+                              enum:
+                              - 10 #Guest
+                              - 20 #Reporter
+                              - 30 #Developer
+                              - 40 #Maintainer
+                              - 50 #Owner
+                    required:
+                      - name
+          status:
+            type: object
+            properties:
+              groupId:
+                type: integer
