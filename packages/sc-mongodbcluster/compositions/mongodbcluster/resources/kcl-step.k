@@ -13,7 +13,7 @@ _MongodbCluster = {
     metadata = {
         name = "{}-ss".format(oxr.metadata.name)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "mongodbcluster"
+            "krm.kcl.dev/composition-resource-name": "percona-mongodb-cluster"
         }
     }
     spec = {
@@ -62,6 +62,15 @@ _MongodbCluster = {
                                     }
                                 }
                             }
+
+                            podDisruptionBudget = {
+                                maxUnavailable = parameters?.sharding?.mongos?.podDisruptionBudget?.maxUnavailable
+                                minAvailable = parameters?.sharding?.mongos?.podDisruptionBudget?.minAvailable
+                            } if parameters?.sharding?.mongos?.podDisruptionBudget else {}
+
+                            priorityClassName = parameters?.sharding?.mongos?.priorityClassName
+
+                            tolerations = parameters?.sharding?.mongos?.tolerations
                         }
                     ]
                     sharding = {
@@ -81,9 +90,7 @@ _MongodbCluster = {
                                     memory = parameters?.sharding?.configsvrReplSet?.resources?.requests?.memory
                                 }
                             }
-                            podDisruptionBudget = {
-                                maxUnavailable = parameters?.sharding?.configsvrReplSet?.podDisruptionBudget?.maxUnavailable
-                            }
+
                             expose = {
                                 enabled = parameters?.sharding?.configsvrReplSet?.expose?.enabled
                                 type = parameters?.sharding?.configsvrReplSet?.expose?.type
@@ -97,6 +104,14 @@ _MongodbCluster = {
                                     }
                                 }
                             }
+                            podDisruptionBudget = {
+                                maxUnavailable = parameters?.sharding?.configsvrReplSet?.podDisruptionBudget?.maxUnavailable
+                                minAvailable = parameters?.sharding?.configsvrReplSet?.podDisruptionBudget?.minAvailable
+                            } if parameters?.sharding?.configsvrReplSet?.podDisruptionBudget else {}
+
+                            priorityClassName = parameters?.sharding?.configsvrReplSet?.priorityClassName
+
+                            tolerations = parameters?.sharding?.configsvrReplSet?.tolerations
                         }
                         mongos = {
                             size = parameters?.sharding?.mongos?.size
@@ -113,12 +128,19 @@ _MongodbCluster = {
                                     memory = parameters?.sharding?.mongos?.resources?.requests?.memory
                                 }
                             }
-                            podDisruptionBudget = {
-                                maxUnavailable = parameters?.sharding?.mongos?.podDisruptionBudget?.maxUnavailable
-                            }
+
                             expose = {
                                 type = parameters?.sharding?.mongos?.expose?.type
                             }
+                            podDisruptionBudget = {
+                                maxUnavailable = parameters?.sharding?.mongos?.podDisruptionBudget?.maxUnavailable
+                                minAvailable = parameters?.sharding?.mongos?.podDisruptionBudget?.minAvailable
+                            } if parameters?.sharding?.mongos?.podDisruptionBudget else {}
+
+                            priorityClassName = parameters?.sharding?.mongos?.priorityClassName
+
+                            tolerations = parameters?.sharding?.mongos?.tolerations
+
                         }
                     }
                     backup = {
@@ -171,7 +193,70 @@ _Secret = {
     }
 }
 
-_items += [_MongodbCluster, _Secret]
+_ip = ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host if ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host else ""
+
+_DnsRecord = {
+    apiVersion = "utils.aws.mojaloop.io/v1alpha1"
+    kind = "XAWSRoute53Record"
+    metadata = {
+        name = "{}-dnsrecord".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "dns-record"
+        }
+    }
+
+    spec = {
+        parameters = {
+            name = parameters?.dns?.name
+            region = parameters?.dns?.region
+            ttl =  parameters?.dns?.ttl
+            type =  parameters?.dns?.type
+            records = [_ip]
+            zoneId = parameters?.dns?.zoneId
+        }
+        providerConfigsRef = {
+            awsProviderConfigName = spec?.providerConfigsRef?.awsProviderName
+        }
+    }
+}
+
+# TODO - clean up , this is not required this can be directly pushed to vault to share with env, keeping it because to make the code compatible with rds
+
+_externalName = ocds["dns-record"]?.Resource?.status?.atProvider?.fqdn or ""
+
+_ExternalService = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-en-svc".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "percona-mongodb-svc"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Service"
+                metadata = {
+                    name = parameters?.externalServiceName
+                    namespace = parameters?.appNamespace
+                }
+                spec = {
+                    type = "ExternalName"
+                    externalName = _externalName
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.ccK8sProviderName
+        }
+    }
+}
+
+
+_items += [_MongodbCluster, _Secret, _DnsRecord, _ExternalService]
 dxr = {
     **oxr
 }

@@ -37,6 +37,8 @@ spec:
           resources:
             requests:
               storage: 3Gi
+      tolerations: []
+      priorityClassName: ""
     sharding:
       enabled: true
       configsvrReplSet:
@@ -60,6 +62,8 @@ spec:
             resources:
               requests:
                 storage: 3Gi
+        tolerations: []
+        priorityClassName: ""
       mongos:
         size: 3
         affinity:
@@ -76,9 +80,19 @@ spec:
           requests:
             cpu: "300m"
             memory: "0.5G"
+        tolerations: []
+        priorityClassName: ""
+    dns:
+      name: my-cluster-service
+      region: eu-west-1
+      ttl: 300
+      type: A
+      zoneId: Z0111719400KIQPJMA8G
+
 
   providerConfigsRef:
     scK8sProviderName: sc-kubernetes-provider
     ccK8sProviderName: kubernetes-provider
+    awsProviderName: aws-cp-upbound-provider-config
   managementPolicies:
     - "*"
