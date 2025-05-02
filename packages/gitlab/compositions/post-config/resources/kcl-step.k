@@ -375,8 +375,8 @@ _vaultJwtAuthBackend = {
                     forProvider = {
                         path = p?.gitlabRunnerJwtPath
                         description = "JWT for Gitlab Runner"
-                        oidcDiscoveryUrl = "https://{}".format(p?.vaultFqdn)
-                        boundIssuer = "https://{}".format(p?.vaultFqdn)
+                        oidcDiscoveryUrl = "https://{}".format(p?.gitlabFqdn)
+                        boundIssuer = "https://{}".format(p?.gitlabFqdn)
                     }
                     managementPolicies = spec.managementPolicies
                     providerConfigRef = {
