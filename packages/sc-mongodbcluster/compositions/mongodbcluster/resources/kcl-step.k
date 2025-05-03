@@ -222,7 +222,7 @@ _DnsRecord = {
 
 # TODO - clean up , this is not required this can be directly pushed to vault to share with env, keeping it because to make the code compatible with rds
 
-_externalName = ocds["dns-record"]?.Resource?.status?.atProvider?.fqdn or ""
+_externalName = ocds["dns-record"]?.Resource?.status?.fqdn or ""
 
 _ExternalService = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
