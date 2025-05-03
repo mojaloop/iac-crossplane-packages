@@ -30,6 +30,7 @@ _MysqlCluster = {
                     allowUnsafeConfigurations = True
                     imagePullPolicy = "IfNotPresent"
                     secretsName = parameters?.dbSecret
+                    allowUnsafeConfigurations = True
                     pxc = {
                             size = parameters?.pxc?.replicas
                             image = parameters?.pxc?.image
