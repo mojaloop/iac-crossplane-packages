@@ -189,7 +189,7 @@ _Secret = {
             objectType = "Secret"
             source = {
                 name = parameters?.dbSecret
-                namespace = parameters?.clusterName
+                namespace = parameters?.appNamespace
             }
             destination = {
                 name = parameters?.dbSecret
