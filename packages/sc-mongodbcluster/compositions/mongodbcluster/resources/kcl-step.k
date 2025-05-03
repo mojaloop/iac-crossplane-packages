@@ -11,7 +11,7 @@ _MongodbCluster = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "{}-ss".format(oxr.metadata.name)
+        name = "{}-psmdb".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "percona-mongodb-cluster"
         }
@@ -23,7 +23,7 @@ _MongodbCluster = {
                 kind = "PerconaServerMongoDB"
                 metadata = {
                     name = "{}-mongodb".format(oxr.metadata.name)
-                    namespace = parameters.clusterName
+                    namespace = parameters.appNamespace
                 }
                 spec = {
                     crVersion = parameters?.crVersion
