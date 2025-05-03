@@ -15,13 +15,17 @@ spec:
     backup:
       enabled: false
       image: percona/percona-backup-mongodb:2.8.0-multi
-      bucket: my-s3-bucket
-      credentialsSecret: my-s3-credentials
+      verifyTLS: true
+      bucket: "s3-bucket-name"
+      credentialsSecret: "s3-credentials"
+      bucketRegion: "us-east-1"
+      scheduleName: "daily-backup"
+      cronScheduleExpression: "0 0 * * *"
+      backupRetention: 7
+      scheduleEnabled: false
     replsets:
       name: rs0
       size: 3
-      affinity:
-        antiAffinityTopologyKey: "kubernetes.io/hostname"
       expose:
         enabled: true
         type: clusterIP
@@ -43,13 +47,9 @@ spec:
       enabled: true
       configsvrReplSet:
         size: 3
-        affinity:
-          antiAffinityTopologyKey: "kubernetes.io/hostname"
         expose:
           enabled: true
           type: clusterIP
-        podDisruptionBudget:
-          maxUnavailable: 1
         resources:
           limits:
             cpu: "300m"
@@ -66,13 +66,9 @@ spec:
         priorityClassName: ""
       mongos:
         size: 3
-        affinity:
-          antiAffinityTopologyKey: "kubernetes.io/hostname"
         expose:
           enabled: true
           type: clusterIP
-        podDisruptionBudget:
-          maxUnavailable: 1
         resources:
           limits:
             cpu: "300m"

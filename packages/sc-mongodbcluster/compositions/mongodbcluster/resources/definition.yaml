@@ -314,12 +314,31 @@ spec:
                         type: boolean
                       image:
                         type: string
+                      verifyTLS:
+                        type: boolean
+                        description: Verify TLS for S3.
                       bucket:
                         type: string
+                        description: S3 bucket name.
                       credentialsSecret:
                         type: string
-                      region:
+                        description: S3 credentials secret name.
+                      bucketRegion:
                         type: string
+                        description: S3 bucket region.
+                      scheduleEnabled:
+                        type: boolean
+                        description: Enable backup schedule.
+                        default: false
+                      scheduleName:
+                        type: string
+                        description: Name of the backup schedule.
+                      cronScheduleExpression:
+                        type: string
+                        description: Cron expression for the backup schedule.
+                      backupRetention:
+                        type: integer
+                        description: Number of backups to retain.
 
                   dns:
                     type: object

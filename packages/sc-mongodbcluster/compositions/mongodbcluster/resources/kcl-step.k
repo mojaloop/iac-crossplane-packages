@@ -149,13 +149,24 @@ _MongodbCluster = {
                         storages = {
                             "s3-backup-storage" = {
                                     type = "s3"
+                                    verifyTLS = parameters?.backup?.verifyTLS
                                     s3 = {
                                         bucket = parameters?.backup?.bucket
                                         credentialsSecret = parameters?.backup?.credentialsSecret
-                                        region = parameters?.backup?.region
+                                        region = parameters?.backup?.bucketRegion
                                     }
+
                             }
                         }
+                        tasks = [
+                          {
+                                enabled = parameters?.backup?.scheduleEnabled
+                                name = parameters?.backup?.scheduleName
+                                schedule = parameters?.backup?.cronScheduleExpression
+                                keep = parameters?.backup?.backupRetention
+                                storageName = "s3-backup-storage"
+                          }
+                        ]
                     }
                 }
             }
