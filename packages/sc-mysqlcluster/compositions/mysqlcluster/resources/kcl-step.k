@@ -27,7 +27,7 @@ _MysqlCluster = {
                 }
                 spec = {
                     crVersion = parameters?.crVersion
-                    allowUnsafeConfigurations = True
+                    unsafeFlags = True
                     imagePullPolicy = "IfNotPresent"
                     secretsName = parameters?.dbSecret
                     pxc = {

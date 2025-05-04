@@ -32,6 +32,7 @@ _MongodbCluster = {
                     secrets = {
                         users = parameters?.dbSecret
                     }
+                    unsafeFlags = True
                     replsets = [
                         {
                             name = "rs0"
