@@ -27,7 +27,12 @@ _MysqlCluster = {
                 }
                 spec = {
                     crVersion = parameters?.crVersion
-                    unsafeFlags = True
+                    unsafeFlags = {
+                        tls = True
+                        pxcSize = True
+                        proxySize = True
+                        backupIfUnhealthy = True
+                    }
                     imagePullPolicy = "IfNotPresent"
                     secretsName = parameters?.dbSecret
                     pxc = {
