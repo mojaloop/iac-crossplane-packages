@@ -22,7 +22,7 @@ _MongodbCluster = {
                 apiVersion = "psmdb.percona.com/v1"
                 kind = "PerconaServerMongoDB"
                 metadata = {
-                    name = "{}-mongodb".format(oxr.metadata.name)
+                    name = parameters.clusterName
                     namespace = parameters.appNamespace
                 }
                 spec = {

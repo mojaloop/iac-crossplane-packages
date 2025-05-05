@@ -22,7 +22,7 @@ _MysqlCluster = {
                 apiVersion = "pxc.percona.com/v1"
                 kind = "PerconaXtraDBCluster"
                 metadata = {
-                    name = "{}-db".format(oxr.metadata.name)
+                    name = parameters.clusterName
                     namespace = parameters.appNamespace
                 }
                 spec = {
