@@ -1,0 +1,26 @@
+apiVersion: vault.mojaloop.io/v1alpha1
+kind: VaultAwsPostConfig
+metadata:
+  name: example-aws-postconfig
+spec:
+  parameters:
+    region: "us-west-2"
+    kvPath: "secret"
+    credentialPath: "aws/credentials"
+    accessKeyName: "access_key"
+    secretKeyName: "secret_key"
+    defaultLeaseTtlSeconds: 3600
+    enableObjectStorageBackend: true
+    objectStorageBackendPath: "cc-cloud-provider-os"
+    objectStorageAccessRole: "object-storage-role"
+    objectStorageCloudRole: "arn:aws:iam::123456789012:role/object-storage-role"
+    enableDnsBackend: true
+    dnsBackendPath: "cc-cloud-provider-dns"
+    dnsAccessRole: "dns-access-role"
+    externalDnsCloudRole: "arn:aws:iam::123456789012:role/external-dns-role"
+    certManagerAccessRole: "cert-manager-role"
+    certManagerCloudPolicy: "arn:aws:iam::123456789012:policy/cert-manager-policy"
+  providerConfigsRef:
+    vaultProviderName: vault-provider
+  managementPolicies:
+    - "*"

@@ -1,0 +1,143 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xvaultawspostconfig.vault.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: vault.mojaloop.io
+  names:
+    kind: XVaultAwsPostConfig
+    plural: xvaultawspostconfig
+  claimNames:
+    kind: VaultAwsPostConfig
+    plural: vaultawspostconfig
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the vault provider.
+                required:
+                  - vaultProviderName
+                properties:
+                  vaultProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the vault provider.
+              parameters:
+                type: object
+                required:
+                  - region
+                  - kvPath
+                  - credentialPath
+                  - accessKeyName
+                  - secretKeyName
+                properties:
+                  region:
+                    type: string
+                    description: |-
+                      Cloud provider region.
+                  kvPath:
+                    type: string
+                    description: |-
+                      Path for KV secrets engine.
+                  credentialPath:
+                    type: string
+                    description: |-
+                      Path for credentials.
+                  accessKeyName:
+                    type: string
+                    description: |-
+                      Key for access key.
+                  secretKeyName:
+                    type: string
+                    description: |-
+                      Key for secret key.
+                  defaultLeaseTtlSeconds:
+                    type: integer
+                    description: |-
+                      Default lease TTL in seconds.
+                    default: 3600
+                  enableObjectStorageBackend:
+                    type: boolean
+                    description: |-
+                      Enable object storage vault backend.
+                    default: false
+                  objectStorageBackendPath:
+                    type: string
+                    description: |-
+                      Auth path for cloud engine for object storage.
+                    default: "cc-cloud-provider-os"
+                  objectStorageAccessRole:
+                    type: string
+                    description: |-
+                      Role name for object storage.
+                  objectStorageCloudRole:
+                    type: string
+                    description: |-
+                      Role ARN for object storage.
+                  enableDnsBackend:
+                    type: boolean
+                    description: |-
+                      Enable DNS vault backend.
+                    default: false
+                  dnsBackendPath:
+                    type: string
+                    description: |-
+                      Auth path for cloud engine.
+                    default: "cc-cloud-provider-dns"
+                  dnsAccessRole:
+                    type: string
+                    description: |-
+                      Role name for DNS.
+                  externalDnsCloudRole:
+                    type: string
+                    description: |-
+                      Role ARN for DNS.
+                  certManagerAccessRole:
+                    type: string
+                    description: |-
+                      Role name for cert manager since it doesn't support session token.
+                  certManagerCloudPolicy:
+                    type: string
+                    description: |-
+                      Policy ARN for cert manager.
+          status:
+            type: object
+            properties:
+              objectStorageBackendPath:
+                type: string
+                description: |-
+                  Path to the object storage backend.
+              dnsBackendPath:
+                type: string
+                description: |-
+                  Path to the DNS backend.
