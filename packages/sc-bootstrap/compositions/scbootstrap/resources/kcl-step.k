@@ -13,18 +13,9 @@ ready = lambda o: any, statusPath = "atProvider" -> bool {
     len(objstatus) > 0 and all_true([c.status == "True" for c in objstatus]) and status and statusPath in status
 }
 
-# Method to check if daemonset is ready
-daemonsetReady = lambda o: any -> bool {
-    status = o?.Resource?.status?.atProvider?.manifest?.status
-    if not status:
-        False
-    # Check if desiredNumberScheduled is same as numberAvailable
-    status?.desiredNumberScheduled == status?.numberAvailable and (status?.numberAvailable or 0) > 0
-}
-
 # Method to check if the argocd pods are ready
 argocdPodsReady = lambda pods: [any] -> bool {
-    pods and all_true([
+    pods and len(pods) >= 7 and all_true([
         all_true([
             c.status == "True"
             for c in (pod?.status?.atProvider?.manifest?.status?.conditions or [])
@@ -537,7 +528,7 @@ _argocdHelmChart = {
                 }
             }
         }
-        managementPolicies = spec.managementPolicies
+        managementPolicies = ["Create"]
         providerConfigRef = {
             name = spec?.providerConfigsRef?.scHelmProviderName
         }
@@ -650,11 +641,10 @@ _items += [
     _role
     _roleBinding
     _daemonSet
-]
+    _argocdHelmChart
+    _argocdPodsCollection
 
-# Install ArgoCD only if the DaemonSet is ready
-if daemonsetReady(ocds["daemon-set"]):
-    _items += [_argocdHelmChart, _argocdPodsCollection]
+]
 
 if argocdPodsReady(extra?.argocdpods):
     _items += [_Application]
