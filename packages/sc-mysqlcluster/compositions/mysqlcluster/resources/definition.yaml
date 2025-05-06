@@ -1,0 +1,336 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xmysqlcluster.sc.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: sc.mojaloop.io
+  names:
+    kind: XMysqlCluster
+    plural: xmysqlcluster
+  claimNames:
+    kind: MysqlCluster
+    plural: mysqlcluster
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the remote and local k8s providers.
+                required:
+                  - scK8sProviderName
+                  - ccK8sProviderName
+                  - awsProviderName
+                properties:
+                  ccK8sProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the local k8s provider.
+                  scK8sProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the remote k8s provider.
+                  awsProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the AWS provider.
+              parameters:
+                type: object
+                properties:
+                  clusterName:
+                    type: string
+                    description: Name for the consumer cluster
+                  externalServiceName:
+                    type: string
+                    description: Name for the external service object created
+                  appNamespace:
+                    type: string
+                    description: Namespace for the consumer application
+                  crVersion:
+                    type: string
+                    description: Type of object to be synced
+                    default: "2.5.0"
+                  dbSecret:
+                    type: string
+                    description: Type of object to be synced
+                  dbUsername:
+                    type: string
+                    description: Name of the database user to be created
+                  dbName:
+                    type: string
+                    description: Name of the database to be created
+                  pxc:
+                    type: object
+                    properties:
+                      image:
+                        type: string
+                        description: PXC image
+                      imagePullPolicy:
+                        type: string
+                        description: Image pull policy for PXC
+                        default: IfNotPresent
+                      storageSize:
+                        type: string
+                        description: Size of storage requested for PXC
+                        default: 10Gi
+                      replicas:
+                        type: number
+                        description: Number of PXC replicas
+                        default: 1
+                      resources:
+                        type: object
+                        description: The resources for pxc
+                        properties:
+                          requests:
+                            type: object
+                            description: the resources requests for pxc
+                            properties:
+                              memory:
+                                type: string
+                                description: Memory request for pxc
+                              cpu:
+                                type: string
+                                description: CPU request for pxc
+                          limit:
+                            type: object
+                            description: the resources limit for pxc
+                            properties:
+                              memory:
+                                type: string
+                                description: Memory limit for pxc
+                              cpu:
+                                type: string
+                                description: CPU limit for pxc
+                      configuration:
+                        type: string
+                        description: Configuration for PXC
+                      priorityClassName:
+                        type: string
+                        description: Priority class name for PXC
+                      tolerations:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                              description: Toleration key
+                            operator:
+                              type: string
+                              description: Toleration operator
+                            value:
+                              type: string
+                              description: Toleration value
+                            effect:
+                              type: string
+                              description: Toleration effect
+                        podDisruptionBudget:
+                          type: object
+                          properties:
+                            minAvailable:
+                              type: number
+                              description: Minimum number of available pods
+                            maxUnavailable:
+                              type: number
+                              description: Maximum number of unavailable pods
+
+                  haproxy:
+                    type: object
+                    properties:
+                      replicas:
+                        type: number
+                        description: Number of HAProxy replicas
+                        default: 1
+                      image:
+                        type: string
+                        description: HAProxy image
+                      imagePullPolicy:
+                        type: string
+                        description: Image pull policy for PXC
+                        default: IfNotPresent
+                      expose:
+                        type: object
+                        description: Expose HAProxy service
+                        properties:
+                          type:
+                            type: string
+                            description: Type of service to expose (e.g., LoadBalancer, NodePort)
+                          annotations:
+                            type: object
+                            additionalProperties:
+                              type: string
+                            description: Annotations for the service
+                          labels:
+                            type: object
+                            additionalProperties:
+                              type: string
+                            description: Labels for the service
+                      resources:
+                        type: object
+                        description: The resources for haproxy
+                        properties:
+                          requests:
+                            type: object
+                            description: the resources requests for haproxy
+                            properties:
+                              memory:
+                                type: string
+                                description: Memory request for haproxy
+                              cpu:
+                                type: string
+                                description: CPU request for haproxy
+                          limit:
+                            type: object
+                            description: the resources limit for haproxy
+                            properties:
+                              memory:
+                                type: string
+                                description: Memory limit for haproxy
+                              cpu:
+                                type: string
+                                description: CPU limit for haproxy
+                      priorityClassName:
+                        type: string
+                        description: Priority class name for HAProxy
+                      tolerations:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                              description: Toleration key
+                            operator:
+                              type: string
+                              description: Toleration operator
+                            value:
+                              type: string
+                              description: Toleration value
+                            effect:
+                              type: string
+                              description: Toleration effect
+                        podDisruptionBudget:
+                          type: object
+                          properties:
+                            minAvailable:
+                              type: number
+                              description: Minimum number of available pods
+                            maxUnavailable:
+                              type: number
+                              description: Maximum number of unavailable pods
+                  logcollector:
+                    type: object
+                    properties:
+                      image:
+                        type: string
+                        description: LogCollector image
+                      imagePullPolicy:
+                        type: string
+                        description: Image pull policy for PXC
+                        default: IfNotPresent
+                      resources:
+                        type: object
+                        description: The resources for LogCollector
+                        properties:
+                          requests:
+                            type: object
+                            description: the resources requests for LogCollector
+                            properties:
+                              memory:
+                                type: string
+                                description: Memory request for LogCollector
+                              cpu:
+                                type: string
+                                description: CPU request for LogCollector
+                          limit:
+                            type: object
+                            description: the resources limit for LogCollector
+                            properties:
+                              memory:
+                                type: string
+                                description: Memory limit for LogCollector
+                              cpu:
+                                type: string
+                                description: CPU limit for LogCollector
+                  backup:
+                    type: object
+                    properties:
+                      image:
+                        type: string
+                        description: Backup image
+                      imagePullPolicy:
+                        type: string
+                        description: Image pull policy for PXC
+                        default: IfNotPresent
+                      verifyTLS:
+                        type: boolean
+                        description: Verify TLS for S3.
+                      bucket:
+                        type: string
+                        description: S3 bucket name.
+                      credentialsSecret:
+                        type: string
+                        description: S3 credentials secret name.
+                      bucketRegion:
+                        type: string
+                        description: S3 bucket region.
+                      scheduleName:
+                        type: string
+                        description: Name of the backup schedule.
+                      cronScheduleExpression:
+                        type: string
+                        description: Cron expression for the backup schedule.
+                      backupRetention:
+                        type: integer
+                        description: Number of backups to retain.
+                  dns:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: The name of the DNS record
+                      region:
+                        type: string
+                        description: AWS Region where the DNS record is created
+                      ttl:
+                        type: integer
+                        description: TTL (Time to Live) of the DNS record
+                      type:
+                        type: string
+                        description: Type of the DNS record (e.g., A, CNAME)
+                      records:
+                        type: array
+                        items:
+                          type: string
+                        description: List of DNS record values (e.g., IP addresses)
+                      zoneId:
+                        type: string
+                        description: Route53 Hosted Zone ID

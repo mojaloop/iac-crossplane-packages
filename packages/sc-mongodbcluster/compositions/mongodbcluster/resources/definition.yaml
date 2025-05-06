@@ -1,0 +1,365 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xmongodbcluster.sc.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: sc.mojaloop.io
+  names:
+    kind: XMongodbCluster
+    plural: xmongodbcluster
+  claimNames:
+    kind: MongodbCluster
+    plural: mongodbcluster
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the remote and local k8s providers.
+                required:
+                  - scK8sProviderName
+                  - ccK8sProviderName
+                  - awsProviderName
+                properties:
+                  ccK8sProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the local k8s provider.
+                  scK8sProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the remote k8s provider.
+                  awsProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the AWS provider.
+              parameters:
+                type: object
+                properties:
+                  clusterName:
+                    type: string
+                    description: Name for the consumer cluster
+                  externalServiceName:
+                    type: string
+                    description: Name for the external service object created
+                  appNamespace:
+                    type: string
+                    description: Namespace for the consumer application
+                  dbSecret:
+                    type: string
+                    description: Secret name for the database credentials
+                  crVersion:
+                    type: string
+                  image:
+                    type: string
+                  imagePullPolicy:
+                    type: string
+                  replsets:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      size:
+                        type: integer
+                      affinity:
+                        type: object
+                        properties:
+                          antiAffinityTopologyKey:
+                            type: string
+                      expose:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                          type:
+                            type: string
+                      resources:
+                        type: object
+                        properties:
+                          limits:
+                            type: object
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                          requests:
+                            type: object
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                      volumeSpec:
+                        type: object
+                        properties:
+                          persistentVolumeClaim:
+                            type: object
+                            properties:
+                              resources:
+                                type: object
+                                properties:
+                                  requests:
+                                    type: object
+                                    properties:
+                                      storage:
+                                        type: string
+                      priorityClassName:
+                        type: string
+                        description: Priority class name for replsets
+                      tolerations:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                              description: Toleration key
+                            operator:
+                              type: string
+                              description: Toleration operator
+                            value:
+                              type: string
+                              description: Toleration value
+                            effect:
+                              type: string
+                              description: Toleration effect
+                      podDisruptionBudget:
+                        type: object
+                        properties:
+                          minAvailable:
+                            type: number
+                            description: Minimum number of available pods
+                          maxUnavailable:
+                            type: number
+                            description: Maximum number of unavailable pods
+                  sharding:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                      configsvrReplSet:
+                        type: object
+                        properties:
+                          size:
+                            type: integer
+                          affinity:
+                            type: object
+                            properties:
+                              antiAffinityTopologyKey:
+                                type: string
+                          resources:
+                            type: object
+                            properties:
+                              limits:
+                                type: object
+                                properties:
+                                  cpu:
+                                    type: string
+                                  memory:
+                                    type: string
+                              requests:
+                                type: object
+                                properties:
+                                  cpu:
+                                    type: string
+                                  memory:
+                                    type: string
+                          expose:
+                            type: object
+                            properties:
+                              enabled:
+                                type: boolean
+                              type:
+                                type: string
+                          priorityClassName:
+                            type: string
+                            description: Priority class name for sharding configvr
+                          tolerations:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                  description: Toleration key
+                                operator:
+                                  type: string
+                                  description: Toleration operator
+                                value:
+                                  type: string
+                                  description: Toleration value
+                                effect:
+                                  type: string
+                                  description: Toleration effect
+                          podDisruptionBudget:
+                            type: object
+                            properties:
+                              minAvailable:
+                                type: number
+                                description: Minimum number of available pods
+                              maxUnavailable:
+                                type: number
+                                description: Maximum number of unavailable pods
+                          volumeSpec:
+                            type: object
+                            properties:
+                              persistentVolumeClaim:
+                                type: object
+                                properties:
+                                  resources:
+                                    type: object
+                                    properties:
+                                      requests:
+                                        type: object
+                                        properties:
+                                          storage:
+                                            type: string
+                      mongos:
+                        type: object
+                        properties:
+                          size:
+                            type: integer
+                          affinity:
+                            type: object
+                            properties:
+                              antiAffinityTopologyKey:
+                                type: string
+                          resources:
+                            type: object
+                            properties:
+                              limits:
+                                type: object
+                                properties:
+                                  cpu:
+                                    type: string
+                                  memory:
+                                    type: string
+                              requests:
+                                type: object
+                                properties:
+                                  cpu:
+                                    type: string
+                                  memory:
+                                    type: string
+                          expose:
+                            type: object
+                            properties:
+                              enabled:
+                                type: boolean
+                              type:
+                                type: string
+                          priorityClassName:
+                            type: string
+                            description: Priority class name for replsets
+                          tolerations:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                  description: Toleration key
+                                operator:
+                                  type: string
+                                  description: Toleration operator
+                                value:
+                                  type: string
+                                  description: Toleration value
+                                effect:
+                                  type: string
+                                  description: Toleration effect
+                          podDisruptionBudget:
+                            type: object
+                            properties:
+                              minAvailable:
+                                type: number
+                                description: Minimum number of available pods
+                              maxUnavailable:
+                                type: number
+                                description: Maximum number of unavailable pods
+                  backup:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      verifyTLS:
+                        type: boolean
+                        description: Verify TLS for S3.
+                      bucket:
+                        type: string
+                        description: S3 bucket name.
+                      credentialsSecret:
+                        type: string
+                        description: S3 credentials secret name.
+                      bucketRegion:
+                        type: string
+                        description: S3 bucket region.
+                      scheduleEnabled:
+                        type: boolean
+                        description: Enable backup schedule.
+                        default: false
+                      scheduleName:
+                        type: string
+                        description: Name of the backup schedule.
+                      cronScheduleExpression:
+                        type: string
+                        description: Cron expression for the backup schedule.
+                      backupRetention:
+                        type: integer
+                        description: Number of backups to retain.
+
+                  dns:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: The name of the DNS record
+                      region:
+                        type: string
+                        description: AWS Region where the DNS record is created
+                      ttl:
+                        type: integer
+                        description: TTL (Time to Live) of the DNS record
+                      type:
+                        type: string
+                        description: Type of the DNS record (e.g., A, CNAME)
+                      records:
+                        type: array
+                        items:
+                          type: string
+                        description: List of DNS record values (e.g., IP addresses)
+                      zoneId:
+                        type: string
+                        description: Route53 Hosted Zone ID

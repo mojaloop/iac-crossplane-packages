@@ -1,0 +1,94 @@
+apiVersion: sc.mojaloop.io/v1alpha1
+kind: XMongodbCluster
+metadata:
+  name: my-mongodb-cluster
+  namespace: env
+spec:
+  parameters:
+    clusterName: env
+    externalServiceName: my-cluster-service
+    appNamespace: env
+    crVersion: "1.19.1"
+    image: percona/percona-server-mongodb:7.0.15-9-multi
+    imagePullPolicy: IfNotPresent
+    dbSecret: my-db-secret
+    backup:
+      enabled: false
+      image: percona/percona-backup-mongodb:2.8.0-multi
+      verifyTLS: true
+      bucket: "s3-bucket-name"
+      credentialsSecret: "s3-credentials"
+      bucketRegion: "us-east-1"
+      scheduleName: "daily-backup"
+      cronScheduleExpression: "0 0 * * *"
+      backupRetention: 7
+      scheduleEnabled: false
+    replsets:
+      name: rs0
+      size: 3
+      expose:
+        enabled: true
+        type: clusterIP
+      resources:
+        limits:
+          cpu: "300m"
+          memory: "0.5G"
+        requests:
+          cpu: "300m"
+          memory: "0.5G"
+      volumeSpec:
+        persistentVolumeClaim:
+          resources:
+            requests:
+              storage: 3Gi
+      tolerations: []
+      priorityClassName: ""
+    sharding:
+      enabled: true
+      configsvrReplSet:
+        size: 3
+        expose:
+          enabled: true
+          type: clusterIP
+        resources:
+          limits:
+            cpu: "300m"
+            memory: "0.5G"
+          requests:
+            cpu: "300m"
+            memory: "0.5G"
+        volumeSpec:
+          persistentVolumeClaim:
+            resources:
+              requests:
+                storage: 3Gi
+        tolerations: []
+        priorityClassName: ""
+      mongos:
+        size: 3
+        expose:
+          enabled: true
+          type: clusterIP
+        resources:
+          limits:
+            cpu: "300m"
+            memory: "0.5G"
+          requests:
+            cpu: "300m"
+            memory: "0.5G"
+        tolerations: []
+        priorityClassName: ""
+    dns:
+      name: my-cluster-service
+      region: eu-west-1
+      ttl: 300
+      type: A
+      zoneId: Z0111719400KIQPJMA8G
+
+
+  providerConfigsRef:
+    scK8sProviderName: sc-kubernetes-provider
+    ccK8sProviderName: kubernetes-provider
+    awsProviderName: aws-cp-upbound-provider-config
+  managementPolicies:
+    - "*"

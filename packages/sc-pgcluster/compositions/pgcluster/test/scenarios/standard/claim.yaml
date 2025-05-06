@@ -1,25 +1,66 @@
 apiVersion: sc.mojaloop.io/v1alpha1
 kind: XPGCluster
 metadata:
-  name: db_name
-  namespace: namespace
+  name: example-pgcluster
+  namespace: example
 spec:
   parameters:
-    consumerClusterType: controlcenter
-    clusterName: cluster_name #TODO
-    externalServiceName: externalservice_name
+    clusterName: example  # TODO: Replace with your consumer cluster name
+    externalServiceName: externalservice-name
     appNamespace: foo
-    postgres:
-      crVersion: "2.5.0"
-      pgVersion: 16
-      dbSecret: db_secret
-      dbUsername: dbuser
-      dbName: dbname
-      replicas: 1
-      storageSize: postgres_storage_size
+    crVersion: "2.6.0"
+    pgVersion: 16
+    dbSecret: db-secret
+    dbUsername: dbuser
+    dbName: dbname
+    replicas: 3
+    storageSize: 10Gi  # Replace with desired PVC size
+
+    image: percona/percona-postgresql-operator:2.6.0-ppg16.8-postgres
+
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+
+    priorityClassName: ""  # Optional
+
+    tolerations: []
+
+    backup:
+      image: percona/percona-postgresql-operator:2.6.0-ppg16.8-pgbackrest2.54.2
+      objectStoreEndpoint: s3.endpoint.example.com
+      bucket: example-bucket
+      bucketRegion: us-east-1
+      fullBackupCronSchedule: "0 1 * * *"
+      differentialBackupCronSchedule: "0 6 * * *"
+
+    proxy:
+      pgBouncer:
+        image: percona/percona-postgresql-operator:2.6.0-ppg16.8-pgbouncer1.24.0
+        replicas: 3
+        exposeSuperusers: true
+        globalConfig:
+          pool_mode: session
+          query_wait_timeout: "10"
+          max_prepared_statements: "0"
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "128Mi"
+          request:
+            cpu: "100m"
+            memory: "64Mi"
+        expose:
+          type: LoadBalancer
+        tolerations: []
 
   providerConfigsRef:
     scK8sProviderName: sc-kubernetes-provider
     ccK8sProviderName: kubernetes-provider
+
   managementPolicies:
     - "*"
