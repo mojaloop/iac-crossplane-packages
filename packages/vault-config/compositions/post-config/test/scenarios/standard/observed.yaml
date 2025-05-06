@@ -9,9 +9,9 @@ status:
       apiVersion: v1
       kind: Secret
       metadata:
-        name: vault-secret
-        namespace: vault
+        name: "vault-secret"
+        namespace: "vault"
       data:
-        clientId: Y2xvdWRfcGxhdGZvcm1fYXBpX2NsaWVudF9pZA==
-        clientSecret: Y2xvdWRfcGxhdGZvcm1fYXBpX2NsaWVudF9zZWNyZXQ=
+        clientId: "Y2xvdWRfcGxhdGZvcm1fYXBpX2NsaWVudF9pZA=="
+        clientSecret: "Y2xvdWRfcGxhdGZvcm1fYXBpX2NsaWVudF9zZWNyZXQ="
       type: Opaque
