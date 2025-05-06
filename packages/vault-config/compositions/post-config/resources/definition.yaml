@@ -104,10 +104,18 @@ spec:
                             type: string
                             description: |-
                               The name of the Vault role for accessing DNS.
-                          cloudRole:
+                          externalDnsRole:
                             type: string
                             description: |-
                               The ARN of the AWS IAM role for external DNS.
+                          certManagerAccessRole:
+                            type: string
+                            description: |-
+                              The name of the Vault role for cert-manager.
+                          certManagerCloudPolicy:
+                            type: string
+                            description: |-
+                              The ARN of the AWS IAM policy for cert-manager.
                       objectStorageBackend:
                         type: object
                         description: |-
@@ -127,18 +135,10 @@ spec:
                             type: string
                             description: |-
                               The name of the Vault role for accessing object storage.
-                          externalDnsRole:
+                          cloudRole:
                             type: string
                             description: |-
-                              The ARN of the AWS IAM role for external DNS.
-                          certManagerAccessRole:
-                            type: string
-                            description: |-
-                              The name of the Vault role for cert-manager.
-                          certManagerCloudPolicy:
-                            type: string
-                            description: |-
-                              The ARN of the AWS IAM policy for cert-manager.
+                              The ARN of the AWS IAM role for object storage.
                       region:
                         type: string
                         description: |-

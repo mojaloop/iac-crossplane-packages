@@ -196,7 +196,6 @@ if parameters.aws?.objectStorageBackend?.enabled:
 
     # AwsSecretBackendRole Object storage
     # https://marketplace.upbound.io/providers/upbound/provider-vault/v2.1.3/resources/aws.vault.upbound.io/SecretBackendRole/v1alpha1
-
     _awsObjectStorageBackendRole = {
         apiVersion = "aws.vault.upbound.io/v1alpha1"
         kind = "SecretBackendRole"
@@ -211,7 +210,7 @@ if parameters.aws?.objectStorageBackend?.enabled:
                 backend = parameters.aws?.objectStorageBackend?.path
                 name = parameters.aws?.objectStorageBackend?.accessRole
                 credentialType = "assumed_role"
-                roleArns = [parameters.aws?.objectStorageBackend?.externalDnsRole]
+                roleArns = [parameters.aws?.objectStorageBackend?.cloudRole]
             }
             managementPolicies = spec.managementPolicies
             providerConfigRef = {
@@ -260,7 +259,6 @@ if parameters.aws?.dnsBackend?.enabled:
 
     # AwsSecretBackendRole DNS Access
     # https://marketplace.upbound.io/providers/upbound/provider-vault/v2.1.3/resources/aws.vault.upbound.io/SecretBackendRole/v1alpha1
-
     _awsDnsBackendRole = {
         apiVersion = "aws.vault.upbound.io/v1alpha1"
         kind = "SecretBackendRole"
@@ -275,7 +273,7 @@ if parameters.aws?.dnsBackend?.enabled:
                 backend = parameters.aws?.dnsBackend?.path
                 name = parameters.aws?.dnsBackend?.accessRole
                 credentialType = "assumed_role"
-                roleArns = [parameters.aws?.dnsBackend?.cloudRole]
+                roleArns = [parameters.aws?.dnsBackend?.externalDnsRole]
             }
             managementPolicies = spec.managementPolicies
             providerConfigRef = {
@@ -286,7 +284,6 @@ if parameters.aws?.dnsBackend?.enabled:
 
     # AwsSecretBackendRole Cert Manager Access
     # https://marketplace.upbound.io/providers/upbound/provider-vault/v2.1.3/resources/aws.vault.upbound.io/SecretBackendRole/v1alpha1
-
     _awsCertManagerBackendRole = {
         apiVersion = "aws.vault.upbound.io/v1alpha1"
         kind = "SecretBackendRole"
@@ -299,9 +296,9 @@ if parameters.aws?.dnsBackend?.enabled:
         spec = {
             forProvider = {
                 backend = parameters.aws?.dnsBackend?.path
-                name = parameters.aws?.objectStorageBackend?.certManagerAccessRole
+                name = parameters.aws?.dnsBackend?.certManagerAccessRole
                 credentialType = "iam_user"
-                policyArns = [parameters.aws?.objectStorageBackend?.certManagerCloudPolicy]
+                policyArns = [parameters.aws?.dnsBackend?.certManagerCloudPolicy]
             }
             managementPolicies = spec.managementPolicies
             providerConfigRef = {
