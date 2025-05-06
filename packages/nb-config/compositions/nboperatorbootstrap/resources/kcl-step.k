@@ -42,10 +42,6 @@ _zitadel_project_id_secret = {
     }
 }
 
-zitadel_project_id = base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or ""] or "bm9uZQo=")
-admin_group_name = "{}:{}".format(zitadel_project_id, parameters.groupNames.admin)
-external_access_group_name = "{}:{}".format(zitadel_project_id, parameters.groupNames.externalAccess)
-
 _external_access_group = {
     apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
     kind = "NbGroup"
@@ -53,12 +49,12 @@ _external_access_group = {
         name = "{}-external-access-group".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "external-access-group"
-            "crossplane.io/external-name": external_access_group_name
+            "crossplane.io/external-name":           "{}:{}".format(base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or "unknown"]), parameters.groupNames.externalAccess)
         }
     }
     spec = {
         forProvider = {
-            name = external_access_group_name
+            name =           "{}:{}".format(base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or "unknown"]), parameters.groupNames.externalAccess)
         }
         providerConfigRef = {
             name = spec?.providerConfigsRef?.netbirdProviderConfigName
@@ -387,7 +383,7 @@ _internal_network_policy = {
         forProvider = {
             name = "{}-internal-network-policy".format(oxr.metadata.name)
             enabled = True
-            description = "Policy for connecting to kubeapi for {}".format(oxr.metadata.name)
+            description = "Policy for connecting to internal network for {}".format(oxr.metadata.name)
             rules = [
                 {
                     action = "accept"

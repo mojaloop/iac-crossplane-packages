@@ -1,16 +1,16 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xpostconfig.nb.mojaloop.io
+  name: xnetbirdpostconfig.nb.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
   group: nb.mojaloop.io
   names:
-    kind: XPostConfig
-    plural: xpostconfig
+    kind: XNetbirdPostConfig
+    plural: xnetbirdpostconfig
   claimNames:
-    kind: PostConfig
-    plural: postconfig
+    kind: NetbirdPostConfig
+    plural: netbirdpostconfig
   versions:
     - name: v1alpha1
       served: true
