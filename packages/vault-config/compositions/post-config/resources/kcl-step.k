@@ -1,3 +1,5 @@
+import base64
+import json
 # Read the XR and the OCDs
 oxr = option("params").oxr
 ocds = option("params").ocds
@@ -155,7 +157,106 @@ path "${parameters.kvPath}/*" {
     }
 }
 
-_items += [_mountObject, _backendObject, _authBackendConfigObject, _authBackendRoleObject, _policyObject, _readPolicyObject]
+## Observe Credentials Secret
+_observeCredsSecret = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-observe-creds".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "observe-credentials"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = parameters.credentialsSecretRef?.name
+                    namespace = parameters.credentialsSecretRef?.namespace
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
+    }
+}
+## TmpPushSecret object to push credentials to vault
+_jsonCreds = {
+    "cloud_platform_api_client_id": ocds["observe-credentials"]?.atProvider?.manifest?.data["clientId"] if ocds["observe-credentials"]?.atProvider?.manifest?.data else ""
+    "cloud_platform_api_client_secret": ocds["observe-credentials"]?.atProvider?.manifest?.data["clientSecret"] if ocds["observe-credentials"]?.atProvider?.manifest?.data else ""
+}
+
+_jsonCredsSecret = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-json-creds".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "json-credentials"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = "{}-json-creds".format(parameters.credentialsSecretRef?.name)
+                    namespace = parameters.credentialsSecretRef?.namespace
+                }
+                data = {
+                    credentials = base64.encode(json.encode(_jsonCreds))
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
+    }
+}
+# Generic Vault Secret
+# https://marketplace.upbound.io/providers/upbound/provider-vault/v2.1.3/resources/generic.vault.upbound.io/Secret/v1alpha1
+_vaultCredsSecret = {
+    apiVersion = "generic.vault.upbound.io/v1alpha1"
+    kind = "Secret"
+    metadata = {
+        name = "{}-vault-creds".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "vault-creds"
+        }
+    }
+    spec = {
+        forProvider = {
+            dataJsonSecretRef = {
+                key = "credentials"
+                name = "{}-json-creds".format(parameters.credentialsSecretRef?.name)
+                namespace = parameters.credentialsSecretRef?.namespace
+            }
+            path = "generic/vault-creds"
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.vaultProviderName
+        }
+    }
+}
+
+_items += [
+    _mountObject
+    _backendObject
+    _authBackendConfigObject
+    _authBackendRoleObject
+    _policyObject
+    _readPolicyObject
+    _observeCredsSecret
+    _jsonCredsSecret
+    _vaultCredsSecret
+]
 
 ## AWS Object Storage Backend
 
@@ -178,13 +279,13 @@ if parameters.aws?.objectStorageBackend?.enabled:
                 defaultLeaseTtlSeconds = parameters.aws?.defaultLeaseTtlSeconds
                 accessKeySecretRef = {
                     key = "clientId"
-                    name = parameters.aws?.credentialsSecretRef?.name
-                    namespace = parameters.aws?.credentialsSecretRef?.namespace
+                    name = parameters.credentialsSecretRef?.name
+                    namespace = parameters.credentialsSecretRef?.namespace
                 }
                 secretKeySecretRef = {
                     key = "clientSecret"
-                    name = parameters.aws?.credentialsSecretRef?.name
-                    namespace = parameters.aws?.credentialsSecretRef?.namespace
+                    name = parameters.credentialsSecretRef?.name
+                    namespace = parameters.credentialsSecretRef?.namespace
                 }
             }
             managementPolicies = spec.managementPolicies
@@ -241,13 +342,13 @@ if parameters.aws?.dnsBackend?.enabled:
                 defaultLeaseTtlSeconds = parameters.aws?.defaultLeaseTtlSeconds
                 accessKeySecretRef = {
                     key = "clientId"
-                    name = parameters.aws?.credentialsSecretRef?.name
-                    namespace = parameters.aws?.credentialsSecretRef?.namespace
+                    name = parameters.credentialsSecretRef?.name
+                    namespace = parameters.credentialsSecretRef?.namespace
                 }
                 secretKeySecretRef = {
                     key = "clientSecret"
-                    name = parameters.aws?.credentialsSecretRef?.name
-                    namespace = parameters.aws?.credentialsSecretRef?.namespace
+                    name = parameters.credentialsSecretRef?.name
+                    namespace = parameters.credentialsSecretRef?.namespace
                 }
             }
             managementPolicies = spec.managementPolicies

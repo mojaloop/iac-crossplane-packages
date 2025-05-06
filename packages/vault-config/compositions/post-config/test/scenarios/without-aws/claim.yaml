@@ -9,7 +9,11 @@ spec:
     k8sAdminRoleName: "vault-admin"
     adminPolicyName: "vault-admin"
     readKvSecretsPolicyName: "read-all-kv-secrets"
+    credentialsSecretRef:
+      name: "vault-secret"
+      namespace: "vault"
   providerConfigsRef:
     vaultProviderName: vault-provider
+    kubernetesProviderName: kubernetes-provider
   managementPolicies:
     - "*"

@@ -1,0 +1,17 @@
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: observe-credentials
+status:
+  atProvider:
+    manifest:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: vault-secret
+        namespace: vault
+      data:
+        clientId: Y2xvdWRfcGxhdGZvcm1fYXBpX2NsaWVudF9pZA==
+        clientSecret: Y2xvdWRfcGxhdGZvcm1fYXBpX2NsaWVudF9zZWNyZXQ=
+      type: Opaque

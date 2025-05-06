@@ -52,6 +52,10 @@ spec:
                     type: string
                     description: |-
                       The name of the provider config to use for the vault provider.
+                  kubernetesProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the kubernetes provider.
               parameters:
                 type: object
                 properties:
@@ -80,6 +84,20 @@ spec:
                     description: |-
                       The name of the read-only policy for KV secrets.
                     default: "read-all-kv-secrets"
+                  credentialsSecretRef:
+                    type: object
+                    description: |-
+                      The secret reference for AWS credentials.
+                    properties:
+                      name:
+                        type: string
+                        description: |-
+                          The name of the secret.
+                      namespace:
+                        type: string
+                        description: |-
+                          The namespace of the secret.
+
                   aws:
                     type: object
                     description: |-
@@ -148,16 +166,3 @@ spec:
                         description: |-
                           The default lease TTL for AWS secrets in seconds.
                         default: 3600
-                      credentialsSecretRef:
-                        type: object
-                        description: |-
-                          The secret reference for AWS credentials.
-                        properties:
-                          name:
-                            type: string
-                            description: |-
-                              The name of the secret.
-                          namespace:
-                            type: string
-                            description: |-
-                              The namespace of the secret.

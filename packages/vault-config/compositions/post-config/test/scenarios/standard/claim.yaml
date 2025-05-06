@@ -9,6 +9,9 @@ spec:
     k8sAdminRoleName: "vault-admin"
     adminPolicyName: "vault-admin"
     readKvSecretsPolicyName: "read-all-kv-secrets"
+    credentialsSecretRef:
+      name: "vault-secret"
+      namespace: "vault"
     aws:
       objectStorageBackend:
         enabled: true
@@ -24,10 +27,9 @@ spec:
         certManagerCloudPolicy: "arn:aws:iam::123456789012:policy/cert-manager-policy"
       region: "us-east-1"
       defaultLeaseTtlSeconds: 3600
-      credentialsSecretRef:
-        name: "vault-secret"
-        namespace: "vault"
   providerConfigsRef:
     vaultProviderName: vault-provider
+    kubernetesProviderName: kubernetes-provider
   managementPolicies:
     - "*"
+
