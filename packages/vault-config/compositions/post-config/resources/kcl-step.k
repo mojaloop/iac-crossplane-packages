@@ -237,7 +237,7 @@ _vaultCredsSecret = {
                 name = "{}-json-creds".format(parameters.credentialsSecretRef?.name)
                 namespace = parameters.credentialsSecretRef?.namespace
             }
-            path = "generic/vault-creds"
+            path = "secret/cloud-api-access"
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
