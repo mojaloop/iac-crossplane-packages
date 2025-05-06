@@ -80,3 +80,84 @@ spec:
                     description: |-
                       The name of the read-only policy for KV secrets.
                     default: "read-all-kv-secrets"
+                  aws:
+                    type: object
+                    description: |-
+                      AWS-specific configurations for Vault.
+                    properties:
+                      dnsBackend:
+                        type: object
+                        description: |-
+                          Configuration for the AWS DNS backend.
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: |-
+                              Whether the DNS backend is enabled.
+                            default: false
+                          path:
+                            type: string
+                            description: |-
+                              The path for the AWS DNS secret backend.
+                            default: "cc-cloud-provider-dns"
+                          accessRole:
+                            type: string
+                            description: |-
+                              The name of the Vault role for accessing DNS.
+                          cloudRole:
+                            type: string
+                            description: |-
+                              The ARN of the AWS IAM role for external DNS.
+                      objectStorageBackend:
+                        type: object
+                        description: |-
+                          Configuration for the AWS object storage backend.
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: |-
+                              Whether the object storage backend is enabled.
+                            default: false
+                          path:
+                            type: string
+                            description: |-
+                              The path for the AWS object storage secret backend.
+                            default: "cc-cloud-provider-os"
+                          accessRole:
+                            type: string
+                            description: |-
+                              The name of the Vault role for accessing object storage.
+                          externalDnsRole:
+                            type: string
+                            description: |-
+                              The ARN of the AWS IAM role for external DNS.
+                          certManagerAccessRole:
+                            type: string
+                            description: |-
+                              The name of the Vault role for cert-manager.
+                          certManagerCloudPolicy:
+                            type: string
+                            description: |-
+                              The ARN of the AWS IAM policy for cert-manager.
+                      region:
+                        type: string
+                        description: |-
+                          The AWS region to use.
+                      defaultLeaseTtlSeconds:
+                        type: integer
+                        description: |-
+                          The default lease TTL for AWS secrets in seconds.
+                        default: 3600
+                      credentialsSecretRef:
+                        type: object
+                        description: |-
+                          The secret reference for AWS credentials.
+                        properties:
+                          name:
+                            type: string
+                            description: |-
+                              The name of the secret.
+                          namespace:
+                            type: string
+                            description: |-
+                              The namespace of the secret.

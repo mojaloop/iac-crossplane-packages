@@ -9,6 +9,24 @@ spec:
     k8sAdminRoleName: "vault-admin"
     adminPolicyName: "vault-admin"
     readKvSecretsPolicyName: "read-all-kv-secrets"
+    aws:
+      dnsBackend:
+        enabled: true
+        path: "aws/dns"
+        accessRole: "vault-dns-access"
+        cloudRole: "arn:aws:iam::123456789012:role/external-dns-role"
+      objectStorageBackend:
+        enabled: true
+        path: "aws/object-storage"
+        accessRole: "vault-object-storage-access"
+        externalDnsRole: "arn:aws:iam::123456789012:role/external-dns-role"
+        certManagerAccessRole: "vault-cert-manager-access"
+        certManagerCloudPolicy: "arn:aws:iam::123456789012:policy/cert-manager-policy"
+      region: "us-east-1"
+      defaultLeaseTtlSeconds: 3600
+      credentialsSecretRef:
+        name: "vault-secret"
+        namespace: "vault"
   providerConfigsRef:
     vaultProviderName: vault-provider
   managementPolicies:

@@ -157,6 +157,161 @@ path "${parameters.kvPath}/*" {
 
 _items += [_mountObject, _backendObject, _authBackendConfigObject, _authBackendRoleObject, _policyObject, _readPolicyObject]
 
+## AWS Object Storage Backend
+
+# AwsSecretBackend Object storage
+# https://marketplace.upbound.io/providers/upbound/provider-vault/v2.1.3/resources/aws.vault.upbound.io/SecretBackend/v1alpha1
+if parameters.aws?.objectStorageBackend?.enabled:
+    _awsObjectStorageBackend = {
+        apiVersion = "aws.vault.upbound.io/v1alpha1"
+        kind = "SecretBackend"
+        metadata = {
+            name = "{}-aws-object-storage-backend".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "aws-object-storage-backend"
+            }
+        }
+        spec = {
+            forProvider = {
+                path = parameters.aws?.objectStorageBackend?.path
+                region = parameters.aws?.region
+                defaultLeaseTtlSeconds = parameters.aws?.defaultLeaseTtlSeconds
+                accessKeySecretRef = {
+                    key = "clientId"
+                    name = parameters.aws?.credentialsSecretRef?.name
+                    namespace = parameters.aws?.credentialsSecretRef?.namespace
+                }
+                secretKeySecretRef = {
+                    key = "clientSecret"
+                    name = parameters.aws?.credentialsSecretRef?.name
+                    namespace = parameters.aws?.credentialsSecretRef?.namespace
+                }
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.vaultProviderName
+            }
+        }
+    }
+
+    # AwsSecretBackendRole Object storage
+    # https://marketplace.upbound.io/providers/upbound/provider-vault/v2.1.3/resources/aws.vault.upbound.io/SecretBackendRole/v1alpha1
+
+    _awsObjectStorageBackendRole = {
+        apiVersion = "aws.vault.upbound.io/v1alpha1"
+        kind = "SecretBackendRole"
+        metadata = {
+            name = "{}-aws-object-storage-role".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "aws-object-storage-role"
+            }
+        }
+        spec = {
+            forProvider = {
+                backend = parameters.aws?.objectStorageBackend?.path
+                name = parameters.aws?.objectStorageBackend?.accessRole
+                credentialType = "assumed_role"
+                roleArns = [parameters.aws?.objectStorageBackend?.externalDnsRole]
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.vaultProviderName
+            }
+        }
+    }
+    _items += [_awsObjectStorageBackend, _awsObjectStorageBackendRole]
+
+## AWS DNS Backend
+
+# AwsSecretBackend DNS Access
+# https://marketplace.upbound.io/providers/upbound/provider-vault/v2.1.3/resources/aws.vault.upbound.io/SecretBackend/v1alpha1
+if parameters.aws?.dnsBackend?.enabled:
+    _awsDnsBackend = {
+        apiVersion = "aws.vault.upbound.io/v1alpha1"
+        kind = "SecretBackend"
+        metadata = {
+            name = "{}-aws-dns-backend".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "aws-dns-backend"
+            }
+        }
+        spec = {
+            forProvider = {
+                path = parameters.aws?.dnsBackend?.path
+                region = parameters.aws?.region
+                defaultLeaseTtlSeconds = parameters.aws?.defaultLeaseTtlSeconds
+                accessKeySecretRef = {
+                    key = "clientId"
+                    name = parameters.aws?.credentialsSecretRef?.name
+                    namespace = parameters.aws?.credentialsSecretRef?.namespace
+                }
+                secretKeySecretRef = {
+                    key = "clientSecret"
+                    name = parameters.aws?.credentialsSecretRef?.name
+                    namespace = parameters.aws?.credentialsSecretRef?.namespace
+                }
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.vaultProviderName
+            }
+        }
+    }
+
+    # AwsSecretBackendRole DNS Access
+    # https://marketplace.upbound.io/providers/upbound/provider-vault/v2.1.3/resources/aws.vault.upbound.io/SecretBackendRole/v1alpha1
+
+    _awsDnsBackendRole = {
+        apiVersion = "aws.vault.upbound.io/v1alpha1"
+        kind = "SecretBackendRole"
+        metadata = {
+            name = "{}-aws-dns-role".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "aws-dns-role"
+            }
+        }
+        spec = {
+            forProvider = {
+                backend = parameters.aws?.dnsBackend?.path
+                name = parameters.aws?.dnsBackend?.accessRole
+                credentialType = "assumed_role"
+                roleArns = [parameters.aws?.dnsBackend?.cloudRole]
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.vaultProviderName
+            }
+        }
+    }
+
+    # AwsSecretBackendRole Cert Manager Access
+    # https://marketplace.upbound.io/providers/upbound/provider-vault/v2.1.3/resources/aws.vault.upbound.io/SecretBackendRole/v1alpha1
+
+    _awsCertManagerBackendRole = {
+        apiVersion = "aws.vault.upbound.io/v1alpha1"
+        kind = "SecretBackendRole"
+        metadata = {
+            name = "{}-aws-cert-manager-role".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "aws-cert-manager-role"
+            }
+        }
+        spec = {
+            forProvider = {
+                backend = parameters.aws?.dnsBackend?.path
+                name = parameters.aws?.objectStorageBackend?.certManagerAccessRole
+                credentialType = "iam_user"
+                policyArns = [parameters.aws?.objectStorageBackend?.certManagerCloudPolicy]
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.vaultProviderName
+            }
+        }
+    }
+
+    _items += [_awsDnsBackend, _awsDnsBackendRole, _awsCertManagerBackendRole]
+
 dxr = {
     **oxr
 }
