@@ -186,8 +186,8 @@ _observeCredsSecret = {
 }
 ## TmpPushSecret object to push credentials to vault
 _jsonCreds = {
-    "cloud_platform_api_client_id": ocds["observe-credentials"]?.Resource?.status?.atProvider?.manifest?.data["clientId"] if ocds["observe-credentials"]?.Resource?.status?.atProvider?.manifest?.data else ""
-    "cloud_platform_api_client_secret": ocds["observe-credentials"]?.Resource?.status?.atProvider?.manifest?.data["clientSecret"] if ocds["observe-credentials"]?.Resource?.status?.atProvider?.manifest?.data else ""
+    "cloud_platform_api_client_id": base64.decode(ocds["observe-credentials"]?.Resource?.status?.atProvider?.manifest?.data["clientId"]) if ocds["observe-credentials"]?.Resource?.status?.atProvider?.manifest?.data else ""
+    "cloud_platform_api_client_secret": base64.decode(ocds["observe-credentials"]?.Resource?.status?.atProvider?.manifest?.data["clientSecret"]) if ocds["observe-credentials"]?.Resource?.status?.atProvider?.manifest?.data else ""
 }
 
 _jsonCredsSecret = {
