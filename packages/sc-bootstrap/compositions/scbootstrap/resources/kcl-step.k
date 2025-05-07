@@ -529,7 +529,7 @@ _argocdHelmChart = {
                 }
             }
         }
-        managementPolicies = ["Create"]
+        managementPolicies = ["Create", "Observe"]
         providerConfigRef = {
             name = spec?.providerConfigsRef?.scHelmProviderName
         }
