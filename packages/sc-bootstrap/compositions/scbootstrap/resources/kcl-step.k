@@ -434,6 +434,7 @@ _argocdHelmChart = {
                     params = {
                         "server.insecure" = True
                         "server.enable.proxy.extension" = "true"
+                        "controller.diff.server.side" = "true"
                     }
                     cmp = {
                         create = True
