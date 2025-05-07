@@ -570,7 +570,7 @@ _argocdPodsCollection = {
     }
 }
 
-# ArgoCD Root application install
+# ArgoCD Root application installation
 _Application = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
