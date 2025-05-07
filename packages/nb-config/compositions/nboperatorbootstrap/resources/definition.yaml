@@ -123,4 +123,41 @@ spec:
                             - local
                             - sc
                             - tenantVault
-                        # TODO: Parameters for example for tenantVault
+                        vaultSecretPath:
+                          type: string
+                          description: "path to write vault secret to"
+                      required: ["destinationType"]
+                    pushSecret:
+                      type: object
+                      description: Properties for pushing secrets to vault
+                      properties:
+                        esoPushSecret:
+                          type: boolean
+                          description: |-
+                            Whether to push the secret to vault.
+                          default: false
+                        esoUpdatePolicy:
+                          type: string
+                          description: |-
+                            Policy to update the secret on vault.
+                          default: "Replace"
+                        esoDeletePolicy:
+                          type: string
+                          description: |-
+                            Policy to delete the secret on vault.
+                          default: "Delete"
+                        esoRefreshInterval:
+                          type: string
+                          description: |-
+                            Interval to refresh the secret on vault.
+                          default: "1m"
+                        vaultSecretStore:
+                          type: string
+                          description: |-
+                            Name of the secretstore on cluster for vault.
+                          default: "vault-secret-store"
+                        vaultSecretStoreKind:
+                          type: string
+                          description: |-
+                            Kind of the secret store in vault.
+                          default: "ClusterSecretStore"

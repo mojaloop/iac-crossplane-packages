@@ -138,6 +138,62 @@ _access_token = {
         managementPolicies = spec?.managementPolicies
     }
 }
+
+if parameters.accessToken.destinationType == "tenantVault":
+  _push_secret_access_token = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+      name = "{}-push-secret-access-token".format(oxr.metadata.name)
+      annotations = {
+        "krm.kcl.dev/composition-resource-name": "push-secret-access-token"
+      }
+    }
+    spec = {
+      forProvider = {
+        manifest = {
+          apiVersion = "external-secrets.io/v1alpha1"
+          kind = "PushSecret"
+          metadata = {
+            name = ocds["access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.name or ""
+            namespace = ocds["access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.namespace or ""
+          }
+          spec = {
+            updatePolicy = parameters.pushSecret.esoUpdatePolicy
+            deletionPolicy = parameters.pushSecret.esoDeletePolicy
+            refreshInterval = parameters.pushSecret.esoRefreshInterval
+            secretStoreRefs = [
+              {
+                name = parameters.pushSecret.vaultSecretStore
+                kind = parameters.pushSecret.vaultSecretStoreKind
+              }
+            ]
+            selector = {
+              secret = {
+                name = ocds["access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.name or ""
+              }
+            }
+            data = [
+              {
+                match = {
+                  secretKey = "password"
+                  remoteRef = {
+                    remoteKey = parameters.accessToken.vaultSecretPath
+                    property = "value"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+      managementPolicies = spec.managementPolicies
+      providerConfigRef = {
+        name = spec.providerConfigsRef.ccK8sProviderName
+      }
+    }
+  }
+
 # Access Token Secret Copy
 if parameters.accessToken.destinationType == "sc":
     # Netbird Namespace
@@ -425,6 +481,9 @@ if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
     ]
     if parameters.accessToken.destinationType == "sc":
         _items += [_sc_netbird_namespace, _sc_access_token_secret_copy, _sc_nb_operator_kyverno_policy, _sc_nb_op_secret_update_kyverno_policy]
+    if parameters.accessToken.destinationType == "tenantVault":
+        _items += [_push_secret_access_token]
+
 
 if readyBasedOnConditions(ocds["external-access-group"]) and readyBasedOnConditions(ocds["network-resource-group"]):
     _items += [
