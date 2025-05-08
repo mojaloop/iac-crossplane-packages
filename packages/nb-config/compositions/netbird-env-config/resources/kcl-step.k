@@ -158,7 +158,7 @@ _push_secret_env_k8s_nodes_setup_key = {
     }
     managementPolicies = spec.managementPolicies
     providerConfigRef = {
-      name = spec.providerConfigsRef.ccK8sProviderName
+      name = spec.providerConfigsRef.k8sProviderConfigName
     }
   }
 }
@@ -309,7 +309,7 @@ if parameters.managedService.enabled:
       }
       managementPolicies = spec.managementPolicies
       providerConfigRef = {
-        name = spec.providerConfigsRef.ccK8sProviderName
+        name = spec.providerConfigsRef.k8sProviderConfigName
       }
     }
   }
