@@ -180,7 +180,7 @@ _MongodbCluster = {
         }
         readiness = {
             policy = "DeriveFromCelQuery"
-            celQuery = '"status" in object && "conditions" in object.status && object.status.conditions.exists(c, c.type == "Ready" && c.status == "True" )'
+            celQuery = '"status" in object && "conditions" in object.status && object.status.conditions.exists(c, c.type == "ready" && c.status == "True" )'
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
