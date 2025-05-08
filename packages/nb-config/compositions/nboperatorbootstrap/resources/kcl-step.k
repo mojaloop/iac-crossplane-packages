@@ -107,7 +107,7 @@ _service_user = {
 }
 ### Access Token
 # NB Service User Access Token
-if parameters.accessToken.destinationType == "local":
+if parameters.accessToken.destinationType == "local" or parameters.accessToken.destinationType == "tenantVault":
     _access_token_secret_name = parameters.accessToken.localSecretName
     _access_token_secret_namespace = parameters.accessToken.localSecretNamespace or oxr.metadata.namespace or "crossplane-system"
 else:
