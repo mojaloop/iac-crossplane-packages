@@ -353,41 +353,25 @@ _projDocs = {
     }
 }
 
-# This is a workaround for the issue in https://github.com/upbound/provider-vault/issues/83
 _vaultJwtAuthBackend = {
-    apiVersion = "kubernetes.crossplane.io/v1alpha2"
-    kind = "Object"
+    apiVersion = "jwt.vault.upbound.io/v1alpha1"
+    kind = "AuthBackend"
     metadata = {
-        name = "{}-vault-jwt-auth-backend".format(oxr.metadata.name)
+        name = "{}-vault-jwt-auth-backend-object".format(oxr.metadata.name)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "{}-vault-jwt-auth-backend".format(oxr.metadata.name)
+            "krm.kcl.dev/composition-resource-name" = "vault-jwt-auth-backend-object"
         }
     }
     spec = {
         forProvider = {
-            manifest = {
-                apiVersion = "jwt.vault.upbound.io/v1alpha1"
-                kind = "AuthBackend"
-                metadata = {
-                    name = "vault-jwt-auth-backend-object"
-                }
-                spec = {
-                    forProvider = {
-                        path = p?.gitlabRunnerJwtPath
-                        description = "JWT for Gitlab Runner"
-                        oidcDiscoveryUrl = "https://{}".format(p?.vaultFqdn)
-                        boundIssuer = "https://{}".format(p?.vaultFqdn)
-                    }
-                    managementPolicies = spec.managementPolicies
-                    providerConfigRef = {
-                        name = spec?.providerConfigsRef?.vaultProvider
-                    }
-                }
-            }
+            path = p?.gitlabRunnerJwtPath
+            description = "JWT for Gitlab Runner"
+            oidcDiscoveryUrl = "https://{}".format(p?.gitlabFqdn)
+            boundIssuer = "https://{}".format(p?.gitlabFqdn)
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
-            name = spec?.providerConfigsRef?.kubernetesProvider
+            name = spec?.providerConfigsRef?.vaultProvider
         }
     }
 }
@@ -404,11 +388,9 @@ _vaultPolicy = {
     spec = {
         forProvider = {
             name = "gitlab-ci-runner"
-            policy = '''
-path "{}/*" {{
+            policy = """path "secret/*" {
   capabilities = ["read", "list"]
-}}
-'''.format(p?.ciTokenVaultPath)
+}"""
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {

@@ -9,6 +9,7 @@ spec:
     tenancyGroupName: tenancy-internal
     iacGroupName: iac
     gitlabRunnerRoleName: gitlab-runner-role
+    gitlabFqdn: gitlab.cluster.mojaloop.io
   providerConfigsRef:
     gitlabProvider: gitlab-provider
     kubernetesProvider: kubernetes-provider

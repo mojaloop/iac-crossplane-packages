@@ -94,6 +94,11 @@ spec:
                     description: |-
                       The fqdn for vault api.
                     default: vault.cluster.mojaloop.io
+                  gitlabFqdn:
+                    type: string
+                    description: |-
+                      The fqdn for gitlab.
+                    default: gitlab.cluster.mojaloop.io
                   privateRepoUser:
                     type: string
                     description: |-
