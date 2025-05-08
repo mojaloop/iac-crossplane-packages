@@ -176,7 +176,7 @@ if parameters.accessToken.destinationType == "tenantVault":
             data = [
               {
                 match = {
-                  secretKey = "password"
+                  secretKey = "NB_API_KEY"
                   remoteRef = {
                     remoteKey = parameters.accessToken.vaultSecretPath
                     property = "value"
