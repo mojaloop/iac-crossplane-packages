@@ -211,7 +211,7 @@ _Secret = {
     }
 }
 
-_ip = ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host if ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host else ""
+_ip = [ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host] if ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host else []
 
 _DnsRecord = {
     apiVersion = "utils.aws.mojaloop.io/v1alpha1"
@@ -229,7 +229,7 @@ _DnsRecord = {
             region = parameters?.dns?.region
             ttl =  parameters?.dns?.ttl
             type =  parameters?.dns?.type
-            records = [_ip]
+            records = _ip
             zoneId = parameters?.dns?.zoneId
         }
         providerConfigsRef = {
