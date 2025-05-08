@@ -21,7 +21,7 @@ _cc_network_resource_group = {
     name = "{}-cc-network-resource-group".format(oxr.metadata.name)
     annotations = {
       "krm.kcl.dev/composition-resource-name": "cc-network-resource-group"
-      "crossplane.io/external-name": parameters.envProperties.groupNames.ccNetworkResourceGroup
+      "crossplane.io/external-name": parameters.envProperties.groupNames.ccNetworkResource
     }
   }
   spec = {
@@ -42,7 +42,7 @@ _sc_network_resource_group = {
     name = "{}-sc-network-resource-group".format(oxr.metadata.name)
     annotations = {
       "krm.kcl.dev/composition-resource-name": "sc-network-resource-group"
-      "crossplane.io/external-name": parameters.envProperties.groupNames.scNetworkResourceGroup
+      "crossplane.io/external-name": parameters.envProperties.groupNames.scNetworkResource
     }
   }
   spec = {
