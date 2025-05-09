@@ -12,6 +12,6 @@ kind: Provider
 metadata:
   name: provider-netbird
 spec:
-  package: ghcr.io/infitx-org/netbird-crossplane-provider:v0.0.20
+  package: ghcr.io/infitx-org/netbird-crossplane-provider:v0.0.19
 ---
 

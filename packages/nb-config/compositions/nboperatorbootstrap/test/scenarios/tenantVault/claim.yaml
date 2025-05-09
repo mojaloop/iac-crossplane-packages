@@ -1,7 +1,7 @@
 apiVersion: nb.mojaloop.io/v1alpha1
 kind: XNBOperatorBootstrap
 metadata:
-  name: example-nboperatorbootstrap
+  name: example-nboperatorbootstrap-withvault
   namespace: testa
 spec:
   parameters:
@@ -12,15 +12,17 @@ spec:
     groupNames:
       admin: techops-admin
       externalAccess: techops-users
-      networkResourceGroup: k8s-internal
+      networkResourceGroup: cc-internal
     serviceUserName: testserviceuser
     accessTokenExpiresInDays: 5
-    operatorKubeapiGroup: testgroup
     accessToken:
       destinationType: tenantVault
+      localSecretName: "test-secret"
+      vaultSecretPath: "test/path"
+    pushSecret:
+      esoPushSecret: true
   providerConfigsRef:
-    netbirdProviderConfigName: "netbird-provider-config"
     ccK8sProviderName: "cc-kubernetes-provider"
-    vaultProviderName: "vault-provider"
+    netbirdProviderConfigName: "netbird-provider-config"
   managementPolicies:
     - "*"

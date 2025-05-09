@@ -42,10 +42,6 @@ _zitadel_project_id_secret = {
     }
 }
 
-zitadel_project_id = base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or ""] or "bm9uZQo=")
-admin_group_name = "{}:{}".format(zitadel_project_id, parameters.groupNames.admin)
-external_access_group_name = "{}:{}".format(zitadel_project_id, parameters.groupNames.externalAccess)
-
 _external_access_group = {
     apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
     kind = "NbGroup"
@@ -53,12 +49,12 @@ _external_access_group = {
         name = "{}-external-access-group".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "external-access-group"
-            "crossplane.io/external-name": external_access_group_name
+            "crossplane.io/external-name":           "{}:{}".format(base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or "unknown"]), parameters.groupNames.externalAccess)
         }
     }
     spec = {
         forProvider = {
-            name = external_access_group_name
+            name =           "{}:{}".format(base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or "unknown"]), parameters.groupNames.externalAccess)
         }
         providerConfigRef = {
             name = spec?.providerConfigsRef?.netbirdProviderConfigName
@@ -111,7 +107,7 @@ _service_user = {
 }
 ### Access Token
 # NB Service User Access Token
-if parameters.accessToken.destinationType == "local":
+if parameters.accessToken.destinationType == "local" or parameters.accessToken.destinationType == "tenantVault":
     _access_token_secret_name = parameters.accessToken.localSecretName
     _access_token_secret_namespace = parameters.accessToken.localSecretNamespace or oxr.metadata.namespace or "crossplane-system"
 else:
@@ -142,6 +138,62 @@ _access_token = {
         managementPolicies = spec?.managementPolicies
     }
 }
+
+if parameters.accessToken.destinationType == "tenantVault":
+  _push_secret_access_token = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+      name = "{}-push-secret-access-token".format(oxr.metadata.name)
+      annotations = {
+        "krm.kcl.dev/composition-resource-name": "push-secret-access-token"
+      }
+    }
+    spec = {
+      forProvider = {
+        manifest = {
+          apiVersion = "external-secrets.io/v1alpha1"
+          kind = "PushSecret"
+          metadata = {
+            name = ocds["access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.name or ""
+            namespace = ocds["access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.namespace or ""
+          }
+          spec = {
+            updatePolicy = parameters.pushSecret.esoUpdatePolicy
+            deletionPolicy = parameters.pushSecret.esoDeletePolicy
+            refreshInterval = parameters.pushSecret.esoRefreshInterval
+            secretStoreRefs = [
+              {
+                name = parameters.pushSecret.vaultSecretStore
+                kind = parameters.pushSecret.vaultSecretStoreKind
+              }
+            ]
+            selector = {
+              secret = {
+                name = ocds["access-token"]?.Resource?.spec?.writeConnectionSecretToRef?.name or ""
+              }
+            }
+            data = [
+              {
+                match = {
+                  secretKey = "NB_API_KEY"
+                  remoteRef = {
+                    remoteKey = parameters.accessToken.vaultSecretPath
+                    property = "value"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+      managementPolicies = spec.managementPolicies
+      providerConfigRef = {
+        name = spec.providerConfigsRef.ccK8sProviderName
+      }
+    }
+  }
+
 # Access Token Secret Copy
 if parameters.accessToken.destinationType == "sc":
     # Netbird Namespace
@@ -387,7 +439,7 @@ _internal_network_policy = {
         forProvider = {
             name = "{}-internal-network-policy".format(oxr.metadata.name)
             enabled = True
-            description = "Policy for connecting to kubeapi for {}".format(oxr.metadata.name)
+            description = "Policy for connecting to internal network for {}".format(oxr.metadata.name)
             rules = [
                 {
                     action = "accept"
@@ -429,6 +481,9 @@ if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
     ]
     if parameters.accessToken.destinationType == "sc":
         _items += [_sc_netbird_namespace, _sc_access_token_secret_copy, _sc_nb_operator_kyverno_policy, _sc_nb_op_secret_update_kyverno_policy]
+    if parameters.accessToken.destinationType == "tenantVault":
+        _items += [_push_secret_access_token]
+
 
 if readyBasedOnConditions(ocds["external-access-group"]) and readyBasedOnConditions(ocds["network-resource-group"]):
     _items += [

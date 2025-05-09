@@ -74,16 +74,9 @@ _sc_argocd_operator_app_install = {
                     }
                   }
                   netbirdAPI = {
-                    keyFromSecret = "nb-operator-api-key"
-                  }
-                  operator = {
-                    podSecurityContext = {
-                      sysctls = [
-                        {
-                          name = "net.ipv4.ip_forward"
-                          value = "1"
-                        }
-                      ]
+                    keyFromSecret = {
+                      name = "nb-operator-api-key"
+                      key = "NB_API_KEY"
                     }
                   }
                   managementURL = parameters.nbManagmentURI

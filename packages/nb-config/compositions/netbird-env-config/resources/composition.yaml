@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: postconfig
+  name: netbirdenvconfig
   labels:
-    crossplane.io/xrd: xpostconfig.nb.mojaloop.io
+    crossplane.io/xrd: xnetbirdenvconfig.nb.mojaloop.io
 spec:
   compositeTypeRef:
     apiVersion: nb.mojaloop.io/v1alpha1
-    kind: XPostConfig
+    kind: XNetbirdEnvConfig
   mode: Pipeline
   pipeline:
     - step: kcl
