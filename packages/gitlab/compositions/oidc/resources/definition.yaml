@@ -1,0 +1,98 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xgitlaboidc.gitlab.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: gitlab.mojaloop.io
+  names:
+    kind: XGitlabOIDC
+    plural: xgitlaboidc
+  claimNames:
+    kind: GitlabOIDC
+    plural: gitlaboidc
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the source and destination k8s providers.
+                required:
+                  - zitadelProviderName
+                  - kubernetesProviderName
+                properties:
+                  zitadelProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the zitadel provider.
+                  kubernetesProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the kubernetes provider.
+              parameters:
+                type: object
+                required:
+                  - gitlabFqdn
+                  - zitadelFqdn
+                  - gitlabNamespace
+                  - zitadelAdminHumanUserId
+                properties:
+                  gitlabFqdn:
+                    type: string
+                    description: |-
+                      FQDN for Gitlab
+                  zitadelFqdn:
+                    type: string
+                    description: |-
+                      FQDN for Zitadel
+                  adminRbacGroup:
+                    type: string
+                    description: |-
+                      RBAC group in IDM for admin access via OIDC
+                    default: "gitlab_administrators"
+                  userRbacGroup:
+                    type: string
+                    description: |-
+                      RBAC group in IDM for user access via OIDC
+                    default: "gitlab_users"
+                  gitlabNamespace:
+                    type: string
+                    description: |-
+                      Namespace where Gitlab is installed
+                  oidcSecretName:
+                    type: string
+                    description: |-
+                      Name of OIDC secret for clientid/secret
+                    default: "gitlab-oidc-secret"
+                  zitadelAdminHumanUserId:
+                    type: string
+                    description: |-
+                      Admin Zitadel human user ID
