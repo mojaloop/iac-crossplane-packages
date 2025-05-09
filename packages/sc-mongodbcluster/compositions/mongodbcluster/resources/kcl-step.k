@@ -178,6 +178,10 @@ _MongodbCluster = {
                 }
             }
         }
+        readiness = {
+            policy = "DeriveFromCelQuery"
+            celQuery = '"status" in object && "conditions" in object.status && object.status.conditions.exists(c, c.type == "ready" && c.status == "True" )'
+        }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
             name = spec.providerConfigsRef.scK8sProviderName
@@ -211,7 +215,7 @@ _Secret = {
     }
 }
 
-_ip = ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host if ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host else ""
+_ip = [ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host] if ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host else []
 
 _DnsRecord = {
     apiVersion = "utils.aws.mojaloop.io/v1alpha1"
@@ -229,7 +233,7 @@ _DnsRecord = {
             region = parameters?.dns?.region
             ttl =  parameters?.dns?.ttl
             type =  parameters?.dns?.type
-            records = [_ip]
+            records = _ip
             zoneId = parameters?.dns?.zoneId
         }
         providerConfigsRef = {
