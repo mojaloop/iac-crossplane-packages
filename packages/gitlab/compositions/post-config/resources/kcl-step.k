@@ -322,6 +322,7 @@ _groupTenancy = {
             path = p?.tenancyGroupName
             description = p?.tenancyGroupName
             requireTwoFactorAuthentication = True
+            visibility = "internal"
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
