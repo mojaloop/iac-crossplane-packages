@@ -271,7 +271,7 @@ _nameserver = {
 _items += [
   _zitadel_project_id_secret,
 ]
-if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
+if readyBasedOnConditions(ocds["zitadel-project-id-secret"]) and len(base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or "unknown"])) == 18:
     _items += [
       _account,
     ]
