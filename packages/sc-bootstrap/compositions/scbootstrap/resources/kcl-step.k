@@ -22,12 +22,13 @@ _calicoHelmChart = {
     spec = {
         forProvider = {
             chart = {
-                name = "calico"
-                repository = "https://raw.githubusercontent.com/projectcalico/calico/v3.30.1/charts/tigera-operator"
+                name = "projectcalico/tigera-operator"
+                repository = "https://docs.tigera.io/calico/charts"
                 version = parameters?.calico?.chartVersion
             }
-            namespace = "calico"
+
             wait = True
+            namespace = "tigera-operator"
         }
         managementPolicies = ["Create", "Observe"]
         providerConfigRef = {
