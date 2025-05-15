@@ -27,6 +27,7 @@ _calicoHelmChart = {
                 version = parameters?.calico?.chartVersion
             }
             namespace = "calico"
+            wait = True
         }
         managementPolicies = ["Create", "Observe"]
         providerConfigRef = {
@@ -53,6 +54,7 @@ _argocdHelmChart = {
                 version = parameters?.argocd?.chartVersion
             }
             namespace = "argocd"
+            wait = True
             values = {
                 fullnameOverride = "argocd"
                 configs = {
@@ -167,7 +169,6 @@ _argocdHelmChart = {
                     ]
                 }
             }
-            wait = True
         }
         managementPolicies = ["Create", "Observe"]
         providerConfigRef = {
@@ -242,6 +243,7 @@ _Application = {
 }
 
 _items += [
+    _calicoHelmChart
     _argocdHelmChart
     _Application
 ]

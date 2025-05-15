@@ -5,6 +5,8 @@ metadata:
   namespace: namespace
 spec:
   parameters:
+    calico:
+      chartVersion: 3.30.0
     argocd:
       chartVersion: 7.6.12
       application:

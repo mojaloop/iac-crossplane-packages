@@ -62,6 +62,16 @@ spec:
               parameters:
                 type: object
                 properties:
+                  calico:
+                    type: object
+                    description: |-
+                      The Calico Helm Chart to deploy.
+                    properties:
+                      chartVersion:
+                        type: string
+                        default: "3.30.0"
+                        description: |-
+                          The version of the Calico Helm Chart to deploy.
                   argocd:
                     type: object
                     description: |-
