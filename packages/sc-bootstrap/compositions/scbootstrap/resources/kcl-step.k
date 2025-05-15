@@ -22,7 +22,7 @@ _calicoHelmChart = {
     spec = {
         forProvider = {
             chart = {
-                name = "projectcalico/tigera-operator"
+                name = "tigera-operator"
                 repository = "https://docs.tigera.io/calico/charts"
                 version = parameters?.calico?.chartVersion
             }
