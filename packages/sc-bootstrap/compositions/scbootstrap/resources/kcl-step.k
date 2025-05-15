@@ -28,6 +28,10 @@ _calicoHelmChart = {
             }
             namespace = "calico"
         }
+        managementPolicies = ["Create", "Observe"]
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.scHelmProviderName
+        }
     }
 }
 
