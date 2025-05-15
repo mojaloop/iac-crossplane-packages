@@ -41,7 +41,7 @@ _argocdHelmChart = {
     apiVersion = "helm.crossplane.io/v1beta1"
     kind = "Release"
     metadata = {
-        name = "{}-argocd".format(oxr.metadata.name)
+        name = "argocd-release"
         annotations = {
             "krm.kcl.dev/composition-resource-name": "argocd-helm-chart"
         }
