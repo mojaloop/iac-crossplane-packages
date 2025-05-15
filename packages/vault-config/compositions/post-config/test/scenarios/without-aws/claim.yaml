@@ -1,0 +1,19 @@
+apiVersion: vault.mojaloop.io/v1alpha1
+kind: XVaultPostConfig
+metadata:
+  name: example-postconfig-claim
+spec:
+  parameters:
+    kvPath: "secret"
+    k8sAdminAuthPath: "kubernetes/admin"
+    k8sAdminRoleName: "vault-admin"
+    adminPolicyName: "vault-admin"
+    readKvSecretsPolicyName: "read-all-kv-secrets"
+    credentialsSecretRef:
+      name: "vault-secret"
+      namespace: "vault"
+  providerConfigsRef:
+    vaultProviderName: vault-provider
+    kubernetesProviderName: kubernetes-provider
+  managementPolicies:
+    - "*"

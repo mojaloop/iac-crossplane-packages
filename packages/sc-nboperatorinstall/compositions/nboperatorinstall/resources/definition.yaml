@@ -1,0 +1,78 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xnboperatorinstall.sc.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: sc.mojaloop.io
+  names:
+    kind: XNBOperatorInstall
+    plural: xnboperatorinstall
+  claimNames:
+    kind: NBOperatorInstall
+    plural: xnboperatorinstalls
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                managementPolicies:
+                  default:
+                    - "*"
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  items:
+                    description: |-
+                      A ManagementAction represents an action that the Crossplane controllers
+                      can take on an external resource.
+                    enum:
+                      - Observe
+                      - Create
+                      - Update
+                      - Delete
+                      - LateInitialize
+                      - "*"
+                    type: string
+                  type: array
+                providerConfigsRef:
+                  type: object
+                  description: |-
+                    The name of the provider config to use for the source and destination k8s providers.
+                  required:
+                    - scK8sProviderName
+                  properties:
+                    scK8sProviderName:
+                      type: string
+                      description: |-
+                        The name of the provider config to use for the remote k8s provider.
+                parameters:
+                  type: object
+                  properties:
+                    nbManagmentURI:
+                      type: string
+                      description: The url for nb management server.
+                    operatorHelmVersion:
+                      type: string
+                      description: Version of nb operator helm chart to install on destination cluster.
+                    operatorNamespace:
+                      type: string
+                      description: Namespace for argo app and helm chart.
+                    operatorArgoAppName:
+                      type: string
+                      description: Name for argo app.
+                    operatorArgoAppSourceURL:
+                      type: string
+                      description: URL for argo app source.
+                    operatorArgoAppSourceRevision:
+                      type: string
+                      description: Revision for argo app source.
+                    operatorClusterName:
+                      type: string
+                      description: Cluster name for k8s operator.

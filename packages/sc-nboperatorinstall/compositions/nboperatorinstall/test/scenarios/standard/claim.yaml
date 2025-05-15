@@ -1,0 +1,18 @@
+apiVersion: sc.mojaloop.io/v1alpha1
+kind: XNBOperatorInstall
+metadata:
+  name: example-nboperatorinstall
+  namespace: testa
+spec:
+  parameters:
+    nbManagmentURI: https://netbird.test.com/
+    operatorHelmVersion: 0.1.7
+    operatorNamespace: netbird
+    operatorArgoAppName: nb-op
+    operatorArgoAppSourceURL: https://github.com/mojaloop/iac-modules/gitops/applications/base/netbird-operator
+    operatorArgoAppSourceRevision: "feat/np-op-install"
+    operatorClusterName: storage-cluster
+  providerConfigsRef:
+    scK8sProviderName: "sc-kubernetes-provider"
+  managementPolicies:
+    - "*"

@@ -1,0 +1,92 @@
+apiVersion: sc.mojaloop.io/v1alpha1
+kind: XMysqlCluster
+metadata:
+  name: mysqlpxc
+  namespace: env
+spec:
+  parameters:
+    clusterName: env
+    externalServiceName: my-cluster-service
+    appNamespace: env
+    crVersion: "1.16.0"
+    dbSecret: my-db-secret
+    dbUsername: my-user
+    dbName: my-database
+    pxc:
+      image: "percona/percona-xtradb-cluster:8.0.39-30.1" #example
+      imagePullPolicy: IfNotPresent
+      storageSize: "20Gi"
+      replicas: 3
+      resources:
+        requests:
+          memory: 2Gi
+          cpu: "1"
+        limit:
+          memory: 4Gi
+          cpu: "2"
+      configuration: |
+        [mysqld]
+        pxc_strict_mode=PERMISSIVE
+        default_authentication_plugin=mysql_native_password
+        max_allowed_packet=16M
+        bind-address="*"
+        character-set-server=UTF8
+        collation-server=utf8_general_ci
+        general_log=0
+        slow_query_log=0
+        long_query_time=10
+        innodb_use_native_aio=0
+        max_connections=2000
+        innodb_buffer_pool_size=2147483648
+        wsrep_auto_increment_control=OFF
+      tolerations: []
+      priorityClassName: ""
+    haproxy:
+      image: "percona/haproxy:2.8.11" #example
+      imagePullPolicy: IfNotPresent
+      expose:
+        type: LoadBalancer
+        annotations: {}
+        labels: {}
+      replicas: 2
+      resources:
+        requests:
+          memory: 1Gi
+          cpu: 500m
+        limit:
+          memory: 2Gi
+          cpu: "1"
+      tolerations: []
+      priorityClassName: ""
+    logcollector:
+      image: "perconalab/percona-xtradb-cluster-operator:main-logcollector" #example
+      imagePullPolicy: IfNotPresent
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 100m
+        limit:
+          memory: 500Mi
+          cpu: 200m
+    backup:
+      image: "percona/percona-xtradb-cluster-operator:1.16.0-logcollector-fluentbit3.2.2" # example
+      imagePullPolicy: IfNotPresent
+      verifyTLS: true
+      bucket: "s3-bucket-name"
+      credentialsSecret: "s3-credentials"
+      bucketRegion: "us-east-1"
+      scheduleName: "daily-backup"
+      cronScheduleExpression: "0 0 * * *"
+      backupRetention: 7
+    dns:
+      name: my-cluster-service
+      region: eu-west-1
+      ttl: 300
+      type: A
+      zoneId: Z0111719400KIQPJMA8G
+  providerConfigsRef:
+    scK8sProviderName: sc-kubernetes-provider
+    ccK8sProviderName: kubernetes-provider
+    awsProviderName: aws-cp-upbound-provider-config
+  managementPolicies:
+    - "*"

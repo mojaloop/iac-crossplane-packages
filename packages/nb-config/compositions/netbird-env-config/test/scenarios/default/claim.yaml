@@ -1,0 +1,25 @@
+apiVersion: nb.mojaloop.io/v1alpha1
+kind: XNetbirdEnvConfig
+metadata:
+  name: example-env-config
+  namespace: testa
+spec:
+  parameters:
+    pushSecret:
+      esoPushSecret: true
+    envProperties:
+      setupKey:
+        name: "setup-key-name"
+        namespace: "setup-key-namespace"
+        vaultSecretPath: "exampleenv/setupkey"
+      groupNames:
+        ccNetworkResource: cc-net
+        scNetworkResource: sc-net
+        envK8sNodes: env-test-nodes
+    managedService:
+      enabled: false
+  providerConfigsRef:
+    netbirdProviderConfigName: "netbird-provider-config"
+    k8sProviderConfigName: "kubernetes-provider"
+  managementPolicies:
+    - "*"

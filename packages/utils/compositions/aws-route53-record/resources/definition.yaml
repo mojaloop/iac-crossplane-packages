@@ -1,0 +1,85 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xawsroute53record.utils.aws.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: utils.aws.mojaloop.io
+  names:
+    kind: XAWSRoute53Record
+    plural: xawsroute53record
+  claimNames:
+    kind: AWSRoute53Record
+    plural: awsroute53record
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                properties:
+                  awsProviderConfigName:
+                    type: string
+                    description: AWS Provider Config Name
+              parameters:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the record
+                  region:
+                    type: string
+                    description: AWS Region where the external service object is created
+                  ttl:
+                    type: integer
+                    description: TTL for the external service object created
+                  type:
+                    type: string
+                    description: Type of the external service object created
+                  records:
+                    type: array
+                    items:
+                      type: string
+                    description: List of records for the external service object created
+                  zoneId:
+                    type: string
+                    description: Zone ID for the external service object created
+                required:
+                  - name
+                  - region
+                  - ttl
+                  - type
+                  - records
+                  - zoneId
+          status:
+            type: object
+            properties:
+              fqdn:
+                type: string
+                description: FQDN of the external service object created

@@ -3,6 +3,199 @@ kind: Object
 metadata:
   labels:
     scbootstrap.sc.mojaloop.io/argocd-pods-collection: name
+  name: pod-1
+status:
+  atProvider:
+    manifest:
+      status:
+        conditions:
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:37Z"
+          status: "True"
+          type: PodReadyToStartContainers
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: Initialized
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: Ready
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: ContainersReady
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: PodScheduled
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  labels:
+    scbootstrap.sc.mojaloop.io/argocd-pods-collection: name
+  name: pod-2
+status:
+  atProvider:
+    manifest:
+      status:
+        conditions:
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:37Z"
+          status: "True"
+          type: PodReadyToStartContainers
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: Initialized
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: Ready
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: ContainersReady
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: PodScheduled
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  labels:
+    scbootstrap.sc.mojaloop.io/argocd-pods-collection: name
+  name: pod-3
+status:
+  atProvider:
+    manifest:
+      status:
+        conditions:
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:37Z"
+          status: "True"
+          type: PodReadyToStartContainers
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: Initialized
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: Ready
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: ContainersReady
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: PodScheduled
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  labels:
+    scbootstrap.sc.mojaloop.io/argocd-pods-collection: name
+  name: pod-4
+status:
+  atProvider:
+    manifest:
+      status:
+        conditions:
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:37Z"
+          status: "True"
+          type: PodReadyToStartContainers
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: Initialized
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: Ready
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: ContainersReady
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: PodScheduled
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  labels:
+    scbootstrap.sc.mojaloop.io/argocd-pods-collection: name
+  name: pod-5
+status:
+  atProvider:
+    manifest:
+      status:
+        conditions:
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:37Z"
+          status: "True"
+          type: PodReadyToStartContainers
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: Initialized
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: Ready
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: ContainersReady
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: PodScheduled
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  labels:
+    scbootstrap.sc.mojaloop.io/argocd-pods-collection: name
+  name: pod-6
+status:
+  atProvider:
+    manifest:
+      status:
+        conditions:
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:37Z"
+          status: "True"
+          type: PodReadyToStartContainers
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: Initialized
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: Ready
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:48Z"
+          status: "True"
+          type: ContainersReady
+        - lastProbeTime: null
+          lastTransitionTime: "2025-04-29T15:32:36Z"
+          status: "True"
+          type: PodScheduled
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  labels:
+    scbootstrap.sc.mojaloop.io/argocd-pods-collection: name
+  name: pod-7
 status:
   atProvider:
     manifest:

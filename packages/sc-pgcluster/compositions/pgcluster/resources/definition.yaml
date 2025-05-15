@@ -60,12 +60,6 @@ spec:
               parameters:
                 type: object
                 properties:
-                  consumerClusterType:
-                    type: string
-                    description: Type of consumer cluster
-                    enum:
-                      - controlcenter
-                      - environment
                   clusterName:
                     type: string
                     description: Name for the consumer cluster
@@ -75,31 +69,152 @@ spec:
                   appNamespace:
                     type: string
                     description: Namespace for the consumer application
-                  postgres:
+                  crVersion:
+                    type: string
+                    description: Type of object to be synced
+                    default: "2.5.0"
+                  pgVersion:
+                    type: number
+                    description: Type of object to be synced
+                    default: 16
+                  dbSecret:
+                    type: string
+                    description: Secret name to store the DB password
+                  dbUsername:
+                    type: string
+                    description: Name of the database user to be created
+                  dbName:
+                    type: string
+                    description: Name of the database to be created
+                  replicas:
+                    type: number
+                    description: Number of replicas for the DB instance
+                    default: 1
+                  storageSize:
+                    type: string
+                    description: Storage size for the DB PVC
+                    default: 10Gi
+                  image:
+                    type: string
+                    description: Percona PostgreSQL image to use for the cluster
+                  resources:
                     type: object
+                    description: CPU/Memory resource requests and limits
                     properties:
-                      crVersion:
+                      limits:
+                        type: object
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                      requests:
+                        type: object
+                        properties:
+                          cpu:
+                            type: string
+                          memory:
+                            type: string
+                  priorityClassName:
+                    type: string
+                    description: Priority class for scheduling pods
+                  tolerations:
+                    type: array
+                    description: Tolerations applied to DB and proxy pods
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        operator:
+                          type: string
+                        value:
+                          type: string
+                        effect:
+                          type: string
+                  backup:
+                    type: object
+                    description: Backup configuration
+                    properties:
+                      image:
                         type: string
-                        description: Type of object to be synced
-                        default: "2.5.0"
-                      pgVersion:
-                        type: number
-                        description: Type of object to be synced
-                        default: 16
-                      dbSecret:
+                        description: Image used for pgbackrest
+                      objectStoreEndpoint:
                         type: string
-                        description: Type of object to be synced
-                      dbUsername:
+                      bucket:
                         type: string
-                        description: Name of the database user to be created
-                      dbName:
+                      bucketRegion:
                         type: string
-                        description: Name of the database to be created
-                      replicas:
-                        type: number
-                        description: Type of object to be synced
-                        default: 1
-                      storageSize:
+                      fullBackupCronSchedule:
                         type: string
-                        description: Type of object to be synced
-                        default: 10Gi
+                      differentialBackupCronSchedule:
+                        type: string
+                  proxy:
+                    type: object
+                    description: Proxy configuration for PgBouncer
+                    properties:
+                      pgBouncer:
+                        type: object
+                        properties:
+                          image:
+                            type: string
+                          replicas:
+                            type: number
+                          exposeSuperusers:
+                            type: boolean
+                          globalConfig:
+                            type: object
+                            properties:
+                              pool_mode:
+                                type: string
+                              query_wait_timeout:
+                                type: string
+                              max_prepared_statements:
+                                type: string
+                          resources:
+                            type: object
+                            properties:
+                              limits:
+                                type: object
+                                properties:
+                                  cpu:
+                                    type: string
+                                  memory:
+                                    type: string
+                              request:
+                                type: object
+                                properties:
+                                  cpu:
+                                    type: string
+                                  memory:
+                                    type: string
+                          expose:
+                            type: object
+                            properties:
+                              type:
+                                type: string
+                              loadBalancerSourceRanges:
+                                type: array
+                                items:
+                                  type: string
+                              annotations:
+                                type: object
+                                additionalProperties:
+                                  type: string
+                              labels:
+                                type: object
+                                additionalProperties:
+                                  type: string
+                          tolerations:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                operator:
+                                  type: string
+                                value:
+                                  type: string
+                                effect:
+                                  type: string
