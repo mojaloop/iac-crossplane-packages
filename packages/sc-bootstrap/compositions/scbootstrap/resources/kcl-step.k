@@ -411,7 +411,7 @@ _argocdHelmChart = {
             chart = {
                 name = "argo-cd"
                 repository = "https://argoproj.github.io/argo-helm"
-                version = parameters?.argocd?.application?.chartVersion
+                version = parameters?.argocd?.chartVersion
             }
             namespace = "argocd"
             values = {
