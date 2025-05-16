@@ -6,12 +6,14 @@ metadata:
 spec:
   parameters:
     calico:
+      # Changing the chart version and values will not trigger a new deployment and it will not update the existing deployment.
       chartVersion: 3.30.0
       values:
         installation:
           enabled: true
           registry: mirror.gcr.io
     argocd:
+      # Changing the chart version will not trigger a new deployment and it will not update the existing deployment.
       chartVersion: 7.6.12
       application:
         source:

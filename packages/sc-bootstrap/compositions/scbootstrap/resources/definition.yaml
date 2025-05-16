@@ -65,7 +65,7 @@ spec:
                   calico:
                     type: object
                     description: |-
-                      The Calico Helm Chart to deploy.
+                      The Calico Helm Chart to deploy. Changing the parameters will not trigger a new deployment it will not update the existing deployment.
                     properties:
                       chartVersion:
                         type: string
@@ -84,7 +84,7 @@ spec:
                   argocd:
                     type: object
                     description: |-
-                      The ArgoCD application to deploy.
+                      The ArgoCD application to deploy. Changing the parameters of helm chart will not trigger a new deployment it will not update the existing deployment.
                     properties:
                       chartVersion:
                         type: string
