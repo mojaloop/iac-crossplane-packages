@@ -74,7 +74,7 @@ spec:
                           The version of the Calico Helm Chart to deploy.
                       values:
                         type: object
-                        x-kubernetes-map-type: granular
+                        x-kubernetes-preserve-unknown-fields: true
                         description: |-
                           The values to pass to the Calico Helm Chart.
                         default:
