@@ -29,13 +29,7 @@ _calicoHelmChart = {
 
             wait = True
             namespace = "tigera-operator"
-
-            values = {
-                installation = {
-                    enabled = "true"
-                    registry = "mirror.gcr.io"
-                }
-            }
+            values = parameters?.calico?.values
         }
         managementPolicies = ["Create", "Observe"]
         providerConfigRef = {

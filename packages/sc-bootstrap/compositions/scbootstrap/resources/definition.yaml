@@ -72,6 +72,15 @@ spec:
                         default: "3.30.0"
                         description: |-
                           The version of the Calico Helm Chart to deploy.
+                      values:
+                        type: object
+                        x-kubernetes-map-type: granular
+                        description: |-
+                          The values to pass to the Calico Helm Chart.
+                        default:
+                          installation:
+                            enabled: true
+                            registry: mirror.gcr.io
                   argocd:
                     type: object
                     description: |-

@@ -7,6 +7,10 @@ spec:
   parameters:
     calico:
       chartVersion: 3.30.0
+      values:
+        installation:
+          enabled: true
+          registry: mirror.gcr.io
     argocd:
       chartVersion: 7.6.12
       application:
