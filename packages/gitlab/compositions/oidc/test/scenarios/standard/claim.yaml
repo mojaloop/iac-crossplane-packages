@@ -1,0 +1,23 @@
+apiVersion: gitlab.mojaloop.io/v1alpha1
+kind: XGitlabOIDC
+metadata:
+  name: gitlab-oidc-claim
+spec:
+  parameters:
+    # Required parameters
+    gitlabFqdn: "gitlab.example.com"
+    zitadelFqdn: "zitadel.example.com"
+    gitlabNamespace: "gitlab"
+    zitadelAdminHumanUserId: "123456789"
+
+    # Optional parameters with defaults
+    adminRbacGroup: "gitlab_administrators"  # Default value
+    userRbacGroup: "gitlab_users"  # Default value
+    oidcSecretName: "gitlab-oidc-secret"  # Default value
+
+  providerConfigsRef:
+    zitadelProviderName: "zitadel-provider"
+    kubernetesProviderName: "kubernetes-provider"
+
+  managementPolicies:
+    - "*"

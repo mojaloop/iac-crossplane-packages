@@ -1,0 +1,65 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xzitadelproviderconfig.zitadel.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: zitadel.mojaloop.io
+  names:
+    kind: XZitadelProviderConfig
+    plural: xzitadelproviderconfig
+  claimNames:
+    kind: ZitadelProviderConfig
+    plural: zitadelproviderconfig
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the source and destination k8s providers.
+                required:
+                  - kubernetesProviderName
+                properties:
+                  kubernetesProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the kubernetes provider.
+              parameters:
+                type: object
+                properties:
+                  domain:
+                    type: string
+                    description: |-
+                      The domain of the zitadel instance.
+                  providerConfigName:
+                    type: string
+                    description: |-
+                      Name of the provider config to create
