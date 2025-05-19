@@ -8,7 +8,10 @@ spec:
     argocdFqdn: "argocd.example.com"
     zitadelFqdn: "zitadel.example.com"
     argocdNamespace: "argocd"
-    zitadelAdminHumanUserId: "123456789"
+    zitadelAdminHumanUserIdRef:
+      name: zitadel-admin-human-user-id
+      namespace: zitadel
+      key: zitadel_admin_human_user_id
 
     # Optional parameters with defaults
     adminRbacGroup: "argocd_administrators"  # Default value

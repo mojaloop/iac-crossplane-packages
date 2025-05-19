@@ -63,7 +63,7 @@ spec:
                   - argocdFqdn
                   - zitadelFqdn
                   - argocdNamespace
-                  - zitadelAdminHumanUserId
+                  - zitadelAdminHumanUserIdRef
                 properties:
                   argocdFqdn:
                     type: string
@@ -92,7 +92,24 @@ spec:
                     description: |-
                       Name of OIDC secret for clientid/secret
                     default: "argo-oidc-secret"
-                  zitadelAdminHumanUserId:
-                    type: string
+                  zitadelAdminHumanUserIdRef:
+                    type: object
                     description: |-
                       Admin Zitadel human user ID
+                    required:
+                      - name
+                      - namespace
+                    properties:
+                      name:
+                        type: string
+                        description: |-
+                          Name of the secret to observe
+                      namespace:
+                        type: string
+                        description: |-
+                          Namespace of the secret to observe
+                      key:
+                        type: string
+                        description: |-
+                          Key of the secret to observe
+                        default: "zitadel_admin_human_user_id"
