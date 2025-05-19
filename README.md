@@ -14,6 +14,9 @@ This project provides a collection of Crossplane composition packages designed t
 - [AWS DocDbCluster](packages/aws-docdbcluster/README.md) - AWS DocumentDB Cluster composition
 - [AWS S3 & Ceph Buckets](packages/objectstores) - Objectstore compositions for Ceph and AWS S3 Buckets Creation
 - [Vault Config](packages/vault-config/README.md) - Vault Config compositions
+- [Zitadel Config](packages/zitadel-config/README.md) - Zitadel Config compositions
+- [ArgoCD Config](packages/argocd-config/README.md) - ArgoCD Config compositions
+
 - Additional packages coming soon...
 
 ## Getting Started
