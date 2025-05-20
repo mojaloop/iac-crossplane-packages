@@ -173,6 +173,8 @@ _build_server_setup_key = {
     name = "{}-build-server-setup-key".format(oxr.metadata.name)
     annotations = {
       "krm.kcl.dev/composition-resource-name": "build-server-setup-key"
+      "crossplane.io/deletion-policy": "Delete"
+      "crossplane.io/depends-on": "external-access-group"
     }
   }
   spec = {

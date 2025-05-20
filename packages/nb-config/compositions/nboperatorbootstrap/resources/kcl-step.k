@@ -120,12 +120,14 @@ _access_token = {
         name = "{}-access-token".format(parameters.serviceUserName)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "access-token"
+            "crossplane.io/deletion-policy": "Delete"
+            "crossplane.io/depends-on": "service-user"
         }
     }
     spec = {
         forProvider = {
             name = "{}-access-token".format(parameters.serviceUserName)
-            user_name: ocds["service-user"]?.Resource?.status?.atProvider?.name or ""
+            user_id: ocds["service-user"]?.Resource?.status?.atProvider?.id or ""
             expires_in: parameters.accessTokenExpiresInDays
         }
         providerConfigRef = {
@@ -433,6 +435,8 @@ _internal_network_policy = {
         name = "{}-internal-network-policy".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "internal-network-policy"
+            "crossplane.io/deletion-policy": "Delete"
+            "crossplane.io/depends-on": "external-access-group,network-resource-group"
         }
     }
     spec = {
