@@ -206,7 +206,6 @@ _netbird_admin_user_update = [{
         name = "{}-admin-user".format(user.user_email.replace("@", "at"))
         annotations = {
             "krm.kcl.dev/composition-resource-name": "{}-admin-user".format(user.user_email.replace("@", "at"))
-            "crossplane.io/delete-protection": "true"
         }
     }
     spec = {
