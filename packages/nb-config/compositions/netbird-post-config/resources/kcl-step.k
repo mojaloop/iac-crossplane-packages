@@ -203,9 +203,9 @@ _netbird_admin_user_update = [{
     apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
     kind = "NbUser"
     metadata = {
-        name = "{}-admin-user".format(user.user_email)
+        name = "{}-admin-user".format(user.user_email.replace("@", "at"))
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "{}-admin-user".format(user.user_email)
+            "krm.kcl.dev/composition-resource-name": "{}-admin-user".format(user.user_email.replace("@", "at"))
             "crossplane.io/delete-protection": "true"
         }
     }
