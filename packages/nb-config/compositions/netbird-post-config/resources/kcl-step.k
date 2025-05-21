@@ -276,8 +276,7 @@ if readyBasedOnConditions(ocds["nb-account"]):
       _external_access_group,
       _build_server_setup_key,
       _nameserver,
-      _netbird_admin_user_update,
-    ]
+    ] + _netbird_admin_user_update
 
 dxr = {
   **oxr
