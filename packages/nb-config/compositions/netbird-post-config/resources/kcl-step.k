@@ -210,7 +210,7 @@ _netbird_admin_user_update = [{
     }
     spec = {
         forProvider = {
-            name = user.user_email
+            email = user.user_email
             is_service_user = False
             role = "admin"
         }
