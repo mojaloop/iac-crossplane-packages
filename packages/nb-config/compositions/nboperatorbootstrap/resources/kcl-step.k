@@ -231,6 +231,7 @@ if parameters.accessToken.destinationType == "sc":
             name = "{}-secret".format(oxr.metadata.name)
             annotations = {
                 "krm.kcl.dev/composition-resource-name": "sc-access-token-secret-copy"
+                "crossplane.io/depends-on": "access-token"
             }
         }
         spec = {
