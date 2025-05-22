@@ -120,7 +120,6 @@ _access_token = {
         name = "{}-access-token".format(parameters.serviceUserName)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "access-token"
-            "crossplane.io/depends-on": "service-user"
         }
     }
     spec = {
@@ -231,7 +230,6 @@ if parameters.accessToken.destinationType == "sc":
             name = "{}-secret".format(oxr.metadata.name)
             annotations = {
                 "krm.kcl.dev/composition-resource-name": "sc-access-token-secret-copy"
-                "crossplane.io/depends-on": "access-token"
             }
         }
         spec = {
@@ -435,7 +433,6 @@ _internal_network_policy = {
         name = "{}-internal-network-policy".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "internal-network-policy"
-            "crossplane.io/depends-on": "external-access-group,network-resource-group"
         }
     }
     spec = {
