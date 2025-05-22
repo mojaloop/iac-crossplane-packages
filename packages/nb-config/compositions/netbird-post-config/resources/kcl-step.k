@@ -217,7 +217,12 @@ _netbird_admin_user_update = [{
         providerConfigRef = {
             name = spec?.providerConfigsRef?.netbirdProviderConfigName
         }
-        managementPolicies = spec?.managementPolicies
+        managementPolicies = [
+          "Observe",
+          "Update",
+          "Create",
+          "LateInitialize"
+        ]
     }
 } for user in ocds["nb-account"]?.Resource?.status?.atProvider?.user_list or [] if "{}:{}".format(base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or "unknown"]), parameters.groupNames.admin) in (user.user_groups or [])]
 
