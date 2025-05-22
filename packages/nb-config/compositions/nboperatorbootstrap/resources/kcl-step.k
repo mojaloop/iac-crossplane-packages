@@ -120,7 +120,6 @@ _access_token = {
         name = "{}-access-token".format(parameters.serviceUserName)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "access-token"
-            "crossplane.io/deletion-policy": "Delete"
             "crossplane.io/depends-on": "service-user"
         }
     }
@@ -435,7 +434,6 @@ _internal_network_policy = {
         name = "{}-internal-network-policy".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "internal-network-policy"
-            "crossplane.io/deletion-policy": "Delete"
             "crossplane.io/depends-on": "external-access-group,network-resource-group"
         }
     }

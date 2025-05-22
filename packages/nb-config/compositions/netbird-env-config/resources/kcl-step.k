@@ -83,7 +83,6 @@ _env_k8s_nodes_setup_key = {
     name = "{}-env-k8s-nodes-setup-key".format(oxr.metadata.name)
     annotations = {
       "krm.kcl.dev/composition-resource-name": "env-k8s-nodes-setup-key"
-      "crossplane.io/deletion-policy": "Delete"
       "crossplane.io/depends-on": "env-k8s-nodes-group"
     }
   }
@@ -172,7 +171,6 @@ _env_k8s_nodes_network_policy = {
         name = "{}-env-k8s-nodes-network-policy".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "env-k8s-nodes-network-policy"
-            "crossplane.io/deletion-policy": "Delete"
             "crossplane.io/depends-on": "env-k8s-nodes-group"
         }
     }
@@ -239,7 +237,6 @@ if parameters.managedService.enabled:
       name = "{}-env-managed-svc-setup-key".format(oxr.metadata.name)
       annotations = {
         "krm.kcl.dev/composition-resource-name": "env-managed-svc-setup-key"
-        "crossplane.io/deletion-policy": "Delete"
         "crossplane.io/depends-on": "env-managed-svc-group"
       }
     }
@@ -326,7 +323,6 @@ if parameters.managedService.enabled:
         name = "{}-env-managed-svc-cc-internal-network-policy".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "env-managed-svc-internal-network-policy"
-            "crossplane.io/deletion-policy": "Delete"
             "crossplane.io/depends-on": "env-managed-svc-group"
         }
     }
