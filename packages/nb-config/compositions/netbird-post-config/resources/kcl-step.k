@@ -197,37 +197,32 @@ _build_server_setup_key = {
   }
 }
 
-
-# _build_server_setup_key_secret = {
-#   apiVersion = "kubernetes.crossplane.io/v1alpha2"
-#     kind = "Object"
-#     metadata = {
-#         name = "{}-build-server-setup-key-secret".format(oxr.metadata.name)
-#         annotations = {
-#             "krm.kcl.dev/composition-resource-name": "build-server-setup-key-secret"
-#         }
-#     }
-#     spec = {
-#         forProvider = {
-#             manifest = {
-#                 apiVersion = "v1"
-#                 kind = "Secret"
-#                 metadata = {
-#                     name = parameters.setupKey.name
-#                     namespace = parameters.setupKey.namespace
-#                 }
-#                 data = {
-#                   parameters?.setupKey?.buildSetupKeySecretKey = ocds["build-server-setup-key"]?.Resource?.status?.atProvider?.key or ""
-#                 }
-#                 type = "Opaque"
-#             }
-#         }
-#         managementPolicies = spec?.managementPolicies
-#         providerConfigRef = {
-#           name = spec?.providerConfigsRef?.k8sProviderConfigName
-#         }
-#     }
-# }
+_netbird_admin_user_update = [{
+    apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+    kind = "NbUser"
+    metadata = {
+        name = "{}-admin-user".format(user.user_email.replace("@", "at"))
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "{}-admin-user".format(user.user_email.replace("@", "at"))
+        }
+    }
+    spec = {
+        forProvider = {
+            email = user.user_email
+            is_service_user = False
+            role = "admin"
+        }
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.netbirdProviderConfigName
+        }
+        managementPolicies = [
+          "Observe",
+          "Update",
+          "Create",
+          "LateInitialize"
+        ]
+    }
+} for user in ocds["nb-account"]?.Resource?.status?.atProvider?.user_list or [] if "{}:{}".format(base64.decode(ocds["zitadel-project-id-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters?.zitadelProjectIdSecret?.key or "unknown"]), parameters.groupNames.admin) in (user.user_groups or []) and user.role != "owner"]
 
 
 _nameserver = {
@@ -283,7 +278,7 @@ if readyBasedOnConditions(ocds["nb-account"]):
       _external_access_group,
       _build_server_setup_key,
       _nameserver,
-    ]
+    ] + _netbird_admin_user_update
 
 dxr = {
   **oxr

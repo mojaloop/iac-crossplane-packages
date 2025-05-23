@@ -59,6 +59,7 @@ _sourceObject = {
         }
     }
     spec = {
+        watch = True
         forProvider = {
             manifest = _sourceObjectManifest
         }

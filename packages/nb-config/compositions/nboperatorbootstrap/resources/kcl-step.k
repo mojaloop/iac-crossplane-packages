@@ -125,7 +125,7 @@ _access_token = {
     spec = {
         forProvider = {
             name = "{}-access-token".format(parameters.serviceUserName)
-            user_name: ocds["service-user"]?.Resource?.status?.atProvider?.name or ""
+            user_id: ocds["service-user"]?.Resource?.status?.atProvider?.id or ""
             expires_in: parameters.accessTokenExpiresInDays
         }
         providerConfigRef = {
