@@ -109,6 +109,34 @@ _env_k8s_nodes_setup_key = {
   }
 }
 
+_usage_env_k8s_nodes_setup_key = {
+    apiVersion = "apiextensions.crossplane.io/v1alpha1"
+    kind = "Usage"
+    metadata = {
+      name = "{}-env-k8s-nodes-setup-key-usage".format(oxr.metadata.name)
+      annotations = {
+        "krm.kcl.dev/composition-resource-name": "env-k8s-nodes-setup-key-usage"
+      }
+  }
+    spec: {
+        replayDeletion = True
+        by = {
+            apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+            kind = "NbSetupKey"
+            resourceRef = {
+              name = "{}-env-k8s-nodes-setup-key".format(oxr.metadata.name)
+            }
+        }
+        of = {
+            apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+            kind = "NbGroup"
+            resourceRef = {
+              name = "{}-env-k8s-nodes-group".format(oxr.metadata.name)
+            }
+        }
+    }
+}
+
 _push_secret_env_k8s_nodes_setup_key = {
   apiVersion = "kubernetes.crossplane.io/v1alpha2"
   kind = "Object"
@@ -207,6 +235,33 @@ _env_k8s_nodes_network_policy = {
         managementPolicies = spec.managementPolicies
     }
 }
+_usage_env_k8s_nodes_network_policy = {
+    apiVersion = "apiextensions.crossplane.io/v1alpha1"
+    kind = "Usage"
+    metadata = {
+      name = "{}-env-k8s-nodes-network-policy-usage".format(oxr.metadata.name)
+      annotations = {
+        "krm.kcl.dev/composition-resource-name": "env-k8s-nodes-network-policy-usage"
+      }
+  }
+    spec: {
+        replayDeletion = True
+        by = {
+            apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+            kind = "NbPolicy"
+            resourceRef = {
+              name = "{}-env-k8s-nodes-network-policy".format(oxr.metadata.name)
+            }
+        }
+        of = {
+            apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+            kind = "NbGroup"
+            resourceRef = {
+              name = "{}-env-k8s-nodes-group".format(oxr.metadata.name)
+            }
+        }
+    }
+}
 
 if parameters.managedService.enabled:
   _env_managed_svc_group = {
@@ -258,6 +313,33 @@ if parameters.managedService.enabled:
         namespace = parameters.managedService.setupKey.namespace
       }
       managementPolicies = spec.managementPolicies
+    }
+  }
+  _usage_env_managed_svc_setup_key = {
+    apiVersion = "apiextensions.crossplane.io/v1alpha1"
+    kind = "Usage"
+    metadata = {
+      name = "{}-env-managed-svc-setup-key-usage".format(oxr.metadata.name)
+      annotations = {
+        "krm.kcl.dev/composition-resource-name": "env-managed-svc-setup-key-usage"
+      }
+  }
+    spec: {
+        replayDeletion = True
+        by = {
+            apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+            kind = "NbSetupKey"
+            resourceRef = {
+              name = "{}-env-managed-svc-setup-key".format(oxr.metadata.name)
+            }
+        }
+        of = {
+            apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+            kind = "NbGroup"
+            resourceRef = {
+              name = "{}-env-managed-svc-group".format(oxr.metadata.name)
+            }
+        }
     }
   }
   _push_secret_env_managed_svc_setup_key = {
@@ -357,6 +439,33 @@ if parameters.managedService.enabled:
         managementPolicies = spec.managementPolicies
     }
   }
+  _usage_env_managed_svc_network_policy = {
+    apiVersion = "apiextensions.crossplane.io/v1alpha1"
+    kind = "Usage"
+    metadata = {
+      name = "{}-env-managed-svc-cc-internal-network-policy-usage".format(oxr.metadata.name)
+      annotations = {
+        "krm.kcl.dev/composition-resource-name": "env-managed-svc-cc-internal-network-policy-usage"
+      }
+    }
+    spec: {
+      replayDeletion = True
+      by = {
+        apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+        kind = "NbPolicy"
+        resourceRef = {
+          name = "{}-env-managed-svc-cc-internal-network-policy".format(oxr.metadata.name)
+        }
+      }
+      of = {
+        apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+        kind = "NbGroup"
+        resourceRef = {
+          name = "{}-env-managed-svc-group".format(oxr.metadata.name)
+        }
+      }
+    }
+  }
 
 
 # Add the resources to the items list
@@ -369,6 +478,8 @@ if readyBasedOnConditions(ocds["cc-network-resource-group"]) and readyBasedOnCon
     _items += [
       _env_k8s_nodes_setup_key,
       _env_k8s_nodes_network_policy,
+      _usage_env_k8s_nodes_setup_key,
+      _usage_env_k8s_nodes_network_policy,
     ]
     if parameters.pushSecret.esoPushSecret:
       _items += [
@@ -384,6 +495,9 @@ if parameters?.managedService?.enabled and readyBasedOnConditions(ocds["env-mana
       _env_managed_svc_setup_key,
       _push_secret_env_managed_svc_setup_key,
       _env_managed_svc_network_policy,
+      _usage_env_managed_svc_setup_key,
+      _usage_env_managed_svc_network_policy,
+
     ]
     if parameters.pushSecret.esoPushSecret:
       _items += [
