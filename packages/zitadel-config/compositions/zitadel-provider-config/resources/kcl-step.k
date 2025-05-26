@@ -105,6 +105,7 @@ _zitadelProviderConfig = {
                         secretRef = {
                             name = "zitadel-provider-config"
                             namespace = spec.claimRef?.namespace or "zitadel"
+                            key = "credentials"
                         }
                     }
                 }
