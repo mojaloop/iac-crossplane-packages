@@ -96,7 +96,7 @@ _zitadelProviderConfig = {
                 apiVersion = "zitadel.crossplane.io/v1beta1"
                 kind = "ProviderConfig"
                 metadata = {
-                    name = "zitadel-provider-config"
+                    name = "zitadel-provider"
                 }
                 spec = {
                     name = parameters.providerConfigName
