@@ -344,7 +344,7 @@ _projDocs = {
             project = {
                 name = "tenancy-docs"
                 groupId = ocds[p?.tenancyGroupName]?.Resource?.status?.atProvider?.id
-                visibility = "Internal"
+                visibility = "internal"
             }
         }
         managementPolicies = spec.managementPolicies
