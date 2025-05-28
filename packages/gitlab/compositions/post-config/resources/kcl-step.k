@@ -321,6 +321,7 @@ _groupTenancy = {
             name = p?.tenancyGroupName
             path = p?.tenancyGroupName
             description = p?.tenancyGroupName
+            visibility = "internal"
             requireTwoFactorAuthentication = True
         }
         managementPolicies = spec.managementPolicies
