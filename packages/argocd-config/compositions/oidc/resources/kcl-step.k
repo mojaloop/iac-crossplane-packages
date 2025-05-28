@@ -8,26 +8,35 @@ parameters = spec.parameters
 _items = []
 
 # Get the default organization ID
-_orgs = {
-    apiVersion = "zitadel.zitadel.crossplane.io/v1alpha1"
-    kind = "Org"
+# Observe Zitadel admin sa secret
+_observe_org_id_secret = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
     metadata = {
-        name = "{}-orgs".format(oxr.metadata.name)
+        name = "{}-zitadel-org-id-secret-observe".format(oxr.metadata.name)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "zitadel-orgs",
-            "crossplane.io/external-name": "ZITADEL"
+            "krm.kcl.dev/composition-resource-name": "zitadel-org-id-secret-observe"
         }
     }
     spec = {
         forProvider = {
-            name = "ZITADEL"
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = parameters.organizationIdSecretRef?.name
+                    namespace = parameters.organizationIdSecretRef?.namespace
+                }
+            }
         }
-        managementPolicies = spec.managementPolicies
+        managementPolicies = ["Observe"]
         providerConfigRef = {
-            name = spec.providerConfigsRef.zitadelProviderName
+            name = spec.providerConfigsRef.kubernetesProviderName
         }
     }
 }
+
+_orgId = ocds["zitadel-org-id-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?[parameters.organizationIdSecretRef?.key] or ""
 
 # Create Zitadel Project
 _project = {
@@ -45,7 +54,7 @@ _project = {
             projectRoleAssertion = True
             projectRoleCheck = True
             hasProjectCheck = True
-            orgId = ocds["zitadel-orgs"]?.Resource?.status?.atProvider?.id
+            orgId = _orgId
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
@@ -68,7 +77,7 @@ _oidcApp = {
         forProvider = {
             name = "argocd"
             projectId = ocds["zitadel-project"]?.Resource?.status?.atProvider?.id
-            orgId = ocds["zitadel-orgs"]?.Resource?.status?.atProvider?.id
+            orgId = _orgId
             redirectUris = ["https://{}/auth/callback".format(parameters.argocdFqdn)]
             responseTypes = ["OIDC_RESPONSE_TYPE_CODE"]
             grantTypes = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
@@ -103,7 +112,7 @@ _adminRole = {
     spec = {
         forProvider = {
             projectId = ocds["zitadel-project"]?.Resource?.status?.atProvider?.id
-            orgId = ocds["zitadel-orgs"]?.Resource?.status?.atProvider?.id
+            orgId = _orgId
             roleKey = parameters.adminRbacGroup
             displayName = "ArgoCd Admins"
         }
@@ -126,7 +135,7 @@ _userRole = {
     spec = {
         forProvider = {
             projectId = ocds["zitadel-project"]?.Resource?.status?.atProvider?.id
-            orgId = ocds["zitadel-orgs"]?.Resource?.status?.atProvider?.id
+            orgId = _orgId
             roleKey = parameters.userRbacGroup
             displayName = "ArgoCd Users"
         }
@@ -180,7 +189,7 @@ _userGrant = {
     spec = {
         forProvider = {
             projectId = ocds["zitadel-project"]?.Resource?.status?.atProvider?.id
-            orgId = ocds["zitadel-orgs"]?.Resource?.status?.atProvider?.id
+            orgId = _orgId
             roleKeys = [parameters.adminRbacGroup]
             userId = _zitadelAdminHumanUserId
         }
@@ -305,7 +314,7 @@ logoutURL: https://${parameters.zitadelFqdn}/oidc/v1/end_session"""
 }
 
 # Add all objects to _items in one line
-_items = [_orgs, _project, _oidcApp, _adminRole, _userRole, _userGrant, _oidcSecret, _rbacConfigMap, _oidcConfigMap, _zitadelAdminHumanUserIdObserveSecret]
+_items = [_observe_org_id_secret, _project, _oidcApp, _adminRole, _userRole, _userGrant, _oidcSecret, _rbacConfigMap, _oidcConfigMap, _zitadelAdminHumanUserIdObserveSecret]
 
 dxr = {
     **oxr

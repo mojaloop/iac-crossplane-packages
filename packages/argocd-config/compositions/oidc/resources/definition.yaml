@@ -113,3 +113,27 @@ spec:
                         description: |-
                           Key of the secret to observe
                         default: "zitadel_admin_human_user_id"
+                  organizationIdSecretRef:
+                    type: object
+                    description: |-
+                      Organization ID secret
+                    default:
+                      name: "zitadel-post-config-init-output"
+                      namespace: "zitadel"
+                      key: "zitadel_org_id"
+                    properties:
+                      name:
+                        type: string
+                        description: |-
+                          Name of the secret to observe
+                        default: "zitadel-post-config-init-output"
+                      namespace:
+                        type: string
+                        description: |-
+                          Namespace of the secret to observe
+                        default: "zitadel"
+                      key:
+                        type: string
+                        description: |-
+                          Key of the secret to observe
+                        default: "zitadel_org_id"

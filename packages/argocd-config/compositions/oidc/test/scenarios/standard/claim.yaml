@@ -18,6 +18,11 @@ spec:
     userRbacGroup: "argocd_users"  # Default value
     oidcSecretName: "argo-oidc-secret"  # Default value
 
+    organizationIdSecretRef:
+      name: zitadel-org-id
+      namespace: zitadel
+      key: zitadel_org_id
+
   providerConfigsRef:
     zitadelProviderName: "zitadel-provider"
     kubernetesProviderName: "kubernetes-provider"
