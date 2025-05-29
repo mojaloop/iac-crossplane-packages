@@ -176,7 +176,7 @@ _zitadelAdminHumanUserIdObserveSecret = {
     }
 }
 
-_zitadelAdminHumanUserId = ocds["zitadel-ahuid-observe-secret"]?.Resource?.status?.atProvider?.manifest?.data[parameters.zitadelAdminHumanUserIdRef.key] if ocds["zitadel-ahuid-observe-secret"]?.Resource?.status?.atProvider?.manifest?.data else ""
+_zitadelAdminHumanUserId = base64.decode(ocds["zitadel-ahuid-observe-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters.zitadelAdminHumanUserIdRef.key]) or ""
 
 # Create User Grant
 _userGrant = {

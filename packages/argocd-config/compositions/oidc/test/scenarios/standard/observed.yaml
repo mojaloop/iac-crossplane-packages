@@ -58,5 +58,5 @@ status:
       apiVersion: v1
       kind: Secret
       data:
-        zitadel_admin_human_user_id: "123456789"
+        zitadel_admin_human_user_id: "MTIzNDU2Nzg5MA=="
 ---
