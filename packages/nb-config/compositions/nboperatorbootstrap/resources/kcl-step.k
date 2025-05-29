@@ -383,7 +383,7 @@ if parameters.accessToken.destinationType == "sc":
                                             template = {
                                                 metadata = {
                                                     annotations = {
-                                                        "kyverno.platform.eon.com/triggerrestart": "{{request.object.metadata.resourceVersion}}"
+                                                        "kyverno.platform.mojaloop.com/triggerrestart": "{{request.object.metadata.resourceVersion}}"
                                                     }
                                                 }
                                             }

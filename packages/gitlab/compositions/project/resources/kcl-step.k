@@ -26,7 +26,7 @@ _namespaceIdSelector = Undefined
 if p?.project?.groupName:
     _namespaceIdSelector = {
         matchLabels = {
-            "gitlab.atlantis.eon.com/group-name" = p?.project?.groupName
+            "gitlab.mojaloop.com/group-name" = p?.project?.groupName
         }
     }
 
