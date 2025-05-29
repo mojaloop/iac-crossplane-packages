@@ -256,7 +256,7 @@ _oidcSecret = {
                     namespace = parameters.argocdNamespace
                     labels = {
                         "app.kubernetes.io/part-of" = "argocd"
-                        "reloader" = "enabled"
+                        "argocd.mojaloop.com/oidc-secret" = "true"
                     }
                 }
                 data = {
