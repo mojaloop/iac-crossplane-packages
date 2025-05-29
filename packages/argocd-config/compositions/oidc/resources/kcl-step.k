@@ -132,8 +132,8 @@ _oidcAppConnObserve = {
     }
 }
 
-_oidcAppClientId = base64.decode(ocds["zitadel-oidc-app-conn-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"]) or ""
-_oidcAppClientSecret = base64.decode(ocds["zitadel-oidc-app-conn-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_secret"]) or ""
+_oidcAppClientId = ocds["zitadel-oidc-app-conn-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"] or ""
+_oidcAppClientSecret = ocds["zitadel-oidc-app-conn-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_secret"] or ""
 
 # Create Project Roles
 _adminRole = {
