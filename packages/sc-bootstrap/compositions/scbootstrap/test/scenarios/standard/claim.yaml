@@ -6,7 +6,7 @@ metadata:
 spec:
   parameters:
     argocd:
-      chartVersion: 1.0.0
+      chartVersion: 7.6.12
       application:
         source:
           repoURL: https://github.com/mojaloop/iac-modules.git

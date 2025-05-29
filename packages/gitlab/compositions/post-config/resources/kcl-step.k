@@ -321,6 +321,7 @@ _groupTenancy = {
             name = p?.tenancyGroupName
             path = p?.tenancyGroupName
             description = p?.tenancyGroupName
+            visibility = "internal"
             requireTwoFactorAuthentication = True
         }
         managementPolicies = spec.managementPolicies
@@ -344,6 +345,7 @@ _projDocs = {
             project = {
                 name = "tenancy-docs"
                 groupId = ocds[p?.tenancyGroupName]?.Resource?.status?.atProvider?.id
+                visibility = "internal"
             }
         }
         managementPolicies = spec.managementPolicies

@@ -6,25 +6,6 @@ extra = option("params")?.ctx["apiextensions.crossplane.io/extra-resources"]
 spec = oxr.spec
 parameters = spec.parameters
 
-# Method to check if the resource is ready
-ready = lambda o: any, statusPath = "atProvider" -> bool {
-    status = o?.Resource?.status
-    objstatus = status?.conditions or []
-    len(objstatus) > 0 and all_true([c.status == "True" for c in objstatus]) and status and statusPath in status
-}
-
-# Method to check if the argocd pods are ready
-argocdPodsReady = lambda pods: [any] -> bool {
-    pods and len(pods) >= 7 and all_true([
-        all_true([
-            c.status == "True"
-            for c in (pod?.status?.atProvider?.manifest?.status?.conditions or [])
-            if c.type in ["Ready", "ContainersReady"]
-        ])
-        for pod in pods
-    ])
-}
-
 # Initialize the items list
 _items = []
 ## Adding resources
@@ -411,7 +392,7 @@ _argocdHelmChart = {
             chart = {
                 name = "argo-cd"
                 repository = "https://argoproj.github.io/argo-helm"
-                version = parameters?.argocd?.application?.chartVersion
+                version = parameters?.argocd?.chartVersion
             }
             namespace = "argocd"
             values = {
@@ -528,44 +509,11 @@ _argocdHelmChart = {
                     ]
                 }
             }
+            wait = True
         }
         managementPolicies = ["Create", "Observe"]
         providerConfigRef = {
             name = spec?.providerConfigsRef?.scHelmProviderName
-        }
-    }
-}
-
-# ArgoCD Pods ObservedObjectCollection
-_argocdPodsCollection = {
-    apiVersion = "kubernetes.crossplane.io/v1alpha1"
-    kind = "ObservedObjectCollection"
-    metadata = {
-        name = "{}-argocd-pods".format(oxr.metadata.name)
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "argocd-pods-collection"
-        }
-    }
-    spec = {
-        objectTemplate = {
-            metadata = {
-                labels = {
-                    "scbootstrap.sc.mojaloop.io/argocd-pods-collection" = oxr.metadata.name
-                }
-            }
-        }
-        observeObjects = {
-            apiVersion = "v1"
-            kind = "Pod"
-            namespace = "argocd"
-            selector = {
-                matchLabels = {
-                    "app.kubernetes.io/part-of" = "argocd"
-                }
-            }
-        }
-        providerConfigRef = {
-            name = spec?.providerConfigsRef?.scK8sProviderName
         }
     }
 }
@@ -643,12 +591,8 @@ _items += [
     _roleBinding
     _daemonSet
     _argocdHelmChart
-    _argocdPodsCollection
-
+    _Application
 ]
-
-if argocdPodsReady(extra?.argocdpods):
-    _items += [_Application]
 
 dxr = {
     **oxr
