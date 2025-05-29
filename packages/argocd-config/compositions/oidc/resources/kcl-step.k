@@ -1,3 +1,5 @@
+import base64
+
 # Read the XR and the OCDs
 oxr = option("params").oxr
 ocds = option("params").ocds
@@ -36,7 +38,7 @@ _observe_org_id_secret = {
     }
 }
 
-_orgId = ocds["zitadel-org-id-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?[parameters.organizationIdSecretRef?.key] or ""
+_orgId = base64.decode(ocds["zitadel-org-id-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?[parameters.organizationIdSecretRef?.key]) or ""
 
 # Create Zitadel Project
 _project = {

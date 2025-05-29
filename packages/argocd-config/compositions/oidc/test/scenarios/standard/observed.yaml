@@ -8,7 +8,7 @@ status:
     manifest:
       apiVersion: v1
       data:
-        zitadel_org_id: "191738205156974598"
+        zitadel_org_id: "MTkxNzM4MjA1MTU2OTc0NTk4"
 ---
 apiVersion: zitadel.zitadel.crossplane.io/v1alpha1
 kind: Project
