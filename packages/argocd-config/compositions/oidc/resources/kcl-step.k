@@ -99,11 +99,41 @@ _oidcApp = {
             name = spec.providerConfigsRef.zitadelProviderName
         }
         writeConnectionSecretToRef = {
-            name = "{}-oidc-secret".format(oxr.metadata.name)
+            name = "{}-oidc-app-conn".format(oxr.metadata.name)
             namespace = parameters.argocdNamespace
         }
     }
 }
+
+_oidcAppConnObserve = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-oidc-app-conn-observe".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "zitadel-oidc-app-conn-observe"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = "{}-oidc-app-conn".format(oxr.metadata.name)
+                    namespace = parameters.argocdNamespace
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
+    }
+}
+
+_oidcAppClientId = base64.decode(ocds["zitadel-oidc-app-conn-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"]) or ""
+_oidcAppClientSecret = base64.decode(ocds["zitadel-oidc-app-conn-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_secret"]) or ""
 
 # Create Project Roles
 _adminRole = {
@@ -206,6 +236,43 @@ _userGrant = {
     }
 }
 
+# Create Kubernetes Secret
+_oidcSecret = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-oidc-secret".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "argo-oidc-secret"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = "{}-oidc-secret".format(oxr.metadata.name)
+                    namespace = parameters.argocdNamespace
+                    labels = {
+                        "app.kubernetes.io/part-of" = "argocd"
+                        "reloader" = "enabled"
+                    }
+                }
+                data = {
+                    oidc_client_id = _oidcAppClientId
+                    oidc_client_secret = _oidcAppClientSecret
+                }
+                type = "Opaque"
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
+    }
+}
+
 # Create RBAC ConfigMap
 _rbacConfigMap = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -264,8 +331,8 @@ _oidcConfigMap = {
                 data = {
                     "oidc.config" = """name: Zitadel
 issuer: https://${parameters.zitadelFqdn}
-clientID: $${oxr.metadata.name}-oidc-secret:attribute.client_id
-clientSecret: $${oxr.metadata.name}-oidc-secret:attribute.client_secret
+clientID: $${oxr.metadata.name}-oidc-secret:oidc_client_id
+clientSecret: $${oxr.metadata.name}-oidc-secret:oidc_client_secret
 requestedScopes:
   - openid
   - profile
@@ -283,7 +350,7 @@ logoutURL: https://${parameters.zitadelFqdn}/oidc/v1/end_session"""
 }
 
 # Add all objects to _items in one line
-_items = [_observe_org_id_secret, _project, _oidcApp, _adminRole, _userRole, _userGrant, _rbacConfigMap, _oidcConfigMap, _zitadelAdminHumanUserIdObserveSecret]
+_items = [_observe_org_id_secret, _project, _oidcApp, _oidcAppConnObserve, _adminRole, _userRole, _userGrant, _oidcSecret, _rbacConfigMap, _oidcConfigMap, _zitadelAdminHumanUserIdObserveSecret]
 
 dxr = {
     **oxr

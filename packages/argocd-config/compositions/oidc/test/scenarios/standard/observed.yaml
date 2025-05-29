@@ -10,6 +10,20 @@ status:
       data:
         zitadel_org_id: "MTkxNzM4MjA1MTU2OTc0NTk4"
 ---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: zitadel-oidc-app-conn-observe
+status:
+  atProvider:
+    manifest:
+      apiVersion: v1
+      kind: Secret
+      data:
+        attribute.client_id: "MTkxNzM4MjA1MTU2OTc0NTk4"
+        attribute.client_secret: "MTkxNzM4MjA1MTU2OTc0NTk4"
+---
 apiVersion: zitadel.zitadel.crossplane.io/v1alpha1
 kind: Project
 metadata:
