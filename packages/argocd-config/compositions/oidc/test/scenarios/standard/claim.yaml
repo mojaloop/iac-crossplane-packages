@@ -16,7 +16,6 @@ spec:
     # Optional parameters with defaults
     adminRbacGroup: "argocd_administrators"  # Default value
     userRbacGroup: "argocd_users"  # Default value
-    oidcSecretName: "argo-oidc-secret"  # Default value
 
     organizationIdSecretRef:
       name: zitadel-org-id

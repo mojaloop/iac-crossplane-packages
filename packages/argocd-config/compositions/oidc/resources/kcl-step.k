@@ -98,6 +98,10 @@ _oidcApp = {
         providerConfigRef = {
             name = spec.providerConfigsRef.zitadelProviderName
         }
+        writeConnectionSecretToRef = {
+            name = "{}-oidc-secret".format(oxr.metadata.name)
+            namespace = parameters.argocdNamespace
+        }
     }
 }
 
@@ -202,43 +206,6 @@ _userGrant = {
     }
 }
 
-# Create Kubernetes Secret
-_oidcSecret = {
-    apiVersion = "kubernetes.crossplane.io/v1alpha2"
-    kind = "Object"
-    metadata = {
-        name = "{}-oidc-secret".format(oxr.metadata.name)
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "argo-oidc-secret"
-        }
-    }
-    spec = {
-        forProvider = {
-            manifest = {
-                apiVersion = "v1"
-                kind = "Secret"
-                metadata = {
-                    name = parameters.oidcSecretName
-                    namespace = parameters.argocdNamespace
-                    labels = {
-                        "app.kubernetes.io/part-of" = "argocd"
-                        "reloader" = "enabled"
-                    }
-                }
-                data = {
-                    oidc_client_id = ocds["zitadel-oidc-app"]?.Resource?.status?.atProvider?.clientId
-                    oidc_client_secret = ocds["zitadel-oidc-app"]?.Resource?.status?.atProvider?.clientSecret
-                }
-                type = "Opaque"
-            }
-        }
-        managementPolicies = spec.managementPolicies
-        providerConfigRef = {
-            name = spec.providerConfigsRef.kubernetesProviderName
-        }
-    }
-}
-
 # Create RBAC ConfigMap
 _rbacConfigMap = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -297,8 +264,8 @@ _oidcConfigMap = {
                 data = {
                     "oidc.config" = """name: Zitadel
 issuer: https://${parameters.zitadelFqdn}
-clientID: $${parameters.oidcSecretName}:oidc_client_id
-clientSecret: $${parameters.oidcSecretName}:oidc_client_secret
+clientID: $${oxr.metadata.name}-oidc-secret:attribute.client_id
+clientSecret: $${oxr.metadata.name}-oidc-secret:attribute.client_secret
 requestedScopes:
   - openid
   - profile
@@ -316,7 +283,7 @@ logoutURL: https://${parameters.zitadelFqdn}/oidc/v1/end_session"""
 }
 
 # Add all objects to _items in one line
-_items = [_observe_org_id_secret, _project, _oidcApp, _adminRole, _userRole, _userGrant, _oidcSecret, _rbacConfigMap, _oidcConfigMap, _zitadelAdminHumanUserIdObserveSecret]
+_items = [_observe_org_id_secret, _project, _oidcApp, _adminRole, _userRole, _userGrant, _rbacConfigMap, _oidcConfigMap, _zitadelAdminHumanUserIdObserveSecret]
 
 dxr = {
     **oxr

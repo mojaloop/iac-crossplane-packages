@@ -87,11 +87,6 @@ spec:
                     type: string
                     description: |-
                       Namespace where ArgoCD is installed
-                  oidcSecretName:
-                    type: string
-                    description: |-
-                      Name of OIDC secret for clientid/secret
-                    default: "argo-oidc-secret"
                   zitadelAdminHumanUserIdRef:
                     type: object
                     description: |-
