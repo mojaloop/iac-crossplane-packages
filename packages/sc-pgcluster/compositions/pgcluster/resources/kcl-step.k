@@ -174,9 +174,58 @@ _PGCluster = {
     }
 }
 
+_LBService = {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-lb-svc".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "percona-db-lb-svc"
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "v1"
+                    kind = "Service"
+                    metadata = {
+                        name = "{}-db".format(oxr.metadata.name)
+                        namespace = parameters.clusterName
+                    }
+                    spec = {
+                        allocateLoadBalancerNodePorts = True
+                        externalTrafficPolicy = "Cluster"
+                        internalTrafficPolicy = "Cluster"
+                        ipFamilies = [
+                            "IPv4"
+                        ]
+                        ipFamilyPolicy = "SingleStack"
+                        ports = [
+                            {
+                                name = "pgbouncer"
+                                port = 5432
+                                protocol = "TCP"
+                                targetPort = "pgbouncer"
+                            }
+                        ]
+                        selector = {
+                            "postgres-operator.crunchydata.com/cluster" = "{}-db".format(oxr.metadata.name)
+                            "postgres-operator.crunchydata.com/role" = "pgbouncer"
+                        }
+                        sessionAffinity = "None"
+                        type = "LoadBalancer"
+                    }
+                }
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.scK8sProviderName
+            }
+        }
+}
 
+_ip = ocds["percona-db-lb-svc"]?.Resource?.status?.atProvider?.manifest?.status?.loadBalancer?.ingress[0]?.ip if ocds["percona-db-lb-svc"]?.Resource?.status?.atProvider?.manifest?.status?.loadBalancer?.ingress else ""
 
-_ip = ocds["percona-sql-db"]?.Resource?.status?.atProvider?.manifest?.status?.host if ocds["percona-sql-db"]?.Resource?.status?.atProvider?.manifest?.status?.host else ""
 _HeadlessService = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
@@ -281,7 +330,7 @@ _Secret = {
     }
 }
 
-_items += [_PGCluster, _Secret, _HeadlessService, _Endpoint]
+_items += [_PGCluster, _Secret, _HeadlessService, _Endpoint, _LBService]
 dxr = {
     **oxr
 }
