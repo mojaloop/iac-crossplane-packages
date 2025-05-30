@@ -276,7 +276,7 @@ _oidcSecret = {
                     namespace = parameters.gitlabNamespace
                     labels = {
                         "app.kubernetes.io/part-of" = "gitlab"
-                        "argocd.mojaloop.com/oidc-secret" = "true"
+                        "gitlab.mojaloop.com/oidc-secret" = "true"
                     }
                 }
                 type = "Opaque"
