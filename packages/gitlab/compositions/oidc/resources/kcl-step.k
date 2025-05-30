@@ -202,6 +202,36 @@ _techopsUserRole = {
     }
 }
 
+# Observe Zitadel Human User ID Secret
+_zitadelAdminHumanUserIdObserveSecret = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-zitadel-ahuid-observe-secret".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "zitadel-ahuid-observe-secret"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = parameters.zitadelAdminHumanUserIdRef.name
+                    namespace = parameters.zitadelAdminHumanUserIdRef.namespace
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
+    }
+}
+
+_zitadelAdminHumanUserId = base64.decode(ocds["zitadel-ahuid-observe-secret"]?.Resource?.status?.atProvider?.manifest?.data?[parameters.zitadelAdminHumanUserIdRef.key]) or ""
+
 # Create User Grant
 _userGrant = {
     apiVersion = "user.zitadel.crossplane.io/v1alpha1"
@@ -217,7 +247,7 @@ _userGrant = {
             projectId = ocds["zitadel-project"]?.Resource?.status?.atProvider?.id
             orgId = _orgId
             roleKeys = [ocds["zitadel-techops-admin-role"]?.Resource?.status?.atProvider?.roleKey or ""]
-            userId = parameters.zitadelAdminHumanUserId
+            userId = _zitadelAdminHumanUserId
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
@@ -288,7 +318,7 @@ args:
 }
 
 # Add all objects to _items in one line
-_items = [_observe_org_id_secret, _project, _oidcAppConnObserve, _oidcApp, _techopsAdminRole, _techopsMaintainerRole, _techopsUserRole, _userGrant, _oidcSecret]
+_items = [_observe_org_id_secret, _project, _zitadelAdminHumanUserIdObserveSecret, _oidcAppConnObserve, _oidcApp, _techopsAdminRole, _techopsMaintainerRole, _techopsUserRole, _userGrant, _oidcSecret]
 
 dxr = {
     **oxr

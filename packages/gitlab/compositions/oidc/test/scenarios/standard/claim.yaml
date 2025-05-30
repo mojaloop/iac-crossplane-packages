@@ -8,7 +8,10 @@ spec:
     gitlabFqdn: "gitlab.example.com"
     zitadelFqdn: "zitadel.example.com"
     gitlabNamespace: "gitlab"
-    zitadelAdminHumanUserId: "123456789"
+    zitadelAdminHumanUserIdRef:
+      name: "zitadel-ahuid-observe-secret"
+      namespace: "zitadel"
+      key: "zitadel_admin_human_user_id"
 
     # Optional parameters with defaults
     adminRbacGroup: "gitlab_administrators"  # Default value

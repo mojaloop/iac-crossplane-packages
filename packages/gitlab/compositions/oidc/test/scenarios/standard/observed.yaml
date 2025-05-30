@@ -69,3 +69,16 @@ metadata:
 status:
   atProvider:
     roleKey: "gitlab_users"
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: zitadel-ahuid-observe-secret
+status:
+  atProvider:
+    manifest:
+      apiVersion: v1
+      kind: Secret
+      data:
+        zitadel_admin_human_user_id: "MTIzNDU2Nzg5MA=="
