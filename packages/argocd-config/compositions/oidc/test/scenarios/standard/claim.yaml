@@ -1,0 +1,30 @@
+apiVersion: argocd.mojaloop.io/v1alpha1
+kind: XArgocdOIDC
+metadata:
+  name: argocd-oidc-claim
+spec:
+  parameters:
+    # Required parameters
+    argocdFqdn: "argocd.example.com"
+    zitadelFqdn: "zitadel.example.com"
+    argocdNamespace: "argocd"
+    zitadelAdminHumanUserIdRef:
+      name: zitadel-admin-human-user-id
+      namespace: zitadel
+      key: zitadel_admin_human_user_id
+
+    # Optional parameters with defaults
+    adminRbacGroup: "argocd_administrators"  # Default value
+    userRbacGroup: "argocd_users"  # Default value
+
+    organizationIdSecretRef:
+      name: zitadel-org-id
+      namespace: zitadel
+      key: zitadel_org_id
+
+  providerConfigsRef:
+    zitadelProviderName: "zitadel-provider"
+    kubernetesProviderName: "kubernetes-provider"
+
+  managementPolicies:
+    - "*"
