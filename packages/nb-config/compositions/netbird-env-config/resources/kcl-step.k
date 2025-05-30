@@ -92,7 +92,7 @@ _env_k8s_nodes_setup_key = {
       auto_groups = [
         ocds["env-k8s-nodes-group"]?.Resource?.status?.atProvider?.id or ""
       ]
-      ephemeral = True
+      ephemeral = False
       usage_limit = 0
       expires_in = 7776000
       allow_extra_dns_labels = False
@@ -244,7 +244,7 @@ if parameters.managedService.enabled:
         auto_groups = [
           ocds["env-managed-svc-group"]?.Resource?.status?.atProvider?.id or ""
         ]
-        ephemeral = True
+        ephemeral = False
         usage_limit = 0
         expires_in = 7776000
         allow_extra_dns_labels = False
