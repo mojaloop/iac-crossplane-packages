@@ -1,12 +1,28 @@
----
-apiVersion: zitadel.zitadel.crossplane.io/v1alpha1
-kind: Org
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
 metadata:
   annotations:
-    crossplane.io/composition-resource-name: zitadel-orgs
+    crossplane.io/composition-resource-name: zitadel-org-id-secret-observe
 status:
   atProvider:
-    id: "191738205156974598"
+    manifest:
+      apiVersion: v1
+      data:
+        zitadel_org_id: "MTkxNzM4MjA1MTU2OTc0NTk4"
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: zitadel-oidc-app-conn-observe
+status:
+  atProvider:
+    manifest:
+      apiVersion: v1
+      kind: Secret
+      data:
+        attribute.client_id: "MTkxNzM4MjA1MTU2OTc0NTk4"
+        attribute.client_secret: "MTkxNzM4MjA1MTU2OTc0NTk4"
 ---
 apiVersion: zitadel.zitadel.crossplane.io/v1alpha1
 kind: Project
@@ -31,7 +47,7 @@ apiVersion: project.zitadel.crossplane.io/v1alpha1
 kind: Role
 metadata:
   annotations:
-    crossplane.io/composition-resource-name: zitadel-admin-role
+    crossplane.io/composition-resource-name: zitadel-techops-admin-role
 status:
   atProvider:
     roleKey: "gitlab_administrators"
@@ -40,7 +56,16 @@ apiVersion: project.zitadel.crossplane.io/v1alpha1
 kind: Role
 metadata:
   annotations:
-    crossplane.io/composition-resource-name: zitadel-user-role
+    crossplane.io/composition-resource-name: zitadel-techops-maintainer-role
+status:
+  atProvider:
+    roleKey: "gitlab_maintainers"
+---
+apiVersion: project.zitadel.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: zitadel-techops-user-role
 status:
   atProvider:
     roleKey: "gitlab_users"

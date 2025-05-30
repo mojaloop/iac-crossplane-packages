@@ -1,3 +1,5 @@
+import base64
+
 # Read the XR and the OCDs
 oxr = option("params").oxr
 ocds = option("params").ocds
@@ -8,26 +10,35 @@ parameters = spec.parameters
 _items = []
 
 # Get the default organization ID
-_orgs = {
-    apiVersion = "zitadel.zitadel.crossplane.io/v1alpha1"
-    kind = "Org"
+# Observe Zitadel admin sa secret
+_observe_org_id_secret = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
     metadata = {
-        name = "{}-orgs".format(oxr.metadata.name)
+        name = "{}-zitadel-org-id-secret-observe".format(oxr.metadata.name)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "zitadel-orgs",
-            "crossplane.io/external-name": "ZITADEL"
+            "krm.kcl.dev/composition-resource-name": "zitadel-org-id-secret-observe"
         }
     }
     spec = {
         forProvider = {
-            name = "ZITADEL"
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = parameters.organizationIdSecretRef?.name
+                    namespace = parameters.organizationIdSecretRef?.namespace
+                }
+            }
         }
-        managementPolicies = spec.managementPolicies
+        managementPolicies = ["Observe"]
         providerConfigRef = {
-            name = spec.providerConfigsRef.zitadelProviderName
+            name = spec.providerConfigsRef.kubernetesProviderName
         }
     }
 }
+
+_orgId = base64.decode(ocds["zitadel-org-id-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?[parameters.organizationIdSecretRef?.key]) or ""
 
 # Create Zitadel Project
 _project = {
@@ -45,7 +56,7 @@ _project = {
             projectRoleAssertion = True
             projectRoleCheck = True
             hasProjectCheck = True
-            orgId = ocds["zitadel-orgs"]?.Resource?.status?.atProvider?.id
+            orgId = _orgId
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
@@ -68,8 +79,8 @@ _oidcApp = {
         forProvider = {
             name = "gitlab"
             projectId = ocds["zitadel-project"]?.Resource?.status?.atProvider?.id
-            orgId = ocds["zitadel-orgs"]?.Resource?.status?.atProvider?.id
-            redirectUris = ["https://{}/auth/callback".format(parameters.gitlabFqdn)]
+            orgId = _orgId
+            redirectUris = ["https://{}/users/auth/openid_connect/callback".format(parameters.gitlabFqdn)]
             responseTypes = ["OIDC_RESPONSE_TYPE_CODE"]
             grantTypes = ["OIDC_GRANT_TYPE_AUTHORIZATION_CODE"]
             postLogoutRedirectUris = ["https://{}".format(parameters.gitlabFqdn)]
@@ -90,22 +101,53 @@ _oidcApp = {
     }
 }
 
+_oidcAppConnObserve = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-oidc-app-conn-observe".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "zitadel-oidc-app-conn-observe"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = "{}-oidc-app-conn".format(oxr.metadata.name)
+                    namespace = parameters.gitlabNamespace
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
+    }
+}
+
+_oidcAppClientId = ocds["zitadel-oidc-app-conn-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"] or ""
+_oidcAppClientSecret = ocds["zitadel-oidc-app-conn-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_secret"] or ""
+
+
 # Create Project Roles
-_adminRole = {
+_techopsAdminRole = {
     apiVersion = "project.zitadel.crossplane.io/v1alpha1"
     kind = "Role"
     metadata = {
-        name = "{}-admin-role".format(oxr.metadata.name)
+        name = "{}-techops-admin-role".format(oxr.metadata.name)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "zitadel-admin-role"
+            "krm.kcl.dev/composition-resource-name": "zitadel-techops-admin-role"
         }
     }
     spec = {
         forProvider = {
             projectId = ocds["zitadel-project"]?.Resource?.status?.atProvider?.id
-            orgId = ocds["zitadel-orgs"]?.Resource?.status?.atProvider?.id
+            orgId = _orgId
             roleKey = parameters.adminRbacGroup
-            displayName = "Gitlab Admins"
+            displayName = "Techops Admins"
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
@@ -114,21 +156,44 @@ _adminRole = {
     }
 }
 
-_userRole = {
+_techopsMaintainerRole = {
     apiVersion = "project.zitadel.crossplane.io/v1alpha1"
     kind = "Role"
     metadata = {
-        name = "{}-user-role".format(oxr.metadata.name)
+        name = "{}-techops-maintainer-role".format(oxr.metadata.name)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "zitadel-user-role"
+            "krm.kcl.dev/composition-resource-name": "zitadel-techops-maintainer-role"
         }
     }
     spec = {
         forProvider = {
             projectId = ocds["zitadel-project"]?.Resource?.status?.atProvider?.id
-            orgId = ocds["zitadel-orgs"]?.Resource?.status?.atProvider?.id
+            orgId = _orgId
+            roleKey = parameters.maintainerRbacGroup
+            displayName = "Techops IaC Maintainers"
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.zitadelProviderName
+        }
+    }
+}
+
+_techopsUserRole = {
+    apiVersion = "project.zitadel.crossplane.io/v1alpha1"
+    kind = "Role"
+    metadata = {
+        name = "{}-techops-user-role".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "zitadel-techops-user-role"
+        }
+    }
+    spec = {
+        forProvider = {
+            projectId = ocds["zitadel-project"]?.Resource?.status?.atProvider?.id
+            orgId = _orgId
             roleKey = parameters.userRbacGroup
-            displayName = "Gitlab Users"
+            displayName = "Techops Users"
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
@@ -150,8 +215,8 @@ _userGrant = {
     spec = {
         forProvider = {
             projectId = ocds["zitadel-project"]?.Resource?.status?.atProvider?.id
-            orgId = ocds["zitadel-orgs"]?.Resource?.status?.atProvider?.id
-            roleKeys = [parameters.adminRbacGroup]
+            orgId = _orgId
+            roleKeys = [ocds["zitadel-techops-admin-role"]?.Resource?.status?.atProvider?.roleKey or ""]
             userId = parameters.zitadelAdminHumanUserId
         }
         managementPolicies = spec.managementPolicies
@@ -181,89 +246,37 @@ _oidcSecret = {
                     namespace = parameters.gitlabNamespace
                     labels = {
                         "app.kubernetes.io/part-of" = "gitlab"
-                        "reloader" = "enabled"
+                        "argocd.mojaloop.com/oidc-secret" = "true"
                     }
                 }
-                data = {
-                    oidc_client_id = ocds["zitadel-oidc-app"]?.Resource?.status?.atProvider?.clientId
-                    oidc_client_secret = ocds["zitadel-oidc-app"]?.Resource?.status?.atProvider?.clientSecret
-                }
                 type = "Opaque"
-            }
-        }
-        managementPolicies = spec.managementPolicies
-        providerConfigRef = {
-            name = spec.providerConfigsRef.kubernetesProviderName
-        }
-    }
-}
-
-# Create RBAC ConfigMap
-_rbacConfigMap = {
-    apiVersion = "kubernetes.crossplane.io/v1alpha2"
-    kind = "Object"
-    metadata = {
-        name = "{}-rbac-cm".format(oxr.metadata.name)
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "gitlab-rbac-cm"
-        }
-    }
-    spec = {
-        forProvider = {
-            manifest = {
-                apiVersion = "v1"
-                kind = "ConfigMap"
-                metadata = {
-                    name = "gitlab-rbac-cm"
-                    namespace = parameters.gitlabNamespace
-                }
                 data = {
-                    "policy.csv" = "g, {}:{}, role:admin\ng, {}:{}, role:readonly".format(
-                        ocds["zitadel-project"]?.Resource?.status?.atProvider?.id,
-                        parameters.adminRbacGroup,
-                        ocds["zitadel-project"]?.Resource?.status?.atProvider?.id,
-                        parameters.userRbacGroup
-                    )
-                }
-            }
-        }
-        managementPolicies = spec.managementPolicies
-        providerConfigRef = {
-            name = spec.providerConfigsRef.kubernetesProviderName
-        }
-    }
-}
-
-# Create OIDC ConfigMap
-_oidcConfigMap = {
-    apiVersion = "kubernetes.crossplane.io/v1alpha2"
-    kind = "Object"
-    metadata = {
-        name = "{}-oidc-cm".format(oxr.metadata.name)
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "gitlab-cm"
-        }
-    }
-    spec = {
-        forProvider = {
-            manifest = {
-                apiVersion = "v1"
-                kind = "ConfigMap"
-                metadata = {
-                    name = "gitlab-cm"
-                    namespace = parameters.gitlabNamespace
-                }
-                data = {
-                    "oidc.config" = """name: Zitadel
-issuer: https://${parameters.zitadelFqdn}
-clientID: $${parameters.oidcSecretName}:oidc_client_id
-clientSecret: $${parameters.oidcSecretName}:oidc_client_secret
-requestedScopes:
-  - openid
-  - profile
-  - email
-  - groups
-logoutURL: https://${parameters.zitadelFqdn}/oidc/v1/end_session"""
+                    provider = base64.encode("""name: openid_connect
+label: Zitadel
+icon: https://${parameters.zitadelFqdn}/ui/console/assets/icons/favicon-32x32.png
+args:
+  name: openid_connect
+  scope:
+    - openid
+    - profile
+    - email
+    - groups
+  response_type: code
+  issuer: https://${parameters.zitadelFqdn}
+  discovery: true
+  client_auth_method: query
+  client_options:
+    identifier: ${_oidcAppClientId}
+    secret: ${_oidcAppClientSecret}
+    host: ${parameters.zitadelFqdn}
+    redirect_uri: https://${parameters.gitlabFqdn}/users/auth/openid_connect/callback
+    authorization_endpoint: https://${parameters.zitadelFqdn}/oauth/v2/authorize
+    token_endpoint: https://${parameters.zitadelFqdn}/oauth/v2/token
+    userinfo_endpoint: https://${parameters.zitadelFqdn}/oidc/v1/userinfo
+    jwks_uri: https://${parameters.zitadelFqdn}/oauth/v2/keys
+    gitlab:
+      groups_attribute: ${parameters.oidcProviderGroupClaimPrefix}
+      admin_groups: ["${ocds["zitadel-project"]?.Resource?.status?.atProvider?.id}:${parameters.adminRbacGroup}"]""")
                 }
             }
         }
@@ -275,7 +288,7 @@ logoutURL: https://${parameters.zitadelFqdn}/oidc/v1/end_session"""
 }
 
 # Add all objects to _items in one line
-_items = [_orgs, _project, _oidcApp, _adminRole, _userRole, _userGrant, _oidcSecret, _rbacConfigMap, _oidcConfigMap]
+_items = [_observe_org_id_secret, _project, _oidcAppConnObserve, _oidcApp, _techopsAdminRole, _techopsMaintainerRole, _techopsUserRole, _userGrant, _oidcSecret]
 
 dxr = {
     **oxr

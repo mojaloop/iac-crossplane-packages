@@ -63,6 +63,9 @@ spec:
                   - gitlabFqdn
                   - zitadelFqdn
                   - gitlabNamespace
+                  - adminRbacGroup
+                  - maintainerRbacGroup
+                  - userRbacGroup
                   - zitadelAdminHumanUserId
                 properties:
                   gitlabFqdn:
@@ -77,12 +80,14 @@ spec:
                     type: string
                     description: |-
                       RBAC group in IDM for admin access via OIDC
-                    default: "gitlab_administrators"
+                  maintainerRbacGroup:
+                    type: string
+                    description: |-
+                      RBAC group in IDM for maintainer access via OIDC
                   userRbacGroup:
                     type: string
                     description: |-
                       RBAC group in IDM for user access via OIDC
-                    default: "gitlab_users"
                   gitlabNamespace:
                     type: string
                     description: |-
@@ -96,3 +101,8 @@ spec:
                     type: string
                     description: |-
                       Admin Zitadel human user ID
+                  oidcProviderGroupClaimPrefix:
+                    type: string
+                    description: |-
+                      Prefix for group claim in OIDC provider
+                    default: "gitlab"
