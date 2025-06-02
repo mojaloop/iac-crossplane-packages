@@ -1,0 +1,88 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xgrafanaproviderconfig.grafana.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: grafana.mojaloop.io
+  names:
+    kind: XGrafanaProviderConfig
+    plural: xgrafanaproviderconfig
+  claimNames:
+    kind: GrafanaProviderConfig
+    plural: grafanaproviderconfig
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the source and destination k8s providers.
+                required:
+                  - kubernetesProviderName
+                properties:
+                  kubernetesProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the kubernetes provider.
+              parameters:
+                type: object
+                required:
+                  - domain
+                  - grafanaAdminSecretRef
+                  - providerConfigName
+                properties:
+                  domain:
+                    type: string
+                    description: |-
+                      The domain of the grafana instance.
+                  grafanaAdminSecretRef:
+                    type: object
+                    required:
+                      - name
+                      - namespace
+                      - key
+                    properties:
+                      name:
+                        type: string
+                        description: |-
+                          The name of the secret containing the grafana admin secret.
+                      namespace:
+                        type: string
+                        description: |-
+                          The namespace of the secret containing the grafana admin secret.
+                      key:
+                        type: string
+                        description: |-
+                          The key of the secret containing the grafana admin secret.
+                  providerConfigName:
+                    type: string
+                    description: |-
+                      Name of the provider config to create

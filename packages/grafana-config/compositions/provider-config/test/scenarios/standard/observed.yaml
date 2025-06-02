@@ -1,0 +1,12 @@
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: grafana-admin-secret-observe
+status:
+  atProvider:
+    manifest:
+      apiVersion: v1
+      data:
+        credentials: eyJ0b2tlbiI6ICJSQU5ET01fVE9LRU4ifQ
