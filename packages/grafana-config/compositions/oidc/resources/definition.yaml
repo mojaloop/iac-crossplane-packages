@@ -1,0 +1,120 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xgrafanaoidc.grafana.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: grafana.mojaloop.io
+  names:
+    kind: XGrafanaOIDC
+    plural: xgrafanaoidc
+  claimNames:
+    kind: GrafanaOIDC
+    plural: grafanaoidc
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the source and destination k8s providers.
+                required:
+                  - zitadelProviderName
+                  - kubernetesProviderName
+                  - grafanaProviderName
+                properties:
+                  zitadelProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the zitadel provider.
+                  kubernetesProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the kubernetes provider.
+                  grafanaProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the grafana provider.
+              parameters:
+                type: object
+                required:
+                  - grafanaFqdn
+                  - zitadelFqdn
+                  - grafanaNamespace
+                  - adminRbacGroup
+                  - userRbacGroup
+                  - zitadelAdminHumanUserIdRef
+                properties:
+                  grafanaFqdn:
+                    type: string
+                    description: |-
+                      FQDN for Grafana
+                  zitadelFqdn:
+                    type: string
+                    description: |-
+                      FQDN for Zitadel
+                  adminRbacGroup:
+                    type: string
+                    description: |-
+                      RBAC group in IDM for admin access via OIDC
+                  userRbacGroup:
+                    type: string
+                    description: |-
+                      RBAC group in IDM for user access via OIDC
+                  grafanaNamespace:
+                    type: string
+                    description: |-
+                      Namespace where Grafana is installed
+                  zitadelAdminHumanUserIdRef:
+                    type: object
+                    description: |-
+                      Admin Zitadel human user ID
+                    required:
+                      - name
+                      - namespace
+                    properties:
+                      name:
+                        type: string
+                        description: |-
+                          Name of the secret to observe
+                      namespace:
+                        type: string
+                        description: |-
+                          Namespace of the secret to observe
+                      key:
+                        type: string
+                        description: |-
+                          Key of the secret to observe
+                        default: "zitadel_admin_human_user_id"
+                  oidcProviderGroupClaimPrefix:
+                    type: string
+                    description: |-
+                      Prefix for group claim in OIDC provider
+                    default: "grafana"

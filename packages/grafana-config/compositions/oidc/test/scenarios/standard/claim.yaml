@@ -1,0 +1,28 @@
+apiVersion: grafana.mojaloop.io/v1alpha1
+kind: XGrafanaOIDC
+metadata:
+  name: grafana-oidc-claim
+spec:
+  parameters:
+    # Required parameters
+    grafanaFqdn: "grafana.example.com"
+    zitadelFqdn: "zitadel.example.com"
+    grafanaNamespace: "grafana"
+    zitadelAdminHumanUserIdRef:
+      name: "zitadel-ahuid-observe-secret"
+      namespace: "zitadel"
+      key: "zitadel_admin_human_user_id"
+
+    # Optional parameters with defaults
+    adminRbacGroup: "grafana_administrators"  # Default value
+    userRbacGroup: "grafana_users"  # Default value
+    oidcProviderGroupClaimPrefix: "grafana"  # Default value
+
+
+  providerConfigsRef:
+    zitadelProviderName: "zitadel-provider"
+    kubernetesProviderName: "kubernetes-provider"
+    grafanaProviderName: "grafana-provider"
+
+  managementPolicies:
+    - "*"

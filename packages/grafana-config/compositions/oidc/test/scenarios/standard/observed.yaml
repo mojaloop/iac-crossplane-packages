@@ -1,0 +1,75 @@
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: zitadel-org-id-secret-observe
+status:
+  atProvider:
+    manifest:
+      apiVersion: v1
+      data:
+        zitadel_org_id: "MTkxNzM4MjA1MTU2OTc0NTk4"
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: zitadel-oidc-app-conn-observe
+status:
+  atProvider:
+    manifest:
+      apiVersion: v1
+      kind: Secret
+      data:
+        attribute.client_id: "MTkxNzM4MjA1MTU2OTc0NTk4"
+        attribute.client_secret: "MTkxNzM4MjA1MTU2OTc0NTk4"
+---
+apiVersion: zitadel.zitadel.crossplane.io/v1alpha1
+kind: Project
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: zitadel-project
+status:
+  atProvider:
+    id: "209485730289475683"
+---
+apiVersion: application.zitadel.crossplane.io/v1alpha1
+kind: Oidc
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: zitadel-oidc-app
+status:
+  atProvider:
+    clientId: "309587204859372945@grafana"
+    clientSecret: "mock-client-secret-value"
+---
+apiVersion: project.zitadel.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: zitadel-grafana-admin-role
+status:
+  atProvider:
+    roleKey: "grafana_administrators"
+---
+apiVersion: project.zitadel.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: zitadel-grafana-user-role
+status:
+  atProvider:
+    roleKey: "grafana_users"
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  annotations:
+    crossplane.io/composition-resource-name: zitadel-ahuid-observe-secret
+status:
+  atProvider:
+    manifest:
+      apiVersion: v1
+      kind: Secret
+      data:
+        zitadel_admin_human_user_id: "MTIzNDU2Nzg5MA=="
