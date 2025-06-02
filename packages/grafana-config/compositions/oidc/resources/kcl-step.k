@@ -128,9 +128,7 @@ _oidcAppConnObserve = {
     }
 }
 
-_oidcAppClientId = ocds["zitadel-oidc-app-conn-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"] or ""
-_oidcAppClientSecret = ocds["zitadel-oidc-app-conn-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_secret"] or ""
-
+_decodedOidcAppClientId = base64.decode(ocds["zitadel-oidc-app-conn-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"]) or ""
 
 # Create Project Roles
 _grafanaAdminRole = {
@@ -234,9 +232,51 @@ _userGrant = {
 }
 
 # Grafana SSO Settings
+_grafanaSSOSettings = {
+    apiVersion = "oss.grafana.crossplane.io/v1alpha1"
+    kind = "SsoSettings"
+    metadata = {
+        name = "{}-sso-settings".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "grafana-sso-settings"
+        }
+    }
+    spec = {
+        forProvider = {
+            providerName = "generic_oauth"
+            oauth2Settings = [{
+                name = "Zitadel"
+                authUrl = "https://{}/oauth/v2/authorize".format(parameters.zitadelFqdn)
+                tokenUrl = "https://{}/oauth/v2/token".format(parameters.zitadelFqdn)
+                apiUrl = "https://{}/oidc/v1/userinfo".format(parameters.zitadelFqdn)
+                clientId = _decodedOidcAppClientId
+                clientSecretSecretRef = {
+                    name = "{}-oidc-app-conn".format(oxr.metadata.name)
+                    namespace = parameters.grafanaNamespace
+                    key = "attribute.client_secret"
+                }
+                allowSignUp = True
+                autoLogin = False
+                scopes = "openid profile email groups zitadel:grants"
+                usePkce = True
+                useRefreshToken = True
+                roleAttributePath = "contains(\"zitadel:grants\"[*], '{}:{}') && 'Admin' || contains(\"zitadel:grants\"[*], '{}:{}') && 'Viewer'".format(
+                    ocds["zitadel-project"]?.Resource?.status?.atProvider?.id,
+                    parameters.adminRbacGroup,
+                    ocds["zitadel-project"]?.Resource?.status?.atProvider?.id,
+                    parameters.userRbacGroup
+                )
+            }]
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.grafanaProviderName
+        }
+    }
+}
 
 # Add all objects to _items in one line
-_items = [_observe_org_id_secret, _project, _zitadelAdminHumanUserIdObserveSecret, _oidcAppConnObserve, _oidcApp, _grafanaAdminRole, _grafanaUserRole, _userGrant]
+_items = [_observe_org_id_secret, _project, _zitadelAdminHumanUserIdObserveSecret, _oidcAppConnObserve, _oidcApp, _grafanaAdminRole, _grafanaUserRole, _userGrant, _grafanaSSOSettings]
 
 dxr = {
     **oxr
