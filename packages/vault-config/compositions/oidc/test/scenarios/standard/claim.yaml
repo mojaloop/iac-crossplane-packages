@@ -1,0 +1,28 @@
+apiVersion: vault.mojaloop.io/v1alpha1
+kind: XVaultOIDC
+metadata:
+  name: example-oidc-claim
+spec:
+  parameters:
+    # Required parameters
+    vaultFqdn: "vault.example.com"
+    zitadelFqdn: "zitadel.example.com"
+    vaultNamespace: "vault"
+    zitadelAdminHumanUserIdRef:
+      name: "zitadel-ahuid-observe-secret"
+      namespace: "zitadel"
+      key: "zitadel_admin_human_user_id"
+
+    # Optional parameters with defaults
+    adminRbacGroup: "vault_administrators"  # Default value
+    userRbacGroup: "vault_users"  # Default value
+    oidcProviderGroupClaimPrefix: "vault"  # Default value
+
+
+  providerConfigsRef:
+    zitadelProviderName: "zitadel-provider"
+    kubernetesProviderName: "kubernetes-provider"
+    vaultProviderName: "vault-provider"
+
+  managementPolicies:
+    - "*"
