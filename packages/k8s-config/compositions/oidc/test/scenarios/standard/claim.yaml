@@ -1,0 +1,30 @@
+apiVersion: k8s.mojaloop.io/v1alpha1
+kind: XK8sOIDC
+metadata:
+  name: k8s-oidc-claim
+spec:
+  parameters:
+    # Required parameters
+    k8sFqdn: "k8s.example.com"
+    zitadelFqdn: "zitadel.example.com"
+    k8sNamespace: "k8s"
+    zitadelAdminHumanUserIdRef:
+      name: zitadel-admin-human-user-id
+      namespace: zitadel
+      key: zitadel_admin_human_user_id
+
+    # Optional parameters with defaults
+    adminRbacGroup: "techops-admin"  # Default value
+    userRbacGroup: "techops-users"  # Default value
+
+    organizationIdSecretRef:
+      name: zitadel-org-id
+      namespace: zitadel
+      key: zitadel_org_id
+
+  providerConfigsRef:
+    zitadelProviderName: "zitadel-provider"
+    kubernetesProviderName: "kubernetes-provider"
+
+  managementPolicies:
+    - "*"
