@@ -117,4 +117,4 @@ spec:
                     type: string
                     description: |-
                       Prefix for group claim in OIDC provider
-                    default: "grafana"
+                    default: "zitadel:grants"

@@ -260,9 +260,11 @@ _grafanaSSOSettings = {
                 scopes = "openid profile email groups zitadel:grants"
                 usePkce = True
                 useRefreshToken = True
-                roleAttributePath = "contains(\"zitadel:grants\"[*], '{}:{}') && 'Admin' || contains(\"zitadel:grants\"[*], '{}:{}') && 'Viewer'".format(
+                roleAttributePath = "contains(\"{}\"[*], '{}:{}') && 'Admin' || contains(\"{}\"[*], '{}:{}') && 'Viewer'".format(
+                    parameters.oidcProviderGroupClaimPrefix,
                     ocds["zitadel-project"]?.Resource?.status?.atProvider?.id,
                     parameters.adminRbacGroup,
+                    parameters.oidcProviderGroupClaimPrefix,
                     ocds["zitadel-project"]?.Resource?.status?.atProvider?.id,
                     parameters.userRbacGroup
                 )

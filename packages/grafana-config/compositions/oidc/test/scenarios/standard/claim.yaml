@@ -16,7 +16,7 @@ spec:
     # Optional parameters with defaults
     adminRbacGroup: "grafana_administrators"  # Default value
     userRbacGroup: "grafana_users"  # Default value
-    oidcProviderGroupClaimPrefix: "grafana"  # Default value
+    oidcProviderGroupClaimPrefix: "zitadel:grants"  # Default value
 
 
   providerConfigsRef:

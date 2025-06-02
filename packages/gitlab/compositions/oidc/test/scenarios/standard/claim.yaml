@@ -18,7 +18,7 @@ spec:
     maintainerRbacGroup: "gitlab_maintainers"  # Default value
     userRbacGroup: "gitlab_users"  # Default value
     oidcSecretName: "gitlab-oidc-secret"  # Default value
-    oidcProviderGroupClaimPrefix: "gitlab"  # Default value
+    oidcProviderGroupClaimPrefix: "zitadel:grants"  # Default value
 
 
   providerConfigsRef:
