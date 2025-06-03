@@ -68,13 +68,6 @@ _sc_argocd_operator_app_install = {
                     enabled = True
                     router = {
                       enabled = True
-                      annotations = {
-                        "helm.sh/hook" = "pre-delete"
-                        "helm.sh/hook-weight" = "-5"
-                        "argocd.argoproj.io/hook" = "PreDelete"
-                        "argocd.argoproj.io/sync-wave" = "-5"
-                        "argocd.argoproj.io/sync-options" = "PruneLast=true"
-                      }
                     }
                     kubernetesAPI = {
                       enabled = False
