@@ -325,10 +325,6 @@ _oidcSecret = {
         providerConfigRef = {
             name = spec.providerConfigsRef.kubernetesProviderName
         }
-        writeConnectionSecretToRef = {
-            name = "{}-oidc-app-conn".format(oxr.metadata.name)
-            namespace = parameters.gitlabNamespace
-        }
     }
 }
 
