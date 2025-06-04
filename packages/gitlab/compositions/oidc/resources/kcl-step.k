@@ -281,32 +281,39 @@ _oidcSecret = {
                 }
                 type = "Opaque"
                 data = {
-                    provider = base64.encode("""name: openid_connect
-label: Zitadel
-icon: https://${parameters.zitadelFqdn}/ui/console/assets/icons/favicon-32x32.png
-args:
-  name: openid_connect
-  scope:
-    - openid
-    - profile
-    - email
-    - groups
-  response_type: code
-  issuer: https://${parameters.zitadelFqdn}
-  discovery: true
-  client_auth_method: query
-  client_options:
-    identifier: ${_oidcAppClientId}
-    secret: ${_oidcAppClientSecret}
-    host: ${parameters.zitadelFqdn}
-    redirect_uri: https://${parameters.gitlabFqdn}/users/auth/openid_connect/callback
-    authorization_endpoint: https://${parameters.zitadelFqdn}/oauth/v2/authorize
-    token_endpoint: https://${parameters.zitadelFqdn}/oauth/v2/token
-    userinfo_endpoint: https://${parameters.zitadelFqdn}/oidc/v1/userinfo
-    jwks_uri: https://${parameters.zitadelFqdn}/oauth/v2/keys
-    gitlab:
-      groups_attribute: ${parameters.oidcProviderGroupClaimPrefix}
-      admin_groups: ["${ocds["zitadel-project"]?.Resource?.status?.atProvider?.id}:${parameters.adminRbacGroup}"]""")
+                    provider = base64.encode("""
+{
+  "name": "openid_connect",
+  "label": "Zitadel",
+  "icon": "https://${parameters.zitadelFqdn}/ui/console/assets/icons/favicon-32x32.png",
+  "args": {
+    "name": "openid_connect",
+    "scope": [
+      "openid",
+      "profile",
+      "email",
+      "groups"
+    ],
+    "response_type": "code",
+    "issuer": "https://${parameters.zitadelFqdn}",
+    "discovery": true,
+    "client_auth_method": "query",
+    "client_options": {
+      "identifier": "${_oidcAppClientId}",
+      "secret": "${_oidcAppClientSecret}",
+      "host": "${parameters.zitadelFqdn}",
+      "redirect_uri": "https://${parameters.gitlabFqdn}/users/auth/openid_connect/callback",
+      "authorization_endpoint": "https://${parameters.zitadelFqdn}/oauth/v2/authorize",
+      "token_endpoint": "https://${parameters.zitadelFqdn}/oauth/v2/token",
+      "userinfo_endpoint": "https://${parameters.zitadelFqdn}/oidc/v1/userinfo",
+      "jwks_uri": "https://${parameters.zitadelFqdn}/oauth/v2/keys",
+      "gitlab": {
+        "groups_attribute": "${parameters.oidcProviderGroupClaimPrefix}",
+        "admin_groups": ["${ocds["zitadel-project"]?.Resource?.status?.atProvider?.id}:${parameters.adminRbacGroup}"]
+      }
+    }
+  }
+}""")
                 }
             }
         }
