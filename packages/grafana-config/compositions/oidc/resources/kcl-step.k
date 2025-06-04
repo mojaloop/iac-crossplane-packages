@@ -98,6 +98,10 @@ _oidcApp = {
         providerConfigRef = {
             name = spec.providerConfigsRef.zitadelProviderName
         }
+        writeConnectionSecretToRef = {
+            name = "{}-oidc-app-conn".format(oxr.metadata.name)
+            namespace = parameters.grafanaNamespace
+        }
     }
 }
 
