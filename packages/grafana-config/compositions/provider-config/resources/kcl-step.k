@@ -64,7 +64,8 @@ _grafanaProviderConfigSecret = {
                 }
                 stringData = {
                     credentials = json.encode({
-                        "grafana_service_account_token" = _grafanaAdminToken
+                        "auth" = _grafanaAdminToken
+                        "url" = parameters.domain
                     })
                 }
                 type = "Opaque"
@@ -104,7 +105,6 @@ _grafanaProviderConfig = {
                             key = "credentials"
                         }
                     }
-                    url = parameters.domain
                 }
             }
         }
