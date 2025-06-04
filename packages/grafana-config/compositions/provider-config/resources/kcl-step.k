@@ -104,6 +104,7 @@ _grafanaProviderConfig = {
                             key = "credentials"
                         }
                     }
+                    url = parameters.domain
                 }
             }
         }
