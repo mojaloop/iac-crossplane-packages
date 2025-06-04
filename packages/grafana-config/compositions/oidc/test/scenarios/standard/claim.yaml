@@ -18,6 +18,11 @@ spec:
     userRbacGroup: "grafana_users"  # Default value
     oidcProviderGroupClaimPrefix: "zitadel:grants"  # Default value
 
+    organizationIdSecretRef:
+      name: zitadel-org-id
+      namespace: zitadel
+      key: zitadel_org_id
+
 
   providerConfigsRef:
     zitadelProviderName: "zitadel-provider"
