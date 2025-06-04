@@ -41,8 +41,8 @@ _observe_grafana_admin_secret = {
 }
 
 # Decode base64 and properly escape JSON content
-_grafanaAdminSecretJson = json.decode(base64.decode(ocds["grafana-admin-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?[parameters.grafanaAdminSecretRef.key] or ""))
-_grafanaAdminToken = _grafanaAdminSecretJson["token"]
+_grafanaAdminSecretJson = json.decode(base64.decode(ocds["grafana-admin-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?[parameters.grafanaAdminSecretRef.key])) if ocds["grafana-admin-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?[parameters.grafanaAdminSecretRef.key] else {}
+_grafanaAdminToken = _grafanaAdminSecretJson["token"] or ""
 
 _grafanaProviderConfigSecret = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
