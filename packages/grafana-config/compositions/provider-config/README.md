@@ -1,12 +1,10 @@
-# OIDC Composition
-
-
+# Grafana ProviderConfig Composition
 
 ## Usage Examples
 
 The following test scenarios demonstrate common use cases:
 
-1. [OIDC](test/scenarios/standard/claim.yaml)
+1. [Standard claim](test/scenarios/standard/claim.yaml)
 
 ## Configuration
 
@@ -20,7 +18,5 @@ Provider configuration must be present on the cluster where the claim is deploye
 
 ```yaml
 providerConfigsRef:
-  zitadelProviderName: ZITADEL_PROVIDER_CONFIG_NAME
   kubernetesProviderName: KUBERNETES_PROVIDER_CONFIG_NAME
-  vaultProviderName: VAULT_PROVIDER_CONFIG_NAME
 ```

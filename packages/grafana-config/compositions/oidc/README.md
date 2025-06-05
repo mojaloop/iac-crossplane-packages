@@ -22,4 +22,5 @@ Provider configuration must be present on the cluster where the claim is deploye
 providerConfigsRef:
   zitadelProviderName: ZITADEL_PROVIDER_CONFIG_NAME
   kubernetesProviderName: KUBERNETES_PROVIDER_CONFIG_NAME
+  grafanaProviderName: GRAFANA_PROVIDER_CONFIG_NAME
 ```

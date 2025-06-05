@@ -16,6 +16,7 @@ This project provides a collection of Crossplane composition packages designed t
 - [Vault Config](packages/vault-config/README.md) - Vault Config compositions
 - [Zitadel Config](packages/zitadel-config/README.md) - Zitadel Config compositions
 - [ArgoCD Config](packages/argocd-config/README.md) - ArgoCD Config compositions
+- [Gitlab](packages/gitlab/README.md) - Gitlab compositions
 
 - Additional packages coming soon...
 

@@ -20,6 +20,7 @@ spec:
 This package includes the following compositions:
 
 1. [PostConfig](compositions/post-config/README.md)
+2. [OIDC](compositions/oidc/README.md)
 
 ## Usage
 
