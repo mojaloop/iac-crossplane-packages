@@ -7,6 +7,10 @@ spec:
   dependsOn:
     - provider: xpkg.upbound.io/crossplane-contrib/provider-vault
       version: ">=v2.1.3"
+    - provider: ghcr.io/infitx-org/zitadel-crossplane-provider
+      version: ">=v0.0.1-rc00"
+    - provider: xpkg.upbound.io/crossplane-contrib/provider-kubernetes
+      version: ">=v0.18.0"
     ## Functions
     - provider: xpkg.upbound.io/crossplane-contrib/function-kcl
       version: ">=v0.9.0"
