@@ -20,4 +20,4 @@ kind: Provider
 metadata:
   name: provider-zitadel
 spec:
-  package: ghcr.io/infitx-org/zitadel-crossplane-provider:v0.0.1-rc01
+  package: ghcr.io/infitx-org/zitadel-crossplane-provider:v0.0.1
