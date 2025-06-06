@@ -1,0 +1,18 @@
+apiVersion: grafana.mojaloop.io/v1alpha1
+kind: XGrafanaProviderConfig
+metadata:
+  name: grafana-provider-config-claim
+spec:
+  parameters:
+    # Required parameters
+    domain: "grafana.example.com"
+    grafanaAdminSecretRef:
+      name: "grafana-admin-secret"
+      namespace: "grafana"
+      key: "credentials"
+    providerConfigName: "grafana-provider-config"
+  providerConfigsRef:
+    kubernetesProviderName: "kubernetes-provider"
+
+  managementPolicies:
+    - "*"
