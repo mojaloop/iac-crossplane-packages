@@ -60,15 +60,10 @@ spec:
               parameters:
                 type: object
                 required:
-                  - k8sFqdn
                   - zitadelFqdn
                   - k8sNamespace
                   - zitadelAdminHumanUserIdRef
                 properties:
-                  k8sFqdn:
-                    type: string
-                    description: |-
-                      FQDN for K8s
                   zitadelFqdn:
                     type: string
                     description: |-
