@@ -305,6 +305,10 @@ _k8sUserRole = {
                 ]
             }
         }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
     }
 }
 
@@ -341,6 +345,10 @@ _k8sUserRoleBinding = {
                     }
                 ]
             }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
         }
     }
 }
