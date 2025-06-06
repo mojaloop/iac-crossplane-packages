@@ -4,8 +4,6 @@ metadata:
   name: k8s-oidc-claim
 spec:
   parameters:
-    # Required parameters
-    k8sFqdn: "k8s.example.com"
     zitadelFqdn: "zitadel.example.com"
     k8sNamespace: "k8s"
     zitadelAdminHumanUserIdRef:
