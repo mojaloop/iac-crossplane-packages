@@ -61,7 +61,8 @@ spec:
                 type: object
                 required:
                   - zitadelFqdn
-                  - k8sNamespace
+                  - oidcSecretNamespace
+                  - oidcSecret
                   - zitadelAdminHumanUserIdRef
                 properties:
                   zitadelFqdn:
@@ -78,10 +79,16 @@ spec:
                     description: |-
                       RBAC group in IDM for user access via OIDC
                     default: "k8s_users"
-                  k8sNamespace:
+                  oidcSecretNamespace:
                     type: string
                     description: |-
-                      Namespace where K8s is installed
+                      Namespace of the OIDC secret output
+                    default: "zitadel"
+                  oidcSecret:
+                    type: string
+                    description: |-
+                      Name of the OIDC secret output
+                    default: "k8s-oidc-post-config-output"
                   zitadelAdminHumanUserIdRef:
                     type: object
                     description: |-
