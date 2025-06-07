@@ -354,6 +354,43 @@ _k8sUserRoleBinding = {
 }
 
 
+# Create Kubernetes Secret
+_oidcSecret = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-oidc-secret".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "k8s-oidc-secret"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = parameters.oidcSecret
+                    namespace = parameters.oidcSecretNamespace
+                    labels = {
+                        "app.kubernetes.io/part-of" = "k8s"
+                        "k8s.mojaloop.com/oidc-secret" = "true"
+                    }
+                }
+                data = {
+                    kubernetes_oidc_client_id = _oidcAppClientId
+                    kubernetes_oidc_issuer = "{}:{}".format("https://", parameters.zitadelFqdn)
+                }
+                type = "Opaque"
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
+    }
+}
+
 # Add all objects to _items in one line
 _items = [_observe_org_id_secret, _project, _oidcApp, _oidcAppConnObserve, _adminRole, _userRole, _userGrant, _k8sAdminRoleBinding, _k8sUserRole, _k8sUserRoleBinding, _zitadelAdminHumanUserIdObserveSecret]
 

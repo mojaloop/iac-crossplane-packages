@@ -5,7 +5,8 @@ metadata:
 spec:
   parameters:
     zitadelFqdn: "zitadel.example.com"
-    k8sNamespace: "k8s"
+    oidcSecretNamespace: "zitadel"
+    oidcSecret: "k8s-oidc-post-config-output"
     zitadelAdminHumanUserIdRef:
       name: zitadel-admin-human-user-id
       namespace: zitadel
