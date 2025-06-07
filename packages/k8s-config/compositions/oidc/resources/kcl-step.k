@@ -100,7 +100,7 @@ _oidcApp = {
         }
         writeConnectionSecretToRef = {
             name = "{}-oidc-app-conn".format(oxr.metadata.name)
-            namespace = parameters.k8sNamespace
+            namespace = parameters.oidcSecretNamespace
         }
     }
 }
@@ -121,7 +121,7 @@ _oidcAppConnObserve = {
                 kind = "Secret"
                 metadata = {
                     name = "{}-oidc-app-conn".format(oxr.metadata.name)
-                    namespace = parameters.k8sNamespace
+                    namespace = parameters.oidcSecretNamespace
                 }
             }
         }
