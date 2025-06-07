@@ -1,0 +1,17 @@
+---
+apiVersion: meta.pkg.crossplane.io/v1alpha1
+kind: Configuration
+metadata:
+  name: k8s-config
+spec:
+  dependsOn:
+    - provider: ghcr.io/infitx-org/zitadel-crossplane-provider
+      version: ">=v0.0.1-rc00"
+    ## Functions
+    - provider: xpkg.upbound.io/crossplane-contrib/function-kcl
+      version: ">=v0.9.0"
+    - function: xpkg.upbound.io/crossplane-contrib/function-auto-ready
+      version: ">=v0.2.1"
+  crossplane:
+    version: ">=v1.14"
+  skipDependencyResolution: true
