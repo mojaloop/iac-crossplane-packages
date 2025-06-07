@@ -392,7 +392,7 @@ _oidcSecret = {
 }
 
 # Add all objects to _items in one line
-_items = [_observe_org_id_secret, _project, _oidcApp, _oidcAppConnObserve, _adminRole, _userRole, _userGrant, _k8sAdminRoleBinding, _k8sUserRole, _k8sUserRoleBinding, _zitadelAdminHumanUserIdObserveSecret]
+_items = [_observe_org_id_secret, _project, _oidcApp, _oidcAppConnObserve, _adminRole, _userRole, _userGrant, _k8sAdminRoleBinding, _k8sUserRole, _k8sUserRoleBinding, _zitadelAdminHumanUserIdObserveSecret, _oidcSecret]
 
 dxr = {
     **oxr
