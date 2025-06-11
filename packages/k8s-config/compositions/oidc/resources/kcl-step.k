@@ -379,7 +379,7 @@ _oidcSecret = {
                 }
                 data = {
                     kubernetes_oidc_client_id =  base64.encode(_oidcAppClientId)
-                    kubernetes_oidc_issuer = base64.encode("{}:{}".format("https://", parameters.zitadelFqdn))
+                    kubernetes_oidc_issuer = base64.encode("https://{}".format(parameters.zitadelFqdn))
                 }
                 type = "Opaque"
             }
