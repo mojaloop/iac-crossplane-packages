@@ -32,7 +32,6 @@ _cephBucket= {
           storageClassName   = parameters?.bucket?.storageClassName
           additionalConfig   = {
             maxSize    = parameters?.bucket?.maxSize
-            maxObjects = parameters?.bucket?.maxObjects
           }
         }
       }
