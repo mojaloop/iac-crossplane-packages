@@ -144,7 +144,7 @@ _MysqlCluster = {
                                 region = parameters?.backup?.bucketRegion
                             }
                         }
-                        if parameters?.backup?.pvc > 0: "fs-pvc" = parameters?.backup?.pvc
+                        if parameters?.backup?.pvc : "fs-pvc" = parameters?.backup?.pvc
                     }
                     schedule = [
                         {
