@@ -269,7 +269,7 @@ _Policy = {
             {
                 name = "restore-db-backup"
                 match = {
-                    any = [{
+                    "any" = [{
                         resources = {
                             kinds = [
                                 "StatefulSet"
@@ -284,7 +284,7 @@ _Policy = {
                     }]
                 }
                 preconditions = {
-                    all = [{
+                    "all" = [{
                         key = """{{ request.object.spec.template.metadata.annotations."utils.mojaloop.io/restore-pvc-name" || ''}}"""
                         operator = "NotEquals"
                         value = ""
