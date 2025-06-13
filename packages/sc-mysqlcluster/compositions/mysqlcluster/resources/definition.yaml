@@ -113,6 +113,9 @@ spec:
                               medium:
                                 type: string
                                 description: Medium for emptyDir (e.g., Memory, Disk)
+                              sizeLimit:
+                                type: string
+                                description: Size limit for emptyDir
                           hostPath:
                             type: object
                             description: Use hostPath for storage
