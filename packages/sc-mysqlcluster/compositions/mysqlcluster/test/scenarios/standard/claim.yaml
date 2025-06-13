@@ -13,9 +13,15 @@ spec:
     dbUsername: my-user
     dbName: my-database
     pxc:
-      image: "percona/percona-xtradb-cluster:8.0.39-30.1" #example
+      image: "percona/percona-xtradb-cluster:8.4.3-3.1" #example
       imagePullPolicy: IfNotPresent
+      annotations:
+        test: "test-annotation"
       storageSize: "20Gi"
+      volumeSpec: # optional, overrides the effects of storageSize
+        emptyDir:
+          medium: Memory
+          sizeLimit: 8Gi
       replicas: 3
       resources:
         requests:
@@ -69,7 +75,7 @@ spec:
           memory: 500Mi
           cpu: 200m
     backup:
-      image: "percona/percona-xtradb-cluster-operator:1.16.0-logcollector-fluentbit3.2.2" # example
+      image: "percona/percona-xtradb-cluster-operator:1.17.0-pxc8.4-backup-pxb8.4.0" # example
       imagePullPolicy: IfNotPresent
       verifyTLS: true
       bucket: "s3-bucket-name"
@@ -78,6 +84,15 @@ spec:
       scheduleName: "daily-backup"
       cronScheduleExpression: "0 0 * * *"
       backupRetention: 7
+      pvc: # optional config for enabling backup to PVC
+        type: filesystem
+        volume:
+          persistentVolumeClaim:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 8G
     dns:
       name: my-cluster-service
       region: eu-west-1

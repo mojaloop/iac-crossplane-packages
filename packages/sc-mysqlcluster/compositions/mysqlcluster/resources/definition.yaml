@@ -97,6 +97,71 @@ spec:
                         type: string
                         description: Image pull policy for PXC
                         default: IfNotPresent
+                      annotations:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        description: Annotations for the PXC pods
+                      volumeSpec:
+                        type: object
+                        description: Volume specification for PXC pods
+                        properties:
+                          emptyDir:
+                            type: object
+                            description: Use emptyDir for storage
+                            properties:
+                              medium:
+                                type: string
+                                description: Medium for emptyDir (e.g., Memory, Disk)
+                              sizeLimit:
+                                type: string
+                                description: Size limit for emptyDir
+                          hostPath:
+                            type: object
+                            description: Use hostPath for storage
+                            properties:
+                              path:
+                                type: string
+                                description: Path on the host
+                              type:
+                                type: string
+                                description: Type of hostPath (e.g., Directory, File)
+                          persistentVolumeClaim:
+                            type: object
+                            description: Use PersistentVolumeClaim for storage
+                            properties:
+                              storageClassName:
+                                type: string
+                                description: Storage class name for PVC
+                              accessModes:
+                                type: array
+                                items:
+                                  type: string
+                                description: Access modes for PVC (e.g., ReadWriteOnce, ReadOnlyMany)
+                              dataSource:
+                                type: object
+                                description: Data source for PVC
+                                properties:
+                                  name:
+                                    type: string
+                                    description: Name of the data source
+                                  kind:
+                                    type: string
+                                    description: Kind of the data source (e.g., VolumeSnapshot)
+                                  apiGroup:
+                                    type: string
+                                    description: API group of the data source
+                              resources:
+                                type: object
+                                description: Resource requirements for PVC
+                                properties:
+                                  requests:
+                                    type: object
+                                    description: Resource requests for PVC
+                                    properties:
+                                      storage:
+                                        type: string
+                                        description: Storage size requested for PVC
                       storageSize:
                         type: string
                         description: Size of storage requested for PXC
@@ -311,6 +376,40 @@ spec:
                       backupRetention:
                         type: integer
                         description: Number of backups to retain.
+                      pvc:
+                        type: object
+                        description: fs-pvc backup storage.
+                        properties:
+                          type:
+                            type: string
+                            description: type of PVC
+                          volume:
+                            type: object
+                            description: Volume specification for backup PVC
+                            properties:
+                              persistentVolumeClaim:
+                                type: object
+                                description: PVC for backup storage
+                                properties:
+                                  storageClassName:
+                                    type: string
+                                    description: Storage class name for PVC
+                                  accessModes:
+                                    type: array
+                                    items:
+                                      type: string
+                                    description: Access modes for PVC (e.g., ReadWriteOnce, ReadOnlyMany)
+                                  resources:
+                                    type: object
+                                    description: Resource requirements for PVC
+                                    properties:
+                                      requests:
+                                        type: object
+                                        description: Resource requests for PVC
+                                        properties:
+                                          storage:
+                                            type: string
+                                            description: Storage size requested for PVC
                   dns:
                     type: object
                     properties:
