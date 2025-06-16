@@ -259,10 +259,9 @@ _ExternalService = {
 
 _Policy = {
     apiVersion = "kyverno.io/v1"
-    kind = "Policy"
+    kind = "ClusterPolicy"
     metadata = {
-        name = "restore-db-backup"
-        namespace = parameters?.appNamespace
+        name = "restore-db-backup-{}".format(parameters?.appNamespace)
     }
     spec = {
         rules = [
@@ -273,6 +272,9 @@ _Policy = {
                         resources = {
                             kinds = [
                                 "StatefulSet"
+                            ]
+                            namespaces = [
+                                parameters?.appNamespace
                             ]
                             selectors = {
                                 matchLabels = {
