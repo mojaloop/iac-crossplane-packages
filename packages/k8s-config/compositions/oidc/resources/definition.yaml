@@ -1,0 +1,136 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xk8soidc.k8s.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: k8s.mojaloop.io
+  names:
+    kind: XK8sOIDC
+    plural: xk8soidc
+  claimNames:
+    kind: K8sOIDC
+    plural: k8soidc
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the source and destination k8s providers.
+                required:
+                  - zitadelProviderName
+                  - kubernetesProviderName
+                properties:
+                  zitadelProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the zitadel provider.
+                  kubernetesProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the kubernetes provider.
+              parameters:
+                type: object
+                required:
+                  - zitadelFqdn
+                  - oidcSecretNamespace
+                  - oidcSecret
+                  - zitadelAdminHumanUserIdRef
+                properties:
+                  zitadelFqdn:
+                    type: string
+                    description: |-
+                      FQDN for Zitadel
+                  adminRbacGroup:
+                    type: string
+                    description: |-
+                      RBAC group in IDM for admin access via OIDC
+                    default: "k8s_administrators"
+                  userRbacGroup:
+                    type: string
+                    description: |-
+                      RBAC group in IDM for user access via OIDC
+                    default: "k8s_users"
+                  oidcSecretNamespace:
+                    type: string
+                    description: |-
+                      Namespace of the OIDC secret output
+                    default: "zitadel"
+                  oidcSecret:
+                    type: string
+                    description: |-
+                      Name of the OIDC secret output
+                    default: "k8s-oidc-post-config-output"
+                  zitadelAdminHumanUserIdRef:
+                    type: object
+                    description: |-
+                      Admin Zitadel human user ID
+                    required:
+                      - name
+                      - namespace
+                    properties:
+                      name:
+                        type: string
+                        description: |-
+                          Name of the secret to observe
+                      namespace:
+                        type: string
+                        description: |-
+                          Namespace of the secret to observe
+                      key:
+                        type: string
+                        description: |-
+                          Key of the secret to observe
+                        default: "zitadel_admin_human_user_id"
+                  organizationIdSecretRef:
+                    type: object
+                    description: |-
+                      Organization ID secret
+                    default:
+                      name: "zitadel-post-config-init-output"
+                      namespace: "zitadel"
+                      key: "zitadel_org_id"
+                    properties:
+                      name:
+                        type: string
+                        description: |-
+                          Name of the secret to observe
+                        default: "zitadel-post-config-init-output"
+                      namespace:
+                        type: string
+                        description: |-
+                          Namespace of the secret to observe
+                        default: "zitadel"
+                      key:
+                        type: string
+                        description: |-
+                          Key of the secret to observe
+                        default: "zitadel_org_id"
