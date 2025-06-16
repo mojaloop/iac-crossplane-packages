@@ -261,7 +261,7 @@ _Policy = {
     apiVersion = "kyverno.io/v1"
     kind = "ClusterPolicy"
     metadata = {
-        name = "restore-db-backup-{}".format(parameters?.appNamespace)
+        name = "{}-restore".format(oxr.metadata.name)
     }
     spec = {
         rules = [
