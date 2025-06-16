@@ -276,7 +276,7 @@ _Policy = {
                             namespaces = [
                                 parameters?.appNamespace
                             ]
-                            selectors = {
+                            selector = {
                                 matchLabels = {
                                     "app.kubernetes.io/component" = "pxc"
                                     "app.kubernetes.io/managed-by" = "percona-xtradb-cluster-operator"
