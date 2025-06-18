@@ -49,7 +49,8 @@ _MysqlCluster = {
 
                             gracePeriod = 600
 
-                            volumeSpec = {
+                            if parameters?.pxc?.annotations: annotations = parameters?.pxc?.annotations
+                            volumeSpec = parameters?.pxc?.volumeSpec if parameters?.pxc?.volumeSpec else {
                                 accessModes = [
                                     "ReadWriteOnce"
                                 ]
@@ -143,6 +144,7 @@ _MysqlCluster = {
                                 region = parameters?.backup?.bucketRegion
                             }
                         }
+                        if parameters?.backup?.pvc : "fs-pvc" = parameters?.backup?.pvc
                     }
                     schedule = [
                         {
@@ -255,7 +257,91 @@ _ExternalService = {
     }
 }
 
-_items += [_MysqlCluster, _Secret, _DnsRecord, _ExternalService]
+_Policy = {
+    apiVersion = "kyverno.io/v1"
+    kind = "ClusterPolicy"
+    metadata = {
+        name = "{}-restore".format(oxr.metadata.name)
+    }
+    spec = {
+        rules = [
+            {
+                name = "restore-db-backup"
+                match = {
+                    "any" = [{
+                        resources = {
+                            kinds = [
+                                "StatefulSet"
+                            ]
+                            namespaces = [
+                                parameters?.appNamespace
+                            ]
+                            selector = {
+                                matchLabels = {
+                                    "app.kubernetes.io/component" = "pxc"
+                                    "app.kubernetes.io/managed-by" = "percona-xtradb-cluster-operator"
+                                }
+                            }
+                        }
+                    }]
+                }
+                preconditions = {
+                    "all" = [{
+                        key = """{{ request.object.spec.template.metadata.annotations."utils.mojaloop.io/restore-pvc-name" || ''}}"""
+                        operator = "NotEquals"
+                        value = ""
+                    }]
+                }
+                mutate = {
+                    patchesJson6902 = """
+- op: add
+  path: /spec/template/spec/initContainers/0
+  value:
+    name: restore-backup
+    image: ${parameters?.backup?.image}
+    imagePullPolicy: ${parameters?.backup?.imagePullPolicy}
+    command:
+      - /bin/sh
+    args:
+      - -c
+      - echo "Backup directory contents:";
+        ls -lh /backup;
+        if [ -f /backup/xtrabackup.stream ]; then
+          echo "MySQL directory contents:";
+          ls -lh /datadir;
+          if [ -z "$(ls -A /datadir)" ]; then
+            echo "Restoring backup...";
+            recovery-pvc-donor.sh & RESTORE_SRC_SERVICE=127.0.0.1 recovery-pvc-joiner.sh;
+            exit 0;
+          else
+            echo "MySQL data already exists, skipping restore.";
+          fi
+        fi
+    volumeMounts:
+      - name: datadir
+        mountPath: /datadir
+      - name: vault-keyring-secret
+        mountPath: /etc/mysql/vault-keyring-secret
+      - name: ssl
+        mountPath: /etc/mysql/ssl
+      - name: ssl-internal
+        mountPath: /etc/mysql/ssl-internal
+      - name: backupdir
+        mountPath: /backup
+- op: add
+  path: /spec/template/spec/volumes/-
+  value:
+    name: backupdir
+    persistentVolumeClaim:
+      claimName: {{ request.object.spec.template.metadata.annotations."utils.mojaloop.io/restore-pvc-name" }}
+"""
+                }
+            }
+        ]
+    }
+}
+
+_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _ExternalService]
 dxr = {
     **oxr
 }
