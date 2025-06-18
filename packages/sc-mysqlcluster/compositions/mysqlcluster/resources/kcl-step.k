@@ -309,7 +309,7 @@ _Policy = {
         if [ -f /backup/xtrabackup.stream ]; then
           echo "MySQL directory contents:";
           ls -lh /datadir;
-          if [ ! -d /datadir/mysql ]; then
+          if [ -z "$(ls -A /datadir)" ]; then
             echo "Restoring backup...";
             recovery-pvc-donor.sh & RESTORE_SRC_SERVICE=127.0.0.1 recovery-pvc-joiner.sh;
             exit 0;
