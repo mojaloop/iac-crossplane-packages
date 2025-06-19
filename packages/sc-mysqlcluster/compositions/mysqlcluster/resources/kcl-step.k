@@ -291,12 +291,9 @@ _Policy = {
                                         namespaces = [
                                             parameters?.appNamespace
                                         ]
-                                        selector = {
-                                            matchLabels = {
-                                                "app.kubernetes.io/component" = "pxc"
-                                                "app.kubernetes.io/managed-by" = "percona-xtradb-cluster-operator"
-                                            }
-                                        }
+                                        names = [
+                                            "*-db-pxc"
+                                        ]
                                     }
                                 }]
                             }
