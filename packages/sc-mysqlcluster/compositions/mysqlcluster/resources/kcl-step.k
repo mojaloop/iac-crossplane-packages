@@ -232,7 +232,7 @@ _ExternalService = {
     metadata = {
         name = "{}-en-svc".format(oxr.metadata.name)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "pxc-mysqlcluster-svc"
+            "krm.kcl.dev/composition-resource-name": "percona"
         }
     }
     spec = {
@@ -258,43 +258,54 @@ _ExternalService = {
 }
 
 _Policy = {
-    apiVersion = "kyverno.io/v1"
-    kind = "ClusterPolicy"
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
     metadata = {
-        name = "{}-restore".format(oxr.metadata.name)
+        name = "{}-policy".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "backup-restore-policy"
+        }
     }
     spec = {
-        rules = [
-            {
-                name = "restore-db-backup"
-                match = {
-                    "any" = [{
-                        resources = {
-                            kinds = [
-                                "StatefulSet"
-                            ]
-                            namespaces = [
-                                parameters?.appNamespace
-                            ]
-                            selector = {
-                                matchLabels = {
-                                    "app.kubernetes.io/component" = "pxc"
-                                    "app.kubernetes.io/managed-by" = "percona-xtradb-cluster-operator"
-                                }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.scK8sProviderName
+        }
+        forProvider = {
+            manifest = {
+                apiVersion = "kyverno.io/v1"
+                kind = "ClusterPolicy"
+                metadata = {
+                    name = "{}-restore".format(oxr.metadata.name)
+                }
+                spec = {
+                    rules = [
+                        {
+                            name = "restore-db-backup"
+                            match = {
+                                "any" = [{
+                                    resources = {
+                                        kinds = [
+                                            "StatefulSet"
+                                        ]
+                                        namespaces = [
+                                            parameters?.appNamespace
+                                        ]
+                                        names = [
+                                            "*-db-pxc"
+                                        ]
+                                    }
+                                }]
                             }
-                        }
-                    }]
-                }
-                preconditions = {
-                    "all" = [{
-                        key = """{{ request.object.spec.template.metadata.annotations."utils.mojaloop.io/restore-pvc-name" || ''}}"""
-                        operator = "NotEquals"
-                        value = ""
-                    }]
-                }
-                mutate = {
-                    patchesJson6902 = """
-- op: add
+                            preconditions = {
+                                "all" = [{
+                                    key = """{{ request.object.spec.template.metadata.annotations."utils.mojaloop.io/restore-pvc-name" || ''}}"""
+                                    operator = "NotEquals"
+                                    value = ""
+                                }]
+                            }
+                            mutate = {
+                                patchesJson6902 = """- op: add
   path: /spec/template/spec/initContainers/0
   value:
     name: restore-backup
@@ -335,9 +346,12 @@ _Policy = {
     persistentVolumeClaim:
       claimName: {{ request.object.spec.template.metadata.annotations."utils.mojaloop.io/restore-pvc-name" }}
 """
+                            }
+                        }
+                    ]
                 }
             }
-        ]
+        }
     }
 }
 
