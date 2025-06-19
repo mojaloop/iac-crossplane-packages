@@ -267,6 +267,10 @@ _Policy = {
         }
     }
     spec = {
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.scK8sProviderName
+        }
         forProvider = {
             manifest = {
                 apiVersion = "kyverno.io/v1"
