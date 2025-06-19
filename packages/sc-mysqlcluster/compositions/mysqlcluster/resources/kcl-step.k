@@ -308,8 +308,7 @@ _Policy = {
                                 }]
                             }
                             mutate = {
-                                patchesJson6902 = """
-- op: add
+                                patchesJson6902 = """- op: add
   path: /spec/template/spec/initContainers/0
   value:
     name: restore-backup
