@@ -99,15 +99,18 @@ spec:
                         default: IfNotPresent
                       annotations:
                         type: object
+                        nullable: true
                         additionalProperties:
                           type: string
                         description: Annotations for the PXC pods
                       volumeSpec:
                         type: object
+                        nullable: true
                         description: Volume specification for PXC pods
                         properties:
                           emptyDir:
                             type: object
+                            nullable: true
                             description: Use emptyDir for storage
                             properties:
                               medium:
@@ -118,6 +121,7 @@ spec:
                                 description: Size limit for emptyDir
                           hostPath:
                             type: object
+                            nullable: true
                             description: Use hostPath for storage
                             properties:
                               path:
@@ -128,6 +132,7 @@ spec:
                                 description: Type of hostPath (e.g., Directory, File)
                           persistentVolumeClaim:
                             type: object
+                            nullable: true
                             description: Use PersistentVolumeClaim for storage
                             properties:
                               storageClassName:
@@ -378,6 +383,7 @@ spec:
                         description: Number of backups to retain.
                       pvc:
                         type: object
+                        nullable: true
                         description: fs-pvc backup storage.
                         properties:
                           type:
