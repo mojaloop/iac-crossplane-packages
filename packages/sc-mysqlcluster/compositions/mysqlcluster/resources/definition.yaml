@@ -99,13 +99,11 @@ spec:
                         default: IfNotPresent
                       annotations:
                         type: object
-                        nullable: true
                         additionalProperties:
                           type: string
                         description: Annotations for the PXC pods
                       volumeSpec:
                         type: object
-                        nullable: true
                         description: Volume specification for PXC pods
                         properties:
                           emptyDir:
@@ -189,7 +187,7 @@ spec:
                               cpu:
                                 type: string
                                 description: CPU request for pxc
-                          limit:
+                          limits:
                             type: object
                             description: the resources limit for pxc
                             properties:
@@ -277,7 +275,7 @@ spec:
                               cpu:
                                 type: string
                                 description: CPU request for haproxy
-                          limit:
+                          limits:
                             type: object
                             description: the resources limit for haproxy
                             properties:
@@ -340,7 +338,7 @@ spec:
                               cpu:
                                 type: string
                                 description: CPU request for LogCollector
-                          limit:
+                          limits:
                             type: object
                             description: the resources limit for LogCollector
                             properties:
@@ -383,7 +381,6 @@ spec:
                         description: Number of backups to retain.
                       pvc:
                         type: object
-                        nullable: true
                         description: fs-pvc backup storage.
                         properties:
                           type:
