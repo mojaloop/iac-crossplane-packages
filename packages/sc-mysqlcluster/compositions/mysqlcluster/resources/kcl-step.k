@@ -292,7 +292,7 @@ _Policy = {
                                             parameters?.appNamespace
                                         ]
                                         names = [
-                                            "*-db-pxc"
+                                            "{}-pxc".format(parameters.clusterName)
                                         ]
                                     }
                                 }]
