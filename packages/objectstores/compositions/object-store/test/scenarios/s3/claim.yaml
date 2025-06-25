@@ -6,7 +6,7 @@ spec:
   parameters:
     clusterName: "example-cluster"
     objectStoreProvider: "s3"
-    bucketName: "example-mojaloopxyz-object-store"
+    bucketName: "example.mojaloopxyz-object-store"
     ccK8sProviderName: "kubernetes-provider"
     esoPushSecret: true
     vaultSecretStore: "vault-backend"

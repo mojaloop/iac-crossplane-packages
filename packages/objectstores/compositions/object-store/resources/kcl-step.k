@@ -1,3 +1,5 @@
+import regex
+
 # Read the XR and the OCDs
 oxr: any = option("params").oxr
 ocds: any = option("params").ocds
@@ -23,7 +25,7 @@ if parameters?.objectStoreProvider == "ceph":
         }
         parameters = {
           bucket = {
-            bucketName               = parameters?.bucketName
+            bucketName               = regex.replace(parameters?.bucketName, "\.", "-")
             storageClassName         = parameters?.ceph?.storageClassName
             maxSize                  = parameters?.ceph?.maxSize
           }
@@ -51,7 +53,7 @@ if parameters?.objectStoreProvider == "s3":
       spec = {
         parameters = {
           bucket = {
-          bucketName           = parameters?.bucketName
+          bucketName           = regex.replace(parameters?.bucketName, "\.", "-")
           bucketRegion         = parameters?.s3?.bucketRegion
           forceDestroy         = parameters?.s3?.forceDestroy
           deletionPolicy       = parameters?.s3?.deletionPolicy
