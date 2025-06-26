@@ -104,9 +104,9 @@ _MysqlCluster = {
                                 cpu = parameters?.haproxy?.resources?.requests?.cpu
                                 memory = parameters?.haproxy?.resources?.requests?.memory
                             }
-                            limit = {
-                                cpu = parameters?.haproxy?.resources?.limit?.cpu
-                                memory = parameters?.haproxy?.resources?.limit?.memory
+                            limits = {
+                                cpu = parameters?.haproxy?.resources?.limits?.cpu
+                                memory = parameters?.haproxy?.resources?.limits?.memory
                             }
                         }
 
@@ -124,9 +124,9 @@ _MysqlCluster = {
                                 memory = parameters?.logcollector?.resources?.requests?.memory
                             }
 
-                            limit = {
-                                cpu = parameters?.logcollector?.resources?.limit?.cpu
-                                memory = parameters?.logcollector?.resources?.limit?.memory
+                            limits = {
+                                cpu = parameters?.logcollector?.resources?.limits?.cpu
+                                memory = parameters?.logcollector?.resources?.limits?.memory
                             }
 
                         }
