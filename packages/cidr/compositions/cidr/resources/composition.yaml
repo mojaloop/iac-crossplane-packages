@@ -1,0 +1,25 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: cidr
+  labels:
+    crossplane.io/xrd: xcidrs.cidr.mojaloop.io
+spec:
+  compositeTypeRef:
+    apiVersion: cidr.mojaloop.io/v1alpha1
+    kind: XCIDR
+  mode: Pipeline
+  pipeline:
+    - step: cidr
+      functionRef:
+        name: function-cidr
+      input:
+        apiVersion: cidr.fn.crossplane.io/v1beta1
+        kind: Parameters
+        cidrFuncField: spec.parameters.cidrFunc
+        prefixField: spec.parameters.cidrBlock
+        newBitsField: spec.parameters.newBits
+        netNumItemsField: spec.parameters.azs
+        hostNumField: spec.parameters.hostNum
+        offsetField: spec.parameters.offset
+        multiPrefixField: spec.parameters.subnets

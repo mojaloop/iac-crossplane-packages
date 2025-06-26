@@ -1,0 +1,15 @@
+apiVersion: cidr.mojaloop.io/v1alpha1
+kind: XCIDR
+metadata:
+  name: cidr-subnetloop
+spec:
+  parameters:
+    cidrFunc: cidrsubnetloop
+    cidrBlock: 10.0.0.0/24
+    newBits:
+      - 8
+    azs:
+      - us-west-1
+      - us-west-2
+      - us-west-3
+    offset: 48

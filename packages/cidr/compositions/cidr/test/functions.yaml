@@ -1,0 +1,6 @@
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: function-cidr
+spec:
+  package: xpkg.upbound.io/upbound/function-cidr:v0.6.0
