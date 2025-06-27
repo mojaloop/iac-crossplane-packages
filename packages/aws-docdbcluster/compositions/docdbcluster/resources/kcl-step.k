@@ -105,7 +105,7 @@ _Cluster = {
         forProvider = {
             allowMajorVersionUpgrade = parameters?.allowMajorVersionUpgrade
             applyImmediately = parameters?.applyImmediately
-            availabilityZone = availability_zones
+            availabilityZones = availability_zones
             backupRetentionPeriod = parameters?.backupRetentionPeriod
             dbClusterParameterGroupNameSelector = { matchControllerRef = True }
             dbSubnetGroupName = "{}-sng".format(oxr.metadata.name)
