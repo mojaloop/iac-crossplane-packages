@@ -169,6 +169,9 @@ spec:
                   subnets:
                     description: The comma separated list of subnet-ids to create the subnetgroup
                     type: string
+                  azs:
+                    description: The comma separated list of availability zones to use
+                    type: string
                   username:
                     description: The name of master user
                     type: string
@@ -195,6 +198,7 @@ spec:
                   - preferredMaintenanceWindow
                   - region
                   - subnets
+                  - azs
                   - username
                   - vpcCidr
                   - vpcId

@@ -21,7 +21,7 @@ spec:
     engine: "aurora-mysql"
     engineVersion: "8.0.mysql_aurora.3.04.0"
     family: "aurora-mysql8.0"
-    instanceCount: 1
+    instanceCount: 3
     parameter:
     - name: character_set_client
       value: utf8mb4
@@ -39,6 +39,7 @@ spec:
     finalSnapshotIdentifier: "example-rds-aurora-cluster"
     storageEncrypted: true
     subnets: "subnet-0a2b4a2a0e71ff936,subnet-0e4fe74d1d445e437,subnet-03fec93c6b529f361"
+    azs: "eu-west-1a,eu-west-1b,eu-west-1c"
     username: "mojaloop"
     vpcCidr: "10.0.0.0/16"
     vpcId: "vpc-093a94cea27a9ff99"
