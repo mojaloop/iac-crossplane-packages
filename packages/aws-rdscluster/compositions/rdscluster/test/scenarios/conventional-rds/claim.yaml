@@ -42,6 +42,7 @@ spec:
     iops: 5000
     allocatedStorage: 100
     subnets: "subnet-0a2b4a2a0e71ff936,subnet-0e4fe74d1d445e437,subnet-03fec93c6b529f361"
+    azs: "eu-west-1a,eu-west-1b,eu-west-1c"
     username: "mojaloop"
     vpcCidr: "10.0.0.0/16"
     vpcId: "vpc-093a94cea27a9ff99"

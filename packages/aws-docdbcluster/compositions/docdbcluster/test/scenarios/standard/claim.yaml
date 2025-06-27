@@ -19,7 +19,7 @@ spec:
     engine: "docdb"
     engineVersion: "5.0"
     family: "docdb5.0"
-    instanceCount: 1
+    instanceCount: 3
     parameter:
     - name: "audit_logs"
       value: "disabled"
@@ -36,6 +36,7 @@ spec:
     storageEncrypted: true
     storageType: "standard"
     subnets: "subnet-0fb26add714322910,subnet-044648d6e6107d293,subnet-0252e9bfa6e483fd7"
+    azs: "eu-west-1a,eu-west-1b,eu-west-1c"
     username: "mojaloop"
     vpcCidr: "10.0.0.0/16"
     vpcId: "vpc-07ff0e8c129aa5db0"

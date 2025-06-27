@@ -91,6 +91,7 @@ _ClusterParameterGroup = {
     }
 }
 
+availability_zones = parameters?.azs.split(",")
 _Cluster = {
     apiVersion = "docdb.aws.upbound.io/v1beta1"
     kind = "Cluster"
@@ -104,6 +105,7 @@ _Cluster = {
         forProvider = {
             allowMajorVersionUpgrade = parameters?.allowMajorVersionUpgrade
             applyImmediately = parameters?.applyImmediately
+            availabilityZone = availability_zones
             backupRetentionPeriod = parameters?.backupRetentionPeriod
             dbClusterParameterGroupNameSelector = { matchControllerRef = True }
             dbSubnetGroupName = "{}-sng".format(oxr.metadata.name)
@@ -147,6 +149,7 @@ _ClusterInstances = [{
     spec = {
         forProvider = {
             applyImmediately = parameters?.applyImmediately
+            availabilityZone  = availability_zones[i]
             autoMinorVersionUpgrade = parameters?.autoMinorVersionUpgrade
             clusterIdentifierSelector = { matchControllerRef = True }
             copyTagsToSnapshot = parameters?.copyTagsToSnapshot
