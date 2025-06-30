@@ -92,7 +92,7 @@ _ClusterParameterGroup = {
     }
 }
 
-
+availability_zones = parameters?.azs.split(",")
 if regex.search(parameters?.engine, "aurora") == True:
     _dbClusterInstanceClass = ""
 else:
@@ -111,6 +111,7 @@ _Cluster = {
         forProvider = {
             allowMajorVersionUpgrade = parameters?.allowMajorVersionUpgrade
             applyImmediately = parameters?.applyImmediately
+            availabilityZones = availability_zones
             backupRetentionPeriod = parameters?.backupRetentionPeriod
             databaseName = parameters?.databaseName
             dbClusterParameterGroupNameSelector = { matchControllerRef = True }
@@ -158,6 +159,7 @@ _ClusterInstances = [{
     spec = {
         forProvider = {
             applyImmediately = parameters?.applyImmediately
+            availabilityZone  = availability_zones[i]
             autoMinorVersionUpgrade = parameters?.autoMinorVersionUpgrade
             clusterIdentifierSelector = { matchControllerRef = True }
             copyTagsToSnapshot = parameters?.copyTagsToSnapshot
