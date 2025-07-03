@@ -11,6 +11,10 @@ spec:
       ccK8sProviderName: "provider-kubernetes"
   parameters:
     allowMajorVersionUpgrade: false
+    appNamespace: "stateful-resources"
+    consumerAppsExternalServices:
+      - ttk-mongodb-svc
+      - bulk-mongodb-svc
     applyImmediately: false
     backupRetentionPeriod: 7
     databaseName: "exampledb"

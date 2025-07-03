@@ -209,7 +209,40 @@ _ExternalService = {
     }
 }
 
-_items += [_SecurityGroupRule, _SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster, _ExternalService] + _ClusterInstances
+_ConsumerAppExternalServices = [
+    {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-en-svc-{}".format(oxr.metadata.name, serviceName)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "aws-rdscluster-{}".format(serviceName)
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "v1"
+                    kind = "Service"
+                    metadata = {
+                        name = serviceName
+                        namespace = parameters?.appNamespace
+                    }
+                    spec = {
+                        type = "ExternalName"
+                        externalName = _externalName
+                    }
+                }
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.ccK8sProviderName
+            }
+        }
+    } for serviceName in parameters?.consumerAppsExternalServices or []
+]
+
+_items += [_SecurityGroupRule, _SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster, _ExternalService] + _ClusterInstances + _ConsumerAppExternalServices
 
 print(_items)
 

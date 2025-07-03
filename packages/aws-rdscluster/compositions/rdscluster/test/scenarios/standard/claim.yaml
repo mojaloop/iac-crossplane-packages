@@ -12,6 +12,10 @@ spec:
   parameters:
     externalServiceName: "example-rds-aurora-cluster"
     appNamespace: "default"
+    consumerAppsExternalServices:
+       - account-lookup-db-svc
+       - central-ledger-db-svc
+       - mcm-db-svc
     allowMajorVersionUpgrade: false
     applyImmediately: false
     backupRetentionPeriod: 7
