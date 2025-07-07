@@ -1,0 +1,20 @@
+apiVersion: utils.mojaloop.io/v1alpha1
+kind: XPerconaRole
+metadata:
+  name: example-percona-role-claim
+  namespace: default
+spec:
+  parameters:
+    clusterName: example-cluster
+    appNamespace: example-namespace
+    esoPushSecret: true
+    esoUpdatePolicy: Replace
+    esoDeletePolicy: Delete
+    esoRefreshInterval: 1m
+    vaultSecretStore: vault-secret-store
+    vaultSecretPath: percona/sa-token-secret
+  providerConfigsRef:
+    scK8sProviderName: sc-kubernetes-provider
+    ccK8sProviderName: cc-kubernetes-provider
+  managementPolicies:
+    - "*"
