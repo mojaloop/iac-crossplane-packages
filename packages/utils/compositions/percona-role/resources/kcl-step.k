@@ -189,29 +189,61 @@ _saTokenSecret = {
   }
 }
 
-_saTokenSyncer = {
-  apiVersion = "utils.mojaloop.io/v1alpha1"
-  kind = "XObjectSyncer"
+_sourceSecret = {
+  apiVersion = "kubernetes.crossplane.io/v1alpha2"
+  kind = "Object"
   metadata = {
-    name = "{}-sa-token-secret".format(oxr.metadata.name)
+    name = "{}-sa-token-secret-ss".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "source-secret"
+    }
   }
   spec = {
-    parameters = {
-      objectType = "Secret"
-      source = {
-        name = "{}-token".format(parameters?.clusterName)
-        namespace = parameters?.appNamespace
-      }
-      destination = {
-        name = "{}-token".format(parameters?.clusterName)
-        namespace = parameters?.appNamespace
+    forProvider = {
+      manifest = {
+        apiVersion = "v1"
+        kind = "Secret"
+        metadata = {
+          name = "{}-token".format(parameters?.clusterName)
+          namespace = parameters?.appNamespace
+        }
       }
     }
-    providerConfigsRef = {
-      sourceK8sProviderName = spec?.providerConfigsRef?.scK8sProviderName
-      destinationK8sProviderName = spec?.providerConfigsRef?.ccK8sProviderName
+    managementPolicies = ["Observe"]
+    providerConfigRef = {
+      name = spec.providerConfigsRef.scK8sProviderName
     }
-    managementPolicies = spec?.managementPolicies
+  }
+}
+
+_destinationSecret = {
+  apiVersion = "kubernetes.crossplane.io/v1alpha2"
+  kind = "Object"
+  metadata = {
+    name = "{}-sa-token-secret-ds".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "destination-secret"
+    }
+  }
+  spec = {
+    forProvider = {
+      manifest = {
+        apiVersion = "v1"
+        kind = "Secret"
+        metadata = {
+          name = "{}-token".format(parameters?.clusterName)
+          namespace = parameters?.appNamespace
+          annotations = {
+            "kubernetes.io/service-account.name": parameters?.clusterName
+          }
+        }
+        type = "kubernetes.io/service-account-token"
+      }
+    }
+    managementPolicies = ["*"]
+    providerConfigRef = {
+      name = spec.providerConfigsRef.ccK8sProviderName
+    }
   }
 }
 
@@ -276,7 +308,8 @@ _items += [
   _roleBindingPercona,
   _roleBindingAdmin,
   _saTokenSecret,
-  _saTokenSyncer,
+  _sourceSecret,
+  _destinationSecret,
   _pushSaTokenSecret
 ]
 
