@@ -264,7 +264,7 @@ if parameters?.esoPushSecret:
           kind = "PushSecret"
           metadata = {
             name = "{}-sa-token".format(parameters?.clusterName)
-            namespace = parameters?.ccNamespace
+            namespace = parameters?.appNamespace
           }
           spec = {
             updatePolicy = parameters?.esoUpdatePolicy
