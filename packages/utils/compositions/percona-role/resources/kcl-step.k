@@ -233,11 +233,11 @@ _destinationSecret = {
         metadata = {
           name = "{}-token".format(parameters?.clusterName)
           namespace = parameters?.appNamespace
-          annotations = {
-            "kubernetes.io/service-account.name": parameters?.clusterName
-          }
         }
-        type = "kubernetes.io/service-account-token"
+        data = {
+          "token"     = ocds["source-secret"]?.Resource?.status?.atProvider?.manifest?.data?.token
+        }
+        type = "Opaque"
       }
     }
     managementPolicies = ["*"]
