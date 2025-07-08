@@ -9,9 +9,16 @@ spec:
   providerConfigsRef:
       awsProviderConfigName: "aws-provider"
       ccK8sProviderName: "provider-kubernetes"
+      httpProviderConfigName: "http-conf"
   parameters:
     externalServiceName: "example-rds-aurora-cluster"
     appNamespace: "default"
+    caBundleUrl: "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
+    consumerAppsConfigMaps:
+       - namespace: mojaloop
+         name: global-ca-bundle
+       - namespace: mcm
+         name: global-ca-bundle
     consumerAppsExternalServices:
        - account-lookup-db-svc
        - central-ledger-db-svc

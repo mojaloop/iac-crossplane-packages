@@ -9,8 +9,13 @@ spec:
   providerConfigsRef:
       awsProviderConfigName: "aws-provider"
       ccK8sProviderName: "provider-kubernetes"
+      httpProviderConfigName: "http-conf"
   parameters:
     externalServiceName: "example-rds-aurora-cluster"
+    caBundleUrl: "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
+    consumerAppsNamespaces:
+       - mojaloop
+       - mcm
     appNamespace: "default"
     allowMajorVersionUpgrade: false
     applyImmediately: false
