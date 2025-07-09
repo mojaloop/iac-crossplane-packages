@@ -283,10 +283,8 @@ _ConsumerAppCAConfigMaps = [
                         name = parameters?.consumerAppsConfigMap?.name
                         namespace = configMapNs
                     }
-                    spec = {
-                        data = {
-                            parameters?.consumerAppsConfigMap?.key = _caBundle
-                        }
+                    data = {
+                        parameters?.consumerAppsConfigMap?.key = _caBundle
                     }
                 }
             }
