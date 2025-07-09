@@ -195,67 +195,64 @@ _Secret = {
     }
 }
 
-_caSecret = {
-    apiVersion = "utils.mojaloop.io/v1alpha1"
-    kind = "XObjectSyncer"
-    metadata = {
-        name = "{}-ca-secret".format(oxr.metadata.name)
+_casourceSecret = {
+  apiVersion = "kubernetes.crossplane.io/v1alpha2"
+  kind = "Object"
+  metadata = {
+    name = "{}-ca-secret-ss".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "ca-source-secret"
     }
-    spec = {
-        parameters = {
-            objectType = "Secret"
-            source = {
-                name = "{}-ca-cert".format(parameters.clusterName)
-                namespace = parameters?.appNamespace
-            }
-            destination = {
-                name = "{}-ca-cert".format(parameters.clusterName)
-                namespace = parameters?.appNamespace
-            }
+  }
+  spec = {
+    forProvider = {
+      manifest = {
+        apiVersion = "v1"
+        kind = "Secret"
+        metadata = {
+          name = "{}-ca-cert".format(parameters.clusterName)
+          namespace = parameters?.appNamespace
         }
-        providerConfigsRef = {
-            sourceK8sProviderName = spec?.providerConfigsRef?.scK8sProviderName
-            destinationK8sProviderName = spec?.providerConfigsRef?.ccK8sProviderName
-        }
-        managementPolicies = spec?.managementPolicies
+      }
     }
+    managementPolicies = ["Observe"]
+    providerConfigRef = {
+      name = spec.providerConfigsRef.scK8sProviderName
+    }
+  }
 }
 
 _caConfigMap = {
-  apiVersion = "utils.mojaloop.io/v1alpha1"
-  kind = "XConfigMapfromSecret"
+  apiVersion = "kubernetes.crossplane.io/v1alpha2"
+  kind = "Object"
   metadata = {
-    name = "{}-ca-cm".format(parameters.clusterName)
+    name = "{}-ca-bundle".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "ca-bundle-configmap"
+    }
   }
   spec = {
-    parameters = {
-      keyMappings = [
-        {
-          sourceKey = "ca.crt"
-          destinationKey = "ca.crt"
-        },
-        {
-          sourceKey = "tls.crt"
-          destinationKey = "tls.crt"
-        },
-        {
-          sourceKey = "tls.key"
-          destinationKey = "tls.key"
+    forProvider = {
+      manifest = {
+        apiVersion = "v1"
+        kind = "ConfigMap"
+        metadata = {
+          name = "{}-ca-cm".format(parameters.clusterName)
+          namespace = parameters.appNamespace
         }
-      ]
-      sourceSecret = {
-        name = "{}-ca-cert".format(parameters.clusterName)
-        namespace = parameters?.appNamespace
+        data = {
+            "ca.pem": <<~|
+              ${base64.decode(ocds["ca-source-secret"].Resource.status.atProvider.manifest.data["ca.crt"])}
+              ${base64.decode(ocds["ca-source-secret"].Resource.status.atProvider.manifest.data["tls.crt"])}
+              ${base64.decode(ocds["ca-source-secret"].Resource.status.atProvider.manifest.data["tls.key"])}
+            |.strip()
+        }
       }
-      destinationConfigMap = {
-        name = "{}-ca-cert".format(parameters.clusterName)
-        namespace = parameters?.appNamespace
-      }
-    }
-    providerConfigsRef = {
-      k8sProviderName = spec?.providerConfigsRef?.ccK8sProviderName
     }
     managementPolicies = ["*"]
+    providerConfigRef = {
+      name = spec.providerConfigsRef.ccK8sProviderName
+    }
   }
 }
 
@@ -419,7 +416,7 @@ _Policy = {
     }
 }
 
-_items += [_Policy, _MysqlCluster, _Secret, _caSecret, _caConfigMap, _DnsRecord, _ExternalService]
+_items += [_Policy, _MysqlCluster, _Secret, _casourceSecret, _caConfigMap, _DnsRecord, _ExternalService]
 dxr = {
     **oxr
 }
