@@ -229,7 +229,8 @@ _caCrt = base64.decode(str(_caData["ca.crt"])) if "ca.crt" in _caData else ""
 _tlsCrt = base64.decode(str(_caData["tls.crt"])) if "tls.crt" in _caData else ""
 _tlsKey = base64.decode(str(_caData["tls.key"])) if "tls.key" in _caData else ""
 
-_caBundle = "{}\n{}\n{}".format(_caCrt, _tlsCrt, _tlsKey)
+#_caBundle = "{}\n{}\n{}".format(_caCrt, _tlsCrt, _tlsKey)
+_caBundle = "{}\n{}\n{}".format(_caCrt, _tlsCrt, _tlsKey).strip()
 
 _caConfigMap = {
   apiVersion = "kubernetes.crossplane.io/v1alpha2"
