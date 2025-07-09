@@ -226,7 +226,6 @@ _caConfigMap = {
   kind = "XConfigMapfromSecret"
   metadata = {
     name = "{}-ca-cm".format(parameters.clusterName)
-    namespace = parameters?.appNamespace
   }
   spec = {
     parameters = {
