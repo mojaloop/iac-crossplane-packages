@@ -74,6 +74,26 @@ spec:
                   appNamespace:
                     type: string
                     description: Namespace for the consumer application
+                  caConfigMap:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        namespace:
+                          type: string
+                          description: Namespace of the consumer application
+                        name:
+                          type: string
+                          description: Name of the configmap for the consumer application
+                        key:
+                          type: string
+                          description: Key in the configmap that contains the CA bundle
+                    description: List of configmaps for the consumer applications
+                  consumerAppsExternalServices:
+                    type: array
+                    items:
+                      type: string
+                    description: List of externalservice names for the consumer applications
                   crVersion:
                     type: string
                     description: Type of object to be synced

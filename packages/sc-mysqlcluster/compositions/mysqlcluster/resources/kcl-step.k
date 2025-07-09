@@ -195,6 +195,71 @@ _Secret = {
     }
 }
 
+_caSecret = {
+    apiVersion = "utils.mojaloop.io/v1alpha1"
+    kind = "XObjectSyncer"
+    metadata = {
+        name = "{}-ca-secret".format(oxr.metadata.name)
+    }
+    spec = {
+        parameters = {
+            objectType = "Secret"
+            source = {
+                name = "{}-ca-cert".format(parameters.clusterName)
+                namespace = parameters?.appNamespace
+            }
+            destination = {
+                name = "{}-ca-cert".format(parameters.clusterName)
+                namespace = parameters?.appNamespace
+            }
+        }
+        providerConfigsRef = {
+            sourceK8sProviderName = spec?.providerConfigsRef?.scK8sProviderName
+            destinationK8sProviderName = spec?.providerConfigsRef?.ccK8sProviderName
+        }
+        managementPolicies = spec?.managementPolicies
+    }
+}
+
+_caConfigMap = {
+  apiVersion = "utils.mojaloop.io/v1alpha1"
+  kind = "XConfigMapfromSecret"
+  metadata = {
+    name = "{}-ca-cm".format(parameters.clusterName)
+    namespace = parameters?.appNamespace
+  }
+  spec = {
+    parameters = {
+      keyMappings = [
+        {
+          sourceKey = "ca.crt"
+          destinationKey = "ca.crt"
+        },
+        {
+          sourceKey = "tls.crt"
+          destinationKey = "tls.crt"
+        },
+        {
+          sourceKey = "tls.key"
+          destinationKey = "tls.key"
+        }
+      ]
+      sourceSecret = {
+        name = "{}-ca-cert".format(parameters.clusterName)
+        namespace = parameters?.appNamespace
+      }
+      destinationConfigMap = {
+        name = "{}-ca-cert".format(parameters.clusterName)
+        namespace = parameters?.appNamespace
+      }
+    }
+    providerConfigsRef = {
+      k8sProviderName = spec?.providerConfigsRef?.ccK8sProviderName
+    }
+    managementPolicies = ["*"]
+  }
+}
+
 _ip = [ocds["percona-sql-db"]?.Resource?.status?.atProvider?.manifest?.status?.host] if ocds["percona-sql-db"]?.Resource?.status?.atProvider?.manifest?.status?.host else []
 
 _DnsRecord = {
