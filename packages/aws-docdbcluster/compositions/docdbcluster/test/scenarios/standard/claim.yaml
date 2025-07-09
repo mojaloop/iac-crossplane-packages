@@ -14,10 +14,13 @@ spec:
     allowMajorVersionUpgrade: false
     appNamespace: "stateful-resources"
     caBundleUrl: "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
-    consumerAppsConfigMaps:
-      - namespace: mojaloop
+    consumerAppsConfigMap:
         name: global-ca-bundle
         key: "ca-bundle.crt"
+        namespaces:
+          - mojaloop
+          - mcm
+          - adiffone
     consumerAppsExternalServices:
       - ttk-mongodb-svc
       - bulk-mongodb-svc

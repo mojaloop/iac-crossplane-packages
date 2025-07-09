@@ -269,9 +269,9 @@ _ConsumerAppCAConfigMaps = [
         apiVersion = "kubernetes.crossplane.io/v1alpha2"
         kind = "Object"
         metadata = {
-            name = "{}-ca-cm-{}".format(oxr.metadata.name, configMap?.namespace)
+            name = "{}-ca-cm-{}".format(oxr.metadata.name, configMapNs)
             annotations = {
-                "krm.kcl.dev/composition-resource-name": "ca-cm-{}".format(configMap?.namespace)
+                "krm.kcl.dev/composition-resource-name": "ca-cm-{}".format(configMapNs)
             }
         }
         spec = {
@@ -280,12 +280,12 @@ _ConsumerAppCAConfigMaps = [
                     apiVersion = "v1"
                     kind = "ConfigMap"
                     metadata = {
-                        name = configMap?.name
-                        namespace = configMap?.namespace
+                        name = parameters?.consumerAppsConfigMap?.name
+                        namespace = configMapNs
                     }
                     spec = {
                         data = {
-                            configMap?.key = _caBundle
+                            parameters?.consumerAppsConfigMap?.key = _caBundle
                         }
                     }
                 }
@@ -295,7 +295,7 @@ _ConsumerAppCAConfigMaps = [
                 name = spec.providerConfigsRef.ccK8sProviderName
             }
         }
-    } for configMap in parameters?.consumerAppsConfigMaps or []
+    } for configMapNs in parameters?.consumerAppsConfigMap.namespaces or []
 ]
 
 _items += [_SecurityGroupRule, _SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster, _ExternalService, _CaBundleRequest] + _ClusterInstances + _ConsumerAppExternalServices + _ConsumerAppCAConfigMaps

@@ -13,13 +13,13 @@ spec:
   parameters:
     externalServiceName: "example-rds-aurora-cluster"
     caBundleUrl: "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
-    consumerAppsConfigMaps:
-      - namespace: mojaloop
-        name: global-ca-bundle
-        key: "ca-bundle.crt"
-      - namespace: mcm
-        name: global-ca-bundle
-        key: "ca-bundle.crt"
+    consumerAppsConfigMap:
+         name: global-ca-bundle
+         key: "ca-bundle.pem"
+         namespaces:
+            - mojaloop
+            - mcm
+            - adiffone
     appNamespace: "default"
     allowMajorVersionUpgrade: false
     applyImmediately: false

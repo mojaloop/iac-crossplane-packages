@@ -67,21 +67,20 @@ spec:
                   caBundleUrl:
                     type: string
                     description: URL to the CA bundle of AWS
-                  consumerAppsConfigMaps:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        namespace:
+                  consumerAppsConfigMap:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: Name of the configmap
+                      key:
+                        type: string
+                        description: Key in the configmap
+                      namespaces:
+                        type: array
+                        items:
                           type: string
-                          description: Namespace of the consumer application
-                        name:
-                          type: string
-                          description: Name of the configmap for the consumer application
-                        key:
-                          type: string
-                          description: Key in the configmap that contains the CA bundle
-                    description: List of configmaps for the consumer applications
+                        description: List of namespaces where the configmap is available
                   consumerAppsExternalServices:
                     type: array
                     items:
