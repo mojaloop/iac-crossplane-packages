@@ -9,9 +9,15 @@ spec:
   providerConfigsRef:
       awsProviderConfigName: "aws-provider"
       ccK8sProviderName: "provider-kubernetes"
+      httpProviderConfigName: "provider-http"
   parameters:
     allowMajorVersionUpgrade: false
     appNamespace: "stateful-resources"
+    caBundleUrl: "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
+    consumerAppsConfigMaps:
+      - namespace: mojaloop
+        name: global-ca-bundle
+        key: "ca-bundle.crt"
     consumerAppsExternalServices:
       - ttk-mongodb-svc
       - bulk-mongodb-svc

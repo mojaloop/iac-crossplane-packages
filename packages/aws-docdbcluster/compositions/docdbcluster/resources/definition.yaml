@@ -51,6 +51,10 @@ spec:
                     type: string
                     description: |-
                       The name of the provider config to use for the local k8s provider.
+                  httpProviderConfigName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the HTTP provider.
               parameters:
                 type: object
                 properties:
@@ -60,6 +64,24 @@ spec:
                   appNamespace:
                     type: string
                     description: Namespace for the consumer application
+                  caBundleUrl:
+                    type: string
+                    description: URL to the CA bundle of AWS
+                  consumerAppsConfigMaps:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        namespace:
+                          type: string
+                          description: Namespace of the consumer application
+                        name:
+                          type: string
+                          description: Name of the configmap for the consumer application
+                        key:
+                          type: string
+                          description: Key in the configmap that contains the CA bundle
+                    description: List of configmaps for the consumer applications
                   consumerAppsExternalServices:
                     type: array
                     items:
