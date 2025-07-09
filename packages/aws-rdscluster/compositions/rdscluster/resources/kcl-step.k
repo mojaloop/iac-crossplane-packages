@@ -294,7 +294,9 @@ _ConsumerAppCAConfigMaps = [
                         namespace = configMap?.namespace
                     }
                     spec = {
-                        data = _caBundle
+                        data = {
+                            "ca-bundle.crt" = _caBundle
+                        }
                     }
                 }
             }
