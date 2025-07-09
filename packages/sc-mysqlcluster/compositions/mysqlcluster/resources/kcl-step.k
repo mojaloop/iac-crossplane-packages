@@ -222,6 +222,18 @@ _casourceSecret = {
   }
 }
 
+_caRawData = ocds["source-tls-secret"]?.Resource?.status?.atProvider?.manifest?.data
+
+_caCrt  = base64.decode(str(_caRawData["ca.crt"]))  if _caRawData != None and "ca.crt"  in _caRawData else ""
+_tlsCrt = base64.decode(str(_caRawData["tls.crt"])) if _caRawData != None and "tls.crt" in _caRawData else ""
+_tlsKey = base64.decode(str(_caRawData["tls.key"])) if _caRawData != None and "tls.key" in _caRawData else ""
+
+_caBundle = """<<~
+    ${_caCrt}
+    ${_tlsCrt}
+    ${_tlsKey}
+~>>""".strip()
+
 _caConfigMap = {
   apiVersion = "kubernetes.crossplane.io/v1alpha2"
   kind = "Object"
@@ -240,13 +252,7 @@ _caConfigMap = {
           name = "{}-ca-cm".format(parameters.clusterName)
           namespace = parameters.appNamespace
         }
-        data = {
-            "ca.pem": <<~|
-              ${base64.decode(ocds["ca-source-secret"].Resource.status.atProvider.manifest.data["ca.crt"])}
-              ${base64.decode(ocds["ca-source-secret"].Resource.status.atProvider.manifest.data["tls.crt"])}
-              ${base64.decode(ocds["ca-source-secret"].Resource.status.atProvider.manifest.data["tls.key"])}
-            |.strip()
-        }
+        data = _caBundle
       }
     }
     managementPolicies = ["*"]
