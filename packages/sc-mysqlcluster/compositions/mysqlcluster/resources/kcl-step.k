@@ -229,10 +229,10 @@ _tlsCrt = base64.decode(str(_caRawData["tls.crt"])) if _caRawData != None and "t
 _tlsKey = base64.decode(str(_caRawData["tls.key"])) if _caRawData != None and "tls.key" in _caRawData else ""
 
 _caBundle = """<<~
-    ${_caCrt}
-    ${_tlsCrt}
-    ${_tlsKey}
-~>>""".strip()
+${_caCrt}
+${_tlsCrt}
+${_tlsKey}
+~>>""".strip() or ""  # fallback to empty string if None
 
 _caConfigMap = {
   apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -252,7 +252,9 @@ _caConfigMap = {
           name = "{}-ca-cm".format(parameters.clusterName)
           namespace = parameters.appNamespace
         }
-        data = _caBundle
+        data = {
+            "ca-bundle.pem" = str(_caBundle)
+        }
       }
     }
     managementPolicies = ["*"]
