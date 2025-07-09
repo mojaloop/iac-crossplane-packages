@@ -236,9 +236,9 @@ _CaBundleRequest = {
     apiVersion = "http.crossplane.io/v1alpha2"
     kind = "Request"
     metadata = {
-        name = "download-ca"
+        name = "{}-download-ca".format(oxr.metadata.name)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "aws-rdscluster-ca"
+            "krm.kcl.dev/composition-resource-name": "aws-docdbcluster-ca"
         }
     }
     spec = {
@@ -262,7 +262,7 @@ _CaBundleRequest = {
     }
 }
 
-_caBundle  =  ocds["aws-rdscluster-ca"]?.Resource?.status?.response?.body or ""
+_caBundle  =  ocds["aws-docdbcluster-ca"]?.Resource?.status?.response?.body or ""
 
 _ConsumerAppCAConfigMaps = [
     {

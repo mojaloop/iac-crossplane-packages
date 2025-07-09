@@ -246,7 +246,7 @@ _CaBundleRequest = {
     apiVersion = "http.crossplane.io/v1alpha2"
     kind = "Request"
     metadata = {
-        name = "download-ca"
+        name = "{}-download-ca".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "aws-rdscluster-ca"
         }
