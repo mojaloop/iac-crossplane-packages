@@ -222,17 +222,14 @@ _casourceSecret = {
   }
 }
 
-_caRawData = ocds["source-tls-secret"]?.Resource?.status?.atProvider?.manifest?.data
+_caRawData = ocds["ca-source-secret"]?.Resource?.status?.atProvider?.manifest?.data
+_caData = _caRawData if _caRawData != None else {}
 
-_caCrt  = base64.decode(str(_caRawData["ca.crt"]))  if _caRawData != None and "ca.crt"  in _caRawData else ""
-_tlsCrt = base64.decode(str(_caRawData["tls.crt"])) if _caRawData != None and "tls.crt" in _caRawData else ""
-_tlsKey = base64.decode(str(_caRawData["tls.key"])) if _caRawData != None and "tls.key" in _caRawData else ""
+_caCrt = base64.decode(str(_caData["ca.crt"])) if "ca.crt" in _caData else ""
+_tlsCrt = base64.decode(str(_caData["tls.crt"])) if "tls.crt" in _caData else ""
+_tlsKey = base64.decode(str(_caData["tls.key"])) if "tls.key" in _caData else ""
 
-_caBundle = """<<~
-${_caCrt}
-${_tlsCrt}
-${_tlsKey}
-~>>""".strip() or ""  # fallback to empty string if None
+_caBundle = "{}\n{}\n{}".format(_caCrt, _tlsCrt, _tlsKey)
 
 _caConfigMap = {
   apiVersion = "kubernetes.crossplane.io/v1alpha2"
