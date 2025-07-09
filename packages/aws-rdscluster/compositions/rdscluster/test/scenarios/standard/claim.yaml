@@ -17,8 +17,10 @@ spec:
     consumerAppsConfigMaps:
        - namespace: mojaloop
          name: global-ca-bundle
+         key: "ca-bundle.pem"
        - namespace: mcm
          name: global-ca-bundle
+         key: "ca-bundle.pem"
     consumerAppsExternalServices:
        - account-lookup-db-svc
        - central-ledger-db-svc

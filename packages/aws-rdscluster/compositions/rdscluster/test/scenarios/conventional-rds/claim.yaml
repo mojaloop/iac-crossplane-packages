@@ -16,8 +16,10 @@ spec:
     consumerAppsConfigMaps:
       - namespace: mojaloop
         name: global-ca-bundle
+        key: "ca-bundle.crt"
       - namespace: mcm
         name: global-ca-bundle
+        key: "ca-bundle.crt"
     appNamespace: "default"
     allowMajorVersionUpgrade: false
     applyImmediately: false

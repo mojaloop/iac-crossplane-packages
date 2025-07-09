@@ -78,6 +78,9 @@ spec:
                         name:
                           type: string
                           description: Name of the configmap for the consumer application
+                        key:
+                          type: string
+                          description: Key in the configmap that contains the CA bundle
                     description: List of configmaps for the consumer applications
                   consumerAppsExternalServices:
                     type: array
