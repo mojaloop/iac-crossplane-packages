@@ -420,7 +420,7 @@ _Policy = {
     }
 }
 
-_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _ExternalService]
+_items += [_Policy, _MysqlCluster, _Secret, _caSecret, _caConfigMap, _DnsRecord, _ExternalService]
 dxr = {
     **oxr
 }
