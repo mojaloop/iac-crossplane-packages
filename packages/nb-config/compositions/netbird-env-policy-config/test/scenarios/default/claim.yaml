@@ -6,10 +6,6 @@ metadata:
 spec:
   parameters:
     envProperties:
-      setupKey:
-        name: "setup-key-name"
-        namespace: "setup-key-namespace"
-        vaultSecretPath: "exampleenv/setupkey"
       groupNames:
         ccNetworkResource: cc-net
         scNetworkResource: sc-net

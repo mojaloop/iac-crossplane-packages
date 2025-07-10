@@ -74,17 +74,11 @@ spec:
                             This is used to create a policy that allows the env k8s nodes to connect to the cc/sc network resources.
                           properties:
                             scPorts:
-                              type: array
+                              type: string
                               description: The ports to sc to allow in the policy.
-                              items:
-                                type: string
-                                description: individual port to allow.
                             ccPorts:
-                              type: array
+                              type: string
                               description: The ports to sc to allow in the policy.
-                              items:
-                                type: string
-                                description: individual port to allow.
                         groupNames:
                           type: object
                           properties:
