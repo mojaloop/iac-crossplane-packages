@@ -245,7 +245,7 @@ _ConsumerAppExternalServices = [
 
 _CaBundleRequest = {
     apiVersion = "http.crossplane.io/v1alpha2"
-    kind = "Request"
+    kind = "DisposableRequest"
     metadata = {
         name = "{}-download-ca".format(oxr.metadata.name)
         annotations = {
@@ -253,19 +253,10 @@ _CaBundleRequest = {
         }
     }
     spec = {
+        deletionPolicy = "Orphan"
         forProvider = {
-            insecureSkipTLSVerify = True
-            waitTimeout = "5m"
-            payload = {
-                baseUrl = parameters?.caBundleUrl
-            }
-            mappings = [
-                {
-                    action = "OBSERVE"
-                    method = "GET"
-                    url = "(.payload.baseUrl)"
-                }
-            ]
+            url = parameters?.caBundleUrl
+            method = "GET"
         }
         providerConfigRef = {
             name = spec.providerConfigsRef.httpProviderConfigName
