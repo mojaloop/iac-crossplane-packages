@@ -270,7 +270,7 @@ _caSecret = {
           name = parameters?.caSecret?.name
           namespace = parameters?.caSecret?.namespace
         }
-        type = "kubernetes.io/tls"
+        type = "Opaque"
         stringData = {
             str(_bundleKey): str(_caBundle)
         }
