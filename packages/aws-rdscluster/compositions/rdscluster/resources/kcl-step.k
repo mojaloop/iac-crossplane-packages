@@ -168,6 +168,7 @@ _ClusterInstances = [{
             instanceClass = parameters?.dbClusterInstanceClass
             preferredMaintenanceWindow = parameters?.preferredMaintenanceWindow
             region = parameters?.region
+            publiclyAccessible = parameters?.publiclyAccessible
             }
         providerConfigRef = {
             name = spec?.providerConfigsRef?.awsProviderConfigName
