@@ -1,5 +1,7 @@
-# Read the XR and the OCDs
 import regex
+import base64
+
+# Read the XR and the OCDs
 oxr = option("params").oxr
 ocds = option("params").ocds
 
@@ -266,27 +268,27 @@ _CaBundleRequest = {
 
 _caBundle  =  ocds["aws-rdscluster-ca"]?.Resource?.status?.response?.body or ""
 
-_ConsumerAppCAConfigMaps = [
+_ConsumerAppCASecrets = [
     {
         apiVersion = "kubernetes.crossplane.io/v1alpha2"
         kind = "Object"
         metadata = {
-            name = "{}-ca-cm-{}".format(oxr.metadata.name, configMapNs)
+            name = "{}-ca-secret-{}".format(oxr.metadata.name, secretNs)
             annotations = {
-                "krm.kcl.dev/composition-resource-name": "ca-cm-{}".format(configMapNs)
+                "krm.kcl.dev/composition-resource-name": "ca-secret-{}".format(secretNs)
             }
         }
         spec = {
             forProvider = {
                 manifest = {
                     apiVersion = "v1"
-                    kind = "ConfigMap"
+                    kind = "Secret"
                     metadata = {
-                        name = parameters?.consumerAppsConfigMap?.name
-                        namespace = configMapNs
+                        name = parameters?.consumerAppsSecret?.name
+                        namespace = secretNs
                     }
                     data = {
-                        parameters?.consumerAppsConfigMap?.key = _caBundle
+                        parameters?.consumerAppsSecret?.key = base64.encode(_caBundle)
                     }
                 }
             }
@@ -295,10 +297,10 @@ _ConsumerAppCAConfigMaps = [
                 name = spec.providerConfigsRef.ccK8sProviderName
             }
         }
-    } for configMapNs in parameters?.consumerAppsConfigMap.namespaces or []
+    } for secretNs in parameters?.consumerAppsSecret.namespaces or []
 ]
 
-_items += [_SecurityGroupRule, _SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster, _ExternalService , _CaBundleRequest] + _ClusterInstances + _ConsumerAppExternalServices + _ConsumerAppCAConfigMaps
+_items += [_SecurityGroupRule, _SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster, _ExternalService , _CaBundleRequest] + _ClusterInstances + _ConsumerAppExternalServices + _ConsumerAppCASecrets
 
 print(_items)
 

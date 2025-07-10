@@ -14,7 +14,7 @@ spec:
     allowMajorVersionUpgrade: false
     appNamespace: "stateful-resources"
     caBundleUrl: "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
-    consumerAppsConfigMap:
+    consumerAppsSecret:
         name: global-ca-bundle
         key: "ca-bundle.crt"
         namespaces:

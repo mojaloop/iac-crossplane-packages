@@ -13,7 +13,7 @@ spec:
   parameters:
     externalServiceName: "example-rds-aurora-cluster"
     caBundleUrl: "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
-    consumerAppsConfigMap:
+    consumerAppsSecret:
          name: global-ca-bundle
          key: "ca-bundle.pem"
          namespaces:
