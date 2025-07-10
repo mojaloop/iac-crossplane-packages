@@ -251,7 +251,7 @@ _caConfigMap = {
           namespace = parameters?.caConfigMap?.namespace
         }
         data = {
-            _bundleKey = str(_caBundle)
+            str(_bundleKey): str(_caBundle)
         }
       }
     }
