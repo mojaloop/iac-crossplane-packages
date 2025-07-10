@@ -230,27 +230,28 @@ _tlsCrt = base64.decode(str(_caData["tls.crt"])).strip() if "tls.crt" in _caData
 _tlsKey = base64.decode(str(_caData["tls.key"])).strip() if "tls.key" in _caData else ""
 
 _caBundle = "{}\n{}\n{}".format(_caCrt, _tlsCrt, _tlsKey)
-_bundleKey = parameters?.caConfigMap?.key if parameters?.caConfigMap?.key != None else "ca-bundle.pem"
+_bundleKey = parameters?.caSecret?.key if parameters?.caSecret?.key != None else "ca-bundle.pem"
 
-_caConfigMap = {
+_caSecret = {
   apiVersion = "kubernetes.crossplane.io/v1alpha2"
   kind = "Object"
   metadata = {
     name = "{}-ca-bundle".format(oxr.metadata.name)
     annotations = {
-      "krm.kcl.dev/composition-resource-name": "ca-bundle-configmap"
+      "krm.kcl.dev/composition-resource-name": "ca-bundle-secret"
     }
   }
   spec = {
     forProvider = {
       manifest = {
         apiVersion = "v1"
-        kind = "ConfigMap"
+        kind = "Secret"
         metadata = {
-          name = parameters?.caConfigMap?.name
-          namespace = parameters?.caConfigMap?.namespace
+          name = parameters?.caSecret?.name
+          namespace = parameters?.caSecret?.namespace
         }
-        data = {
+        type = "kubernetes.io/tls"
+        stringData = {
             str(_bundleKey): str(_caBundle)
         }
       }
@@ -422,7 +423,7 @@ _Policy = {
     }
 }
 
-_items += [_Policy, _MysqlCluster, _Secret, _casourceSecret, _caConfigMap, _DnsRecord, _ExternalService]
+_items += [_Policy, _MysqlCluster, _Secret, _casourceSecret, _caSecret, _DnsRecord, _ExternalService]
 dxr = {
     **oxr
 }

@@ -12,7 +12,7 @@ spec:
     dbSecret: my-db-secret
     dbUsername: my-user
     dbName: my-database
-    caConfigMap:
+    caSecret:
       name: my-ca-configmap
       namespace: env
       key: my-ca-bundle.pem

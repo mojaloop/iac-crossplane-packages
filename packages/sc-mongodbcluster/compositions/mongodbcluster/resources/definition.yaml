@@ -77,7 +77,7 @@ spec:
                   dbSecret:
                     type: string
                     description: Secret name for the database credentials
-                  caConfigMap:
+                  caSecret:
                     type: object
                     properties:
                       namespace:
