@@ -215,6 +215,73 @@ _Secret = {
     }
 }
 
+_casourceSecret = {
+  apiVersion = "kubernetes.crossplane.io/v1alpha2"
+  kind = "Object"
+  metadata = {
+    name = "{}-ca-secret-ss".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "ca-source-secret"
+    }
+  }
+  spec = {
+    forProvider = {
+      manifest = {
+        apiVersion = "v1"
+        kind = "Secret"
+        metadata = {
+          name = "{}-ca-cert".format(parameters.clusterName)
+          namespace = parameters?.appNamespace
+        }
+      }
+    }
+    managementPolicies = ["Observe"]
+    providerConfigRef = {
+      name = spec.providerConfigsRef.scK8sProviderName
+    }
+  }
+}
+
+_caRawData = ocds["ca-source-secret"]?.Resource?.status?.atProvider?.manifest?.data
+_caData = _caRawData if _caRawData != None else {}
+
+_caCrt = base64.decode(str(_caData["ca.crt"])).strip() if "ca.crt" in _caData else ""
+_tlsCrt = base64.decode(str(_caData["tls.crt"])).strip() if "tls.crt" in _caData else ""
+_tlsKey = base64.decode(str(_caData["tls.key"])).strip() if "tls.key" in _caData else ""
+
+_caBundle = "{}\n{}\n{}".format(_caCrt, _tlsCrt, _tlsKey)
+_bundleKey = parameters?.caConfigMap?.key if parameters?.caConfigMap?.key != None else "ca-bundle.pem"
+
+_caConfigMap = {
+  apiVersion = "kubernetes.crossplane.io/v1alpha2"
+  kind = "Object"
+  metadata = {
+    name = "{}-ca-bundle".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "ca-bundle-configmap"
+    }
+  }
+  spec = {
+    forProvider = {
+      manifest = {
+        apiVersion = "v1"
+        kind = "ConfigMap"
+        metadata = {
+          name = parameters?.caConfigMap?.name
+          namespace = parameters?.caConfigMap?.namespace
+        }
+        data = {
+            _bundleKey = str(_caBundle)
+        }
+      }
+    }
+    managementPolicies = ["*"]
+    providerConfigRef = {
+      name = spec.providerConfigsRef.ccK8sProviderName
+    }
+  }
+}
+
 _ip = [ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host] if ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host else []
 
 _DnsRecord = {
@@ -278,7 +345,7 @@ _ExternalService = {
 }
 
 
-_items += [_MongodbCluster, _Secret, _DnsRecord, _ExternalService]
+_items += [_MongodbCluster, _Secret, _casourceSecret, _caConfigMap,  _DnsRecord, _ExternalService]
 dxr = {
     **oxr
 }

@@ -12,6 +12,10 @@ spec:
     image: percona/percona-server-mongodb:7.0.15-9-multi
     imagePullPolicy: IfNotPresent
     dbSecret: my-db-secret
+    caConfigMap:
+      name: my-ca-configmap
+      namespace: env
+      key: my-ca-bundle.pem
     backup:
       enabled: false
       image: percona/percona-backup-mongodb:2.8.0-multi

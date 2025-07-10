@@ -12,6 +12,10 @@ spec:
     dbSecret: my-db-secret
     dbUsername: my-user
     dbName: my-database
+    caConfigMap:
+      name: my-ca-configmap
+      namespace: env
+      key: my-ca-bundle.pem
     pxc:
       image: "percona/percona-xtradb-cluster:8.4.3-3.1" #example
       imagePullPolicy: IfNotPresent

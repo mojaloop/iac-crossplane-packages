@@ -230,6 +230,7 @@ _tlsCrt = base64.decode(str(_caData["tls.crt"])).strip() if "tls.crt" in _caData
 _tlsKey = base64.decode(str(_caData["tls.key"])).strip() if "tls.key" in _caData else ""
 
 _caBundle = "{}\n{}\n{}".format(_caCrt, _tlsCrt, _tlsKey)
+_bundleKey = parameters?.caConfigMap?.key if parameters?.caConfigMap?.key != None else "ca-bundle.pem"
 
 _caConfigMap = {
   apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -246,11 +247,11 @@ _caConfigMap = {
         apiVersion = "v1"
         kind = "ConfigMap"
         metadata = {
-          name = "{}-ca-cm".format(parameters.clusterName)
-          namespace = parameters.appNamespace
+          name = parameters?.caConfigMap?.name
+          namespace = parameters?.caConfigMap?.namespace
         }
         data = {
-            "ca-bundle.pem" = str(_caBundle)
+            _bundleKey = str(_caBundle)
         }
       }
     }
