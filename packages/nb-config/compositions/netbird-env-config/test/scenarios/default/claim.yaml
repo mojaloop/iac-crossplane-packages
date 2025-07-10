@@ -16,8 +16,6 @@ spec:
         ccNetworkResource: cc-net
         scNetworkResource: sc-net
         envK8sNodes: env-test-nodes
-    managedService:
-      enabled: false
   providerConfigsRef:
     netbirdProviderConfigName: "netbird-provider-config"
     k8sProviderConfigName: "kubernetes-provider"

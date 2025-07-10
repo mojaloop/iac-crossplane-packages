@@ -443,7 +443,7 @@ _internal_network_policy = {
             rules = [
                 {
                     action = "accept"
-                    bidirectional = True
+                    bidirectional = False
                     description = "internal network accept"
                     name = "internal-network-accept-rule"
                     enabled = True

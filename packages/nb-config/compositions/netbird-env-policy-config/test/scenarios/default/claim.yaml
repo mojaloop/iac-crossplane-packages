@@ -1,12 +1,10 @@
 apiVersion: nb.mojaloop.io/v1alpha1
-kind: XNetbirdEnvConfig
+kind: XNetbirdEnvPolicyConfig
 metadata:
-  name: managed-example-env-config
+  name: example-env-policy-config
   namespace: testa
 spec:
   parameters:
-    pushSecret:
-      esoPushSecret: true
     envProperties:
       setupKey:
         name: "setup-key-name"
@@ -16,16 +14,10 @@ spec:
         ccNetworkResource: cc-net
         scNetworkResource: sc-net
         envK8sNodes: env-test-nodes
-    managedService:
-      enabled: true
-      setupKey:
-        name: "managed-setup-key-name"
-        namespace: "managed-setup-key-namespace"
-        vaultSecretPath: "exampleenv/managedsetupkey"
-      groupNames:
-        managedSvc: "managed-group"
+      policy:
+        ccPorts: "8080,443"
+        scPorts: "8080,443,6443"
   providerConfigsRef:
     netbirdProviderConfigName: "netbird-provider-config"
-    k8sProviderConfigName: "kubernetes-provider"
   managementPolicies:
     - "*"
