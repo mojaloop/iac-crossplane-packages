@@ -1,6 +1,6 @@
-# ConfigMapfromSecret Composition
+# PerconaRole Composition
 
-This composition allows you to create Kubernetes ConfigMaps by sourcing data from Secret Object keys
+This composition allows you to create required percona role and bindings for CRs creation of database resources
 
 ## Usage Example
 
@@ -17,15 +17,19 @@ Specifies the source secret, and destination configmap and keys.
 ```yaml
 spec:
   parameters:
-    keyMappings:
-      - sourceKey: secret-source-key
-        destinationKey: destination-cm-key
-    sourceSecret:
-      namespace: secret-source-namespace
-      name: secret-name
-    destinationConfigMap:
-      namespace: destinaton-cm-namespace
-      name: configmap-name
+    clusterName: example-cluster
+    appNamespace: example-namespace
+    esoPushSecret: true
+    esoUpdatePolicy: Replace
+    esoDeletePolicy: Delete
+    esoRefreshInterval: 1m
+    vaultSecretStore: vault-secret-store
+    vaultSecretPath: percona/sa-token-secret
+  providerConfigsRef:
+    scK8sProviderName: sc-kubernetes-provider
+    ccK8sProviderName: kubernetes-provider
+  managementPolicies:
+    - "*"
 ```
 
 ### Provider Configuration
@@ -34,5 +38,6 @@ Local Kubernetes provider configurations must be present on the cluster where th
 
 ```yaml
 providerConfigsRef:
-  k8sProviderName: KUBERNETES_PROVIDER
+  scK8sProviderName: sc-kubernetes-provider
+  ccK8sProviderName: kubernetes-provider
 ```
