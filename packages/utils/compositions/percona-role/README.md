@@ -6,13 +6,13 @@ This composition allows you to create required percona role and bindings for CRs
 
 The following test scenarios demonstrate how to use:
 
-- [ConfigMap Creation from Secret](test/scenarios/standard/claim.yaml)
+- [PerconaRole Creation from Secret](test/scenarios/standard/claim.yaml)
 
 ## Configuration
 
 ### Parameters
 
-Specifies the source secret, and destination configmap and keys.
+Specify required parameters
 
 ```yaml
 spec:
