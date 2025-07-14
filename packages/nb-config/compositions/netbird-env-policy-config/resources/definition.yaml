@@ -7,7 +7,7 @@ spec:
   group: nb.mojaloop.io
   names:
     kind: XNetbirdEnvPolicyConfig
-    plural: xnetbirdenvconfig
+    plural: xnetbirdenvpolicyconfig
   claimNames:
     kind: NetbirdEnvPolicyConfig
     plural: netbirdenvpolicyconfig
