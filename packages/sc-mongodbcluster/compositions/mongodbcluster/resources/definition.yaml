@@ -89,6 +89,11 @@ spec:
                       key:
                         type: string
                         description: Key in the configmap that contains the CA bundle
+                  consumerAppsExternalServices:
+                    type: array
+                    items:
+                      type: string
+                    description: List of externalservice names for the consumer applications
                   crVersion:
                     type: string
                   image:
