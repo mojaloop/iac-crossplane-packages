@@ -93,7 +93,7 @@ spec:
                     type: array
                     items:
                       type: string
-                    description: List of externalservice names for the consumer applications
+                    description: List of externalservice names for consumer applications
                   crVersion:
                     type: string
                   image:
