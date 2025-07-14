@@ -3,7 +3,7 @@ kind: Composition
 metadata:
   name: netbirdenvpolicyconfig
   labels:
-    crossplane.io/xrd: netbirdenvpolicyconfig.nb.mojaloop.io
+    crossplane.io/xrd: xnetbirdenvpolicyconfig.nb.mojaloop.io
 spec:
   compositeTypeRef:
     apiVersion: nb.mojaloop.io/v1alpha1
