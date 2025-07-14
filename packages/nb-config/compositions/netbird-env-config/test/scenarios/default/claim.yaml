@@ -13,8 +13,6 @@ spec:
         namespace: "setup-key-namespace"
         vaultSecretPath: "exampleenv/setupkey"
       groupNames:
-        ccNetworkResource: cc-net
-        scNetworkResource: sc-net
         envK8sNodes: env-test-nodes
   providerConfigsRef:
     netbirdProviderConfigName: "netbird-provider-config"
