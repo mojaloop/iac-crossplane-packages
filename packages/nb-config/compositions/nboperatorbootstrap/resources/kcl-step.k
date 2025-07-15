@@ -443,10 +443,10 @@ _internal_network_policy = {
             rules = [
                 {
                     action = "accept"
-                    bidirectional = False
+                    bidirectional = True
                     description = "internal network accept"
                     name = "internal-network-accept-rule"
-                    enabled = False
+                    enabled = True
                     destinations = [
                         {
                             id = ocds["network-resource-group"]?.Resource?.status?.atProvider?.id or ""
@@ -457,7 +457,7 @@ _internal_network_policy = {
                             id = ocds["external-access-group"]?.Resource?.status?.atProvider?.id or ""
                         }
                     ]
-                    protocol = "tcp"
+                    protocol = "all"
                 }
             ]
         }
