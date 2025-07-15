@@ -7,11 +7,9 @@ spec:
   parameters:
     envProperties:
       groupNames:
-        ccNetworkResource: cc-net
         scNetworkResource: sc-net
         envK8sNodes: env-test-nodes
       policy:
-        ccPorts: "8080,443"
         scPorts: "8080,443,6443"
   providerConfigsRef:
     netbirdProviderConfigName: "netbird-provider-config"

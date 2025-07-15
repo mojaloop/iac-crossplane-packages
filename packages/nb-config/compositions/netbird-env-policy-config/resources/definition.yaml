@@ -76,15 +76,9 @@ spec:
                             scPorts:
                               type: string
                               description: The ports to sc to allow in the policy.
-                            ccPorts:
-                              type: string
-                              description: The ports to sc to allow in the policy.
                         groupNames:
                           type: object
                           properties:
-                            ccNetworkResource:
-                              type: string
-                              description: The name of the external access group to use for the post-config.
                             scNetworkResource:
                               type: string
                               description: The name of the external access group to use for the post-config.

@@ -13,7 +13,10 @@ spec:
         namespace: "setup-key-namespace"
         vaultSecretPath: "exampleenv/setupkey"
       groupNames:
+        ccNetworkResource: cc-net
         envK8sNodes: env-test-nodes
+      policy:
+        ccPorts: "8080,443"
   providerConfigsRef:
     netbirdProviderConfigName: "netbird-provider-config"
     k8sProviderConfigName: "kubernetes-provider"

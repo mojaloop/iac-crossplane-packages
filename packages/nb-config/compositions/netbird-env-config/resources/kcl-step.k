@@ -14,6 +14,26 @@ readyBasedOnConditions = lambda o: any -> bool {
     len(conditions) > 0 and all_true([c.status == "True" for c in conditions])
 }
 
+_cc_network_resource_group = {
+  apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+  kind = "NbGroup"
+  metadata = {
+    name = "{}-cc-network-resource-group".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "cc-network-resource-group"
+      "crossplane.io/external-name": parameters.envProperties.groupNames.ccNetworkResource
+    }
+  }
+  spec = {
+    forProvider = {
+      name = parameters.envProperties.groupNames.ccNetworkResource
+    }
+    providerConfigRef = {
+      name = spec?.providerConfigsRef?.netbirdProviderConfigName
+    }
+    managementPolicies = ["Observe"]
+  }
+}
 
 _env_k8s_nodes_group = {
     apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
@@ -150,17 +170,91 @@ _push_secret_env_k8s_nodes_setup_key = {
   }
 }
 
+_env_k8s_nodes_cc_network_policy = {
+    apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+    kind = "NbPolicy"
+    metadata = {
+        name = "{}-env-k8s-nodes-cc-network-policy".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "env-k8s-nodes-cc-network-policy"
+        }
+    }
+    spec = {
+        forProvider = {
+            name = "{}-env-k8s-nodes-cc-network-policy".format(oxr.metadata.name)
+            enabled = True
+            description = "Policy for connecting to internal cc network for env k8s nodes for {}".format(oxr.metadata.name)
+            rules = [
+                {
+                    action = "accept"
+                    bidirectional = False
+                    description = "internal cc network accept"
+                    name = "internal-cc-network-accept-rule"
+                    enabled = True
+                    destinations = [
+                        {
+                            id = ocds["cc-network-resource-group"]?.Resource?.status?.atProvider?.id or ""
+                        }
+                    ]
+                    sources = [
+                        {
+                            id = ocds["env-k8s-nodes-group"]?.Resource?.status?.atProvider?.id or ""
+                        }
+                    ]
+                    protocol = "tcp"
+                    ports = cc_ports
+                }
+            ]
+        }
+        providerConfigRef = {
+            name = spec.providerConfigsRef.netbirdProviderConfigName
+        }
+        managementPolicies = spec.managementPolicies
+    }
+}
 
+_usage_env_k8s_nodes_cc_network_policy = {
+    apiVersion = "apiextensions.crossplane.io/v1alpha1"
+    kind = "Usage"
+    metadata = {
+      name = "{}-env-k8s-nodes-cc-network-policy-usage".format(oxr.metadata.name)
+      annotations = {
+        "krm.kcl.dev/composition-resource-name": "env-k8s-nodes-cc-network-policy-usage"
+      }
+  }
+    spec: {
+        replayDeletion = True
+        by = {
+            apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+            kind = "NbPolicy"
+            resourceRef = {
+              name = "{}-env-k8s-nodes-cc-network-policy".format(oxr.metadata.name)
+            }
+        }
+        of = {
+            apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
+            kind = "NbGroup"
+            resourceRef = {
+              name = "{}-env-k8s-nodes-group".format(oxr.metadata.name)
+            }
+        }
+    }
+}
 
+cc_ports_str = parameters.envProperties.policy.ccPorts or ""
+cc_ports = [p for p in cc_ports_str.split(",") if p != ""]
 
 # Add the resources to the items list
 _items += [
+  _cc_network_resource_group,
   _env_k8s_nodes_group,
 ]
 if readyBasedOnConditions(ocds["env-k8s-nodes-group"]):
     _items += [
       _env_k8s_nodes_setup_key,
-      _usage_env_k8s_nodes_setup_key,    
+      _usage_env_k8s_nodes_setup_key,
+      _env_k8s_nodes_cc_network_policy,
+      _usage_env_k8s_nodes_cc_network_policy,
     ]
     if parameters.pushSecret.esoPushSecret:
       _items += [
