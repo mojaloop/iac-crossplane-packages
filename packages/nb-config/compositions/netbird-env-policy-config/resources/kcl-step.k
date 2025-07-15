@@ -168,9 +168,9 @@ _usage_env_k8s_nodes_network_policy = {
 }
 
 cc_ports_str = parameters.envProperties.policy.ccPorts or ""
-cc_ports = [int(p) for p in cc_ports_str.split(",") if p != ""]
+cc_ports = [p for p in cc_ports_str.split(",") if p != ""]
 sc_ports_str = parameters.envProperties.policy.scPorts or ""
-sc_ports = [int(p) for p in sc_ports_str.split(",") if p != ""]
+sc_ports = [p for p in sc_ports_str.split(",") if p != ""]
 
 
 # Add the resources to the items list
