@@ -446,7 +446,7 @@ _internal_network_policy = {
                     bidirectional = False
                     description = "internal network accept"
                     name = "internal-network-accept-rule"
-                    enabled = True
+                    enabled = False
                     destinations = [
                         {
                             id = ocds["network-resource-group"]?.Resource?.status?.atProvider?.id or ""
