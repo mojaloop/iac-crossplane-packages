@@ -89,7 +89,8 @@ _env_k8s_nodes_sc_network_policy = {
                         }
                     ]
                     protocol = "tcp"
-                    ports = sc_ports
+                    ports = sc_single_ports
+                    port_ranges = sc_port_ranges_formatted
                 }
             ]
         }
@@ -102,7 +103,20 @@ _env_k8s_nodes_sc_network_policy = {
 
 
 sc_ports_str = parameters.envProperties.policy.scPorts or ""
-sc_ports = [p for p in sc_ports_str.split(",") if p != ""]
+sc_port_entries = [p for p in sc_ports_str.split(",") if p != ""]
+
+# Separate single ports from port ranges
+sc_single_ports = [entry for entry in sc_port_entries if "-" not in entry] if sc_port_entries else []
+sc_port_ranges = [entry for entry in sc_port_entries if "-" in entry]
+
+# Create port_ranges structure
+sc_port_ranges_formatted = [
+    {
+        start = int(p.split("-")[0])
+        end = int(p.split("-")[1])
+    } for p in sc_port_ranges
+] if sc_port_ranges else []
+
 
 
 # Add the resources to the items list

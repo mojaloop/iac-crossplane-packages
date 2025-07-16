@@ -16,7 +16,7 @@ spec:
         ccNetworkResource: cc-net
         envK8sNodes: env-test-nodes
       policy:
-        ccPorts: "8080,443"
+        ccPorts: "8080,443,3000-3005"
   providerConfigsRef:
     netbirdProviderConfigName: "netbird-provider-config"
     k8sProviderConfigName: "kubernetes-provider"
