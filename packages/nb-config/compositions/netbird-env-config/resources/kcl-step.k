@@ -202,7 +202,6 @@ _env_k8s_nodes_cc_network_policy = {
                         }
                     ]
                     protocol = "tcp"
-                    ports = cc_single_ports
                     port_ranges = cc_port_ranges_formatted
                 }
             ]
@@ -243,19 +242,15 @@ _usage_env_k8s_nodes_cc_network_policy = {
 }
 
 cc_ports_str = parameters.envProperties.policy.ccPorts or ""
-cc_port_entries = [p for p in cc_ports_str.split(",") if p != ""]
+cc_port_entries = [p.strip() for p in cc_ports_str.split(",") if p.strip() != ""]
 
-# Separate single ports from port ranges
-cc_single_ports = [entry for entry in cc_port_entries if "-" not in entry] if cc_port_entries else []
-cc_port_ranges = [entry for entry in cc_port_entries if "-" in entry]
-
-# Create port_ranges structure
+# Convert all ports to port ranges (individual ports become ranges with same start/end)
 cc_port_ranges_formatted = [
     {
         start = int(p.split("-")[0])
-        end = int(p.split("-")[1])
-    } for p in cc_port_ranges
-] if cc_port_ranges else []
+        end = int(p.split("-")[1]) if "-" in p else int(p.split("-")[0])
+    } for p in cc_port_entries
+] if cc_port_entries else []
 
 # Add the resources to the items list
 _items += [
