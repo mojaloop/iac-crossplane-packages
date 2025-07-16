@@ -77,18 +77,17 @@ spec:
                   dbSecret:
                     type: string
                     description: Secret name for the database credentials
-                  caSecret:
+                  consumerAppsSecret:
                     type: object
                     properties:
-                      namespace:
-                        type: string
-                        description: Namespace of the consumer application
                       name:
                         type: string
-                        description: Name of the configmap for the consumer application
                       key:
                         type: string
-                        description: Key in the configmap that contains the CA bundle
+                      namespaces:
+                        type: array
+                        items:
+                          type: string
                   consumerAppsExternalServices:
                     type: array
                     items:

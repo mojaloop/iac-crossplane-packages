@@ -252,36 +252,38 @@ _tlsKey = base64.decode(str(_caData["tls.key"])).strip() if "tls.key" in _caData
 _caBundle = "{}\n{}\n{}".format(_caCrt, _tlsCrt, _tlsKey)
 _bundleKey = parameters?.caSecret?.key if parameters?.caSecret?.key != None else "ca-bundle.pem"
 
-_caSecret = {
-  apiVersion = "kubernetes.crossplane.io/v1alpha2"
-  kind = "Object"
-  metadata = {
-    name = "{}-ca-bundle".format(oxr.metadata.name)
-    annotations = {
-      "krm.kcl.dev/composition-resource-name": "ca-bundle-secret"
-    }
-  }
-  spec = {
-    forProvider = {
-      manifest = {
-        apiVersion = "v1"
-        kind = "Secret"
-        metadata = {
-          name = parameters?.caSecret?.name
-          namespace = parameters?.caSecret?.namespace
-        }
-        type = "Opaque"
-        stringData = {
-            str(_bundleKey): str(_caBundle)
-        }
+_ConsumerAppCASecrets = [
+  {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+      name = "{}-ca-secret-{}".format(oxr.metadata.name, secretNs)
+      annotations = {
+        "krm.kcl.dev/composition-resource-name": "ca-secret-{}".format(secretNs)
       }
     }
-    managementPolicies = ["*"]
-    providerConfigRef = {
-      name = spec.providerConfigsRef.ccK8sProviderName
+    spec = {
+      forProvider = {
+        manifest = {
+          apiVersion = "v1"
+          kind = "Secret"
+          metadata = {
+            name = parameters?.consumerAppsSecret?.name
+            namespace = secretNs
+          }
+          type = "Opaque"
+          stringData = {
+            parameters?.consumerAppsSecret?.key: _caBundle
+          }
+        }
+      }
+      managementPolicies = ["*"]
+      providerConfigRef = {
+        name = spec.providerConfigsRef.ccK8sProviderName
+      }
     }
-  }
-}
+  } for secretNs in parameters?.consumerAppsSecret?.namespaces or []
+]
 
 _ip = [ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host] if ocds["percona-mongodb-cluster"]?.Resource?.status?.atProvider?.manifest?.status?.host else []
 
@@ -345,8 +347,41 @@ _ExternalService = {
     }
 }
 
+_ConsumerAppExternalServices = [
+    {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-en-svc-{}".format(oxr.metadata.name, serviceName)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "mongodb-{}".format(serviceName)
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "v1"
+                    kind = "Service"
+                    metadata = {
+                        name = serviceName
+                        namespace = parameters?.appNamespace
+                    }
+                    spec = {
+                        type = "ExternalName"
+                        externalName = _externalName
+                    }
+                }
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.ccK8sProviderName
+            }
+        }
+    } for serviceName in parameters?.consumerAppsExternalServices or []
+]
 
-_items += [_MongodbCluster, _Secret, _casourceSecret, _caSecret,  _DnsRecord, _ExternalService]
+
+_items += [_MongodbCluster, _Secret, _casourceSecret] + _ConsumerAppCASecrets + _ConsumerAppExternalServices + [_DnsRecord, _ExternalService]
 dxr = {
     **oxr
 }

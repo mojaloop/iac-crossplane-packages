@@ -12,10 +12,16 @@ spec:
     dbSecret: my-db-secret
     dbUsername: my-user
     dbName: my-database
-    caSecret:
+    consumerAppsSecret:
       name: my-ca-configmap
-      namespace: env
       key: my-ca-bundle.pem
+      namespaces:
+        - env
+        - env2
+    consumerAppsExternalServices:
+      - account-lookup-db-svc
+      - central-ledger-db-svc
+      - mcm-db-svc
     pxc:
       image: "percona/percona-xtradb-cluster:8.4.3-3.1" #example
       imagePullPolicy: IfNotPresent
