@@ -458,7 +458,7 @@ _ConsumerAppExternalServices = [
     } for serviceName in parameters?.consumerAppsExternalServices or []
 ]
 
-_items += [_Policy, _MysqlCluster, _Secret, _casourceSecret, _DnsRecord, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _casourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }
