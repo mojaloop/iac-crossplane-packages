@@ -23,7 +23,7 @@ _MysqlCluster = {
                 kind = "PerconaXtraDBCluster"
                 metadata = {
                     name = parameters.clusterName
-                    namespace = parameters.appNamespace
+                    namespace = parameters.clusterName
                 }
                 spec = {
                     crVersion = parameters?.crVersion
