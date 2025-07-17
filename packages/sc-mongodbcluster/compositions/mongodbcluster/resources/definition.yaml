@@ -74,6 +74,9 @@ spec:
                   appNamespace:
                     type: string
                     description: Namespace for the consumer application
+                  scAppNamespace:
+                    type: string
+                    description: Storage cluster namespace
                   dbSecret:
                     type: string
                     description: Secret name for the database credentials

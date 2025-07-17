@@ -23,7 +23,7 @@ _MongodbCluster = {
                 kind = "PerconaServerMongoDB"
                 metadata = {
                     name = parameters.clusterName
-                    namespace = parameters.clusterName
+                    namespace = parameters.scAppNamespace
                 }
                 spec = {
                     crVersion = parameters?.crVersion
@@ -200,11 +200,11 @@ _Secret = {
             objectType = "Secret"
             source = {
                 name = parameters?.dbSecret
-                namespace = parameters?.appNamespace
+                namespace = parameters?.scAppNamespace
             }
             destination = {
                 name = parameters?.dbSecret
-                namespace = parameters?.clusterName
+                namespace = parameters?.appNamespace
             }
         }
         providerConfigsRef = {
@@ -231,7 +231,7 @@ _casourceSecret = {
         kind = "Secret"
         metadata = {
           name = "{}-ca-cert".format(parameters.clusterName)
-          namespace = parameters?.clusterName
+          namespace = parameters?.scAppNamespace
         }
       }
     }
@@ -381,7 +381,7 @@ _ConsumerAppExternalServices = [
 ]
 
 
-_items += [_MongodbCluster, _Secret, _casourceSecret] + _ConsumerAppCASecrets + _ConsumerAppExternalServices + [_DnsRecord, _ExternalService]
+_items += [_MongodbCluster, _Secret, _casourceSecret, _DnsRecord, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }

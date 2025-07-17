@@ -8,6 +8,7 @@ spec:
     clusterName: env
     externalServiceName: my-cluster-service
     appNamespace: env
+    scAppNamespace: env
     crVersion: "1.16.0"
     dbSecret: my-db-secret
     dbUsername: my-user

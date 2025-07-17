@@ -8,6 +8,7 @@ spec:
     clusterName: env
     externalServiceName: my-cluster-service
     appNamespace: env
+    scAppNamespace: env
     crVersion: "1.19.1"
     image: percona/percona-server-mongodb:7.0.15-9-multi
     imagePullPolicy: IfNotPresent

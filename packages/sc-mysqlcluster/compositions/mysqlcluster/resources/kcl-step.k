@@ -23,7 +23,7 @@ _MysqlCluster = {
                 kind = "PerconaXtraDBCluster"
                 metadata = {
                     name = parameters.clusterName
-                    namespace = parameters.clusterName
+                    namespace = parameters.scAppNamespace
                 }
                 spec = {
                     crVersion = parameters?.crVersion
@@ -180,7 +180,7 @@ _Secret = {
             objectType = "Secret"
             source = {
                 name = parameters?.dbSecret
-                namespace = parameters?.clusterName
+                namespace = parameters?.scAppNamespace
             }
             destination = {
                 name = parameters?.dbSecret
@@ -211,7 +211,7 @@ _casourceSecret = {
         kind = "Secret"
         metadata = {
           name = "{}-ca-cert".format(parameters.clusterName)
-          namespace = parameters?.clusterName
+          namespace = parameters?.scAppNamespace
         }
       }
     }
@@ -359,7 +359,7 @@ _Policy = {
                                             "StatefulSet"
                                         ]
                                         namespaces = [
-                                            parameters?.appNamespace
+                                            parameters?.scAppNamespace
                                         ]
                                         names = [
                                             "{}-pxc".format(parameters.clusterName)

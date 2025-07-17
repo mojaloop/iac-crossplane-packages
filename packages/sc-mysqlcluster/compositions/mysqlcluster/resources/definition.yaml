@@ -74,6 +74,9 @@ spec:
                   appNamespace:
                     type: string
                     description: Namespace for the consumer application
+                  scAppNamespace:
+                    type: string
+                    description: Storage cluster namespace
                   consumerAppsSecret:
                     type: object
                     properties:
