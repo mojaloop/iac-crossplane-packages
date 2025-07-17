@@ -85,6 +85,77 @@ _role = {
   }
 }
 
+_roleClusterKyverno = {
+  apiVersion = "kubernetes.crossplane.io/v1alpha2"
+  kind = "Object"
+  metadata = {
+    name = "{}-kyverno-clusterrole".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "kyverno-clusterrole"
+    }
+  }
+  spec = {
+    forProvider = {
+      manifest = {
+        apiVersion = "rbac.authorization.k8s.io/v1"
+        kind = "ClusterRole"
+        metadata = {
+          name = "{}-kyverno".format(parameters?.clusterName)
+        }
+        rules = [
+          {
+            apiGroups = ["kyverno.io"]
+            resources = ["clusterpolicies"]
+            verbs = ["get", "list", "watch", "create", "update", "patch", "delete"]
+          }
+        ]
+      }
+    }
+    managementPolicies = spec.managementPolicies
+    providerConfigRef = {
+      name = spec.providerConfigsRef.scK8sProviderName
+    }
+  }
+}
+
+_roleBindingKyverno = {
+  apiVersion = "kubernetes.crossplane.io/v1alpha2"
+  kind = "Object"
+  metadata = {
+    name = "{}-kyverno-clusterrolebinding".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "kyverno-clusterrolebinding"
+    }
+  }
+  spec = {
+    forProvider = {
+      manifest = {
+        apiVersion = "rbac.authorization.k8s.io/v1"
+        kind = "ClusterRoleBinding"
+        metadata = {
+          name = "{}-kyverno-binding".format(parameters?.clusterName)
+        }
+        subjects = [
+          {
+            kind = "ServiceAccount"
+            name = parameters?.clusterName
+            namespace = parameters?.appNamespace
+          }
+        ]
+        roleRef = {
+          kind = "ClusterRole"
+          name = "{}-kyverno".format(parameters?.clusterName)
+          apiGroup = "rbac.authorization.k8s.io"
+        }
+      }
+    }
+    managementPolicies = spec.managementPolicies
+    providerConfigRef = {
+      name = spec.providerConfigsRef.scK8sProviderName
+    }
+  }
+}
+
 _roleBindingPercona = {
   apiVersion = "kubernetes.crossplane.io/v1alpha2"
   kind = "Object"
@@ -312,6 +383,8 @@ _items += [
   _role,
   _roleBindingPercona,
   _roleBindingAdmin,
+  _roleClusterKyverno,
+  _roleBindingKyverno,
   _saTokenSecret,
   _sourceSecret,
   _destinationSecret,
