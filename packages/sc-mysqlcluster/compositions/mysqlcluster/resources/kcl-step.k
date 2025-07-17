@@ -230,7 +230,6 @@ _tlsCrt = base64.decode(str(_caData["tls.crt"])).strip() if "tls.crt" in _caData
 _tlsKey = base64.decode(str(_caData["tls.key"])).strip() if "tls.key" in _caData else ""
 
 _caBundle = "{}\n{}\n{}".format(_caCrt, _tlsCrt, _tlsKey)
-_bundleKey = parameters?.caSecret?.key if parameters?.caSecret?.key != None else "ca-bundle.pem"
 
 _ConsumerAppCASecrets = [
   {
