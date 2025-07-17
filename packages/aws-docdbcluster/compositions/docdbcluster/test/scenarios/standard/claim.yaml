@@ -53,3 +53,4 @@ spec:
     username: "mojaloop"
     vpcCidr: "10.0.0.0/16"
     vpcId: "vpc-07ff0e8c129aa5db0"
+    snapshotIdentifier: "arn:aws:rds:eu-west-1:123456789012:cluster-snapshot:example-documentdb-cluster-snapshot"

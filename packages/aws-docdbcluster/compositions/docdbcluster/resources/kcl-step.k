@@ -122,7 +122,6 @@ _Cluster = {
             region = parameters?.region
             restoreToPointInTime = parameters?.restoreToPointInTime
             skipFinalSnapshot = parameters?.skipFinalSnapshot
-            snapshotIdentifier = parameters?.snapshotIdentifier
             storageEncrypted = parameters?.storageEncrypted
             storageType = parameters?.storageType
             vpcSecurityGroupIdSelector = { matchControllerRef = True }
@@ -132,7 +131,10 @@ _Cluster = {
                             namespace = parameters?.passwordSecret?.namespace
                         }
 
-            }
+        }
+        initProvider = {
+            snapshotIdentifier = parameters?.snapshotIdentifier
+        }
         providerConfigRef = {
             name = spec?.providerConfigsRef?.awsProviderConfigName
         }

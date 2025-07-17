@@ -57,3 +57,4 @@ spec:
     username: "mojaloop"
     vpcCidr: "10.0.0.0/16"
     vpcId: "vpc-093a94cea27a9ff99"
+    snapshotIdentifier: "arn:aws:rds:af-south-1:557690596740:cluster-snapshot:controlcenter-test-envdb-plt-p52kb-cluster-final-snapshot"
