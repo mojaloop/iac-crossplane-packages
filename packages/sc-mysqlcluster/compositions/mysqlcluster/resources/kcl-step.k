@@ -158,10 +158,10 @@ _MysqlCluster = {
                 }
             }
         }
-        readiness = {
-            policy = "DeriveFromCelQuery"
-            celQuery = '"status" in object && "conditions" in object.status && object.status.conditions.exists(c, c.type == "ready" && c.status == "True" )'
-        }
+        #readiness = {
+        #    policy = "DeriveFromCelQuery"
+        #    celQuery = '"status" in object && "conditions" in object.status && object.status.conditions.exists(c, c.type == "ready" && c.status == "True" )'
+        #}
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
             name = spec.providerConfigsRef.scK8sProviderName
@@ -458,7 +458,7 @@ _ConsumerAppExternalServices = [
     } for serviceName in parameters?.consumerAppsExternalServices or []
 ]
 
-_items += [_Policy, _MysqlCluster, _Secret, _casourceSecret] + _ConsumerAppCASecrets + _ConsumerAppExternalServices + [_DnsRecord, _ExternalService]
+_items += [_Policy, _MysqlCluster, _Secret, _casourceSecret, _DnsRecord, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }
