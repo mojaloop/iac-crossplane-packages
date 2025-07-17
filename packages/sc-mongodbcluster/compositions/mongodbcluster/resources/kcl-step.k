@@ -23,7 +23,7 @@ _MongodbCluster = {
                 kind = "PerconaServerMongoDB"
                 metadata = {
                     name = parameters.clusterName
-                    namespace = parameters.appNamespace
+                    namespace = parameters.clusterName
                 }
                 spec = {
                     crVersion = parameters?.crVersion
@@ -204,7 +204,7 @@ _Secret = {
             }
             destination = {
                 name = parameters?.dbSecret
-                namespace = parameters?.appNamespace
+                namespace = parameters?.clusterName
             }
         }
         providerConfigsRef = {
@@ -231,7 +231,7 @@ _casourceSecret = {
         kind = "Secret"
         metadata = {
           name = "{}-ca-cert".format(parameters.clusterName)
-          namespace = parameters?.appNamespace
+          namespace = parameters?.clusterName
         }
       }
     }

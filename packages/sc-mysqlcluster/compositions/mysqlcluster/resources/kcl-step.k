@@ -180,7 +180,7 @@ _Secret = {
             objectType = "Secret"
             source = {
                 name = parameters?.dbSecret
-                namespace = parameters?.appNamespace
+                namespace = parameters?.clusterName
             }
             destination = {
                 name = parameters?.dbSecret
@@ -211,7 +211,7 @@ _casourceSecret = {
         kind = "Secret"
         metadata = {
           name = "{}-ca-cert".format(parameters.clusterName)
-          namespace = parameters?.appNamespace
+          namespace = parameters?.clusterName
         }
       }
     }
