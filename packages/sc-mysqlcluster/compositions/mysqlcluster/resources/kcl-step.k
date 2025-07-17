@@ -222,14 +222,47 @@ _casourceSecret = {
   }
 }
 
+_clientsourceSecret = {
+  apiVersion = "kubernetes.crossplane.io/v1alpha2"
+  kind = "Object"
+  metadata = {
+    name = "{}-client-tls-ss".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "client-tls-ss"
+    }
+  }
+  spec = {
+    forProvider = {
+      manifest = {
+        apiVersion = "v1"
+        kind = "Secret"
+        metadata = {
+          name = "{}-ssl".format(parameters.clusterName)
+          namespace = parameters?.scAppNamespace
+        }
+      }
+    }
+    managementPolicies = ["Observe"]
+    providerConfigRef = {
+      name = spec.providerConfigsRef.scK8sProviderName
+    }
+  }
+}
+
 _caRawData = ocds["ca-source-secret"]?.Resource?.status?.atProvider?.manifest?.data
 _caData = _caRawData if _caRawData != None else {}
 
-_caCrt = base64.decode(str(_caData["ca.crt"])).strip() if "ca.crt" in _caData else ""
-_tlsCrt = base64.decode(str(_caData["tls.crt"])).strip() if "tls.crt" in _caData else ""
-_tlsKey = base64.decode(str(_caData["tls.key"])).strip() if "tls.key" in _caData else ""
+_tlsRawData = ocds["client-tls-ss"]?.Resource?.status?.atProvider?.manifest?.data
+_tlsData = _tlsRawData if _tlsRawData != None else {}
 
-_caBundle = "{}\n{}\n{}".format(_caCrt, _tlsCrt, _tlsKey)
+_caCrt = base64.decode(str(_caData["ca.crt"])).strip() if "ca.crt" in _caData else ""
+_catlsCrt = base64.decode(str(_caData["tls.crt"])).strip() if "tls.crt" in _caData else ""
+_catlsKey = base64.decode(str(_caData["tls.key"])).strip() if "tls.key" in _caData else ""
+
+_tlsCrt = base64.decode(str(_tlsData["tls.crt"])).strip() if "tls.crt" in _tlsData else ""
+_tlsKey = base64.decode(str(_tlsData["tls.key"])).strip() if "tls.key" in _tlsData else ""
+
+_caBundle = "{}\n{}\n{}".format(_catlsCrt, _tlsCrt, _tlsKey)
 
 _ConsumerAppCASecrets = [
   {
@@ -457,7 +490,7 @@ _ConsumerAppExternalServices = [
     } for serviceName in parameters?.consumerAppsExternalServices or []
 ]
 
-_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _casourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _casourceSecret, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }
