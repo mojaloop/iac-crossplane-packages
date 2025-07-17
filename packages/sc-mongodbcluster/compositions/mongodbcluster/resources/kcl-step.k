@@ -178,10 +178,10 @@ _MongodbCluster = {
                 }
             }
         }
-        readiness = {
-            policy = "DeriveFromCelQuery"
-            celQuery = '"status" in object && "conditions" in object.status && object.status.conditions.exists(c, c.type == "ready" && c.status == "True" )'
-        }
+        #readiness = {
+        #    policy = "DeriveFromCelQuery"
+        #    celQuery = '"status" in object && "conditions" in object.status && object.status.conditions.exists(c, c.type == "ready" && c.status == "True" )'
+        #}
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
             name = spec.providerConfigsRef.scK8sProviderName
