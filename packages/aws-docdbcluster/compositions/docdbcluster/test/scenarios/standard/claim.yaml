@@ -43,6 +43,7 @@ spec:
     port: 27017
     preferredBackupWindow: "02:00-04:00"
     preferredMaintenanceWindow: "Tue:23:45-Wed:00:15"
+    publiclyAccessible: true
     region: "eu-west-1"
     skipFinalSnapshot: true
     finalSnapshotIdentifier: "example-documentdb-cluster"

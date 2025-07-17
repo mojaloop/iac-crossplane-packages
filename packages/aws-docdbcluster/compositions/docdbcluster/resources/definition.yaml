@@ -166,6 +166,10 @@ spec:
                   preferredMaintenanceWindow:
                     description: The preferred maintenance window
                     type: string
+                  publiclyAccessible:
+                    description: Indicates that the cluster is publicly accessible
+                    type: boolean
+                    default: false
                   region:
                     description: Region
                     type: string
