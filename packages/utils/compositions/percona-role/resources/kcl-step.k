@@ -69,11 +69,6 @@ _role = {
             apiGroups = ["psmdb.percona.com"]
             resources = ["perconaservermongodbs"]
             verbs = ["get", "list", "watch", "create", "update", "patch", "delete"]
-          },
-          {
-            apiGroups = ["kyverno.io"]
-            resources = ["clusterpolicies"]
-            verbs = ["get", "list", "watch", "create", "update", "patch", "delete"]
           }
         ]
       }
