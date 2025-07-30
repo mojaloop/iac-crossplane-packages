@@ -136,4 +136,4 @@ spec:
                           properties:
                             ccPorts:
                               type: string
-                              description: The ports to sc to allow in the policy.
+                              description: The ports to cc to allow in the policy.
