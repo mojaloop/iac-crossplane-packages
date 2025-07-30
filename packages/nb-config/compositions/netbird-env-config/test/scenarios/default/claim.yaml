@@ -14,10 +14,9 @@ spec:
         vaultSecretPath: "exampleenv/setupkey"
       groupNames:
         ccNetworkResource: cc-net
-        scNetworkResource: sc-net
         envK8sNodes: env-test-nodes
-    managedService:
-      enabled: false
+      policy:
+        ccPorts: "8080,443,3000-3005"
   providerConfigsRef:
     netbirdProviderConfigName: "netbird-provider-config"
     k8sProviderConfigName: "kubernetes-provider"
