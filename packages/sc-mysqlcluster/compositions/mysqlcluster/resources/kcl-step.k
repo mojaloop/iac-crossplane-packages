@@ -289,6 +289,7 @@ _DnsRecord = {
         providerConfigsRef = {
             awsProviderConfigName = spec?.providerConfigsRef?.awsProviderName
         }
+        managementPolicies = spec.managementPolicies
     }
 }
 
