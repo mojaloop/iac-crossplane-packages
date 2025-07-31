@@ -239,10 +239,11 @@ _DnsRecord = {
         providerConfigsRef = {
             awsProviderConfigName = spec?.providerConfigsRef?.awsProviderName
         }
+        managementPolicies = spec?.managementPolicies
     }
 }
 
-# TODO - clean up , this is not required this can be directly pushed to vault to share with env, keeping it because to make the code compatible with rds
+## TODO - clean up , this is not required this can be directly pushed to vault to share with env, keeping it because to make the code compatible with rds
 
 _externalName = ocds["dns-record"]?.Resource?.status?.fqdn or ""
 
