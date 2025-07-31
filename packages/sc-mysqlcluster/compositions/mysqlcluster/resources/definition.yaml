@@ -100,6 +100,9 @@ spec:
                   dbSecret:
                     type: string
                     description: Type of object to be synced
+                  dbsourceSecret:
+                    type: string
+                    description: Secret name for the database credentials
                   dbUsername:
                     type: string
                     description: Name of the database user to be created

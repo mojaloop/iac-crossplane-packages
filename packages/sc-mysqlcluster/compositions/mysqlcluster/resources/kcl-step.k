@@ -179,7 +179,7 @@ _Secret = {
         parameters = {
             objectType = "Secret"
             source = {
-                name = parameters?.dbSecret
+                name = parameters?.dbsourceSecret
                 namespace = parameters?.scAppNamespace
             }
             destination = {

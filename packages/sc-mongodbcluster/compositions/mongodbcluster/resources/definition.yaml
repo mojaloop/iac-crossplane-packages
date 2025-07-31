@@ -80,6 +80,9 @@ spec:
                   dbSecret:
                     type: string
                     description: Secret name for the database credentials
+                  dbsourceSecret:
+                    type: string
+                    description: Secret name for the database credentials
                   consumerAppsSecret:
                     type: object
                     properties:

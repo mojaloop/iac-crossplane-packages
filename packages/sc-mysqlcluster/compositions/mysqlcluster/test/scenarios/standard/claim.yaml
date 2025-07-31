@@ -11,6 +11,7 @@ spec:
     scAppNamespace: env
     crVersion: "1.16.0"
     dbSecret: my-db-secret
+    dbsourceSecret: my-db-source-secret
     dbUsername: my-user
     dbName: my-database
     consumerAppsSecret:
