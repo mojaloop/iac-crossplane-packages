@@ -74,6 +74,25 @@ spec:
                   appNamespace:
                     type: string
                     description: Namespace for the consumer application
+                  scAppNamespace:
+                    type: string
+                    description: Storage cluster namespace
+                  consumerAppsSecret:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      key:
+                        type: string
+                      namespaces:
+                        type: array
+                        items:
+                          type: string
+                  consumerAppsExternalServices:
+                    type: array
+                    items:
+                      type: string
+                    description: List of externalservice names for the consumer applications
                   crVersion:
                     type: string
                     description: Type of object to be synced
@@ -81,6 +100,9 @@ spec:
                   dbSecret:
                     type: string
                     description: Type of object to be synced
+                  dbsourceSecret:
+                    type: string
+                    description: Secret name for the database credentials
                   dbUsername:
                     type: string
                     description: Name of the database user to be created

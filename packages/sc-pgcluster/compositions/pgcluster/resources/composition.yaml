@@ -19,6 +19,7 @@ spec:
         kind: KCLInput
         spec:
           source: |
+            import base64
             $KCL_FUNCTION_CODE
 
     - step: automatically-detect-ready-composed-resources
