@@ -18,7 +18,7 @@ spec:
       name: my-ca-configmap
       key: my-ca-bundle.pem
       namespaces:
-        - env
+        - env1
         - env2
     consumerAppsExternalServices:
       - account-lookup-db-svc
