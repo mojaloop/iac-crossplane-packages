@@ -146,14 +146,7 @@ _MysqlCluster = {
                         }
                         if parameters?.backup?.pvc : "fs-pvc" = parameters?.backup?.pvc
                     }
-                    schedule = [
-                        {
-                            name = parameters?.backup?.scheduleName
-                            schedule = parameters?.backup?.cronScheduleExpression
-                            keep = parameters?.backup?.backupRetention
-                            storageName = "s3-backup-storage"
-                        }
-                    ]
+                    schedule = []
                 }
                 }
             }
