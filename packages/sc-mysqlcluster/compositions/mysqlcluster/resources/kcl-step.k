@@ -6,6 +6,33 @@ spec = oxr.spec
 parameters = spec.parameters
 # Initialize the items list
 _items = []
+
+_backupSnippet = {}
+if parameters?.backup?.enabled == True:
+    _backupSnippet = {
+        image =  parameters?.backup?.image,
+        imagePullPolicy =  parameters?.backup?.imagePullPolicy,
+        storages =  {
+            "s3-backup-storage" =  {
+                type =  "s3",
+                verifyTLS =  parameters?.backup?.verifyTLS,
+                s3 =  {
+                    bucket =  parameters?.backup?.bucket,
+                    credentialsSecret =  parameters?.backup?.credentialsSecret,
+                    region =  parameters?.backup?.bucketRegion,
+                }
+            },
+            **({"fs-pvc" =  parameters?.backup?.pvc} if parameters?.backup?.contains("pvc") else {})
+        },
+        schedule =  [{
+            name =  parameters?.backup?.scheduleName,
+            schedule =  parameters?.backup?.cronScheduleExpression,
+            keep =  parameters?.backup?.backupRetention,
+            storageName =  "s3-backup-storage",
+        }]
+    }
+
+
 ## Adding resources
 _MysqlCluster = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -131,23 +158,7 @@ _MysqlCluster = {
 
                         }
                     }
-                    backup = {
-                    image = parameters?.backup?.image
-                    imagePullPolicy = parameters?.backup?.imagePullPolicy
-                    storages = {
-                        "s3-backup-storage" = {
-                            type = "s3"
-                            verifyTLS = parameters?.backup?.verifyTLS
-                            s3 = {
-                                bucket = parameters?.backup?.bucket
-                                credentialsSecret = parameters?.backup?.credentialsSecret
-                                region = parameters?.backup?.bucketRegion
-                            }
-                        }
-                        if parameters?.backup?.pvc : "fs-pvc" = parameters?.backup?.pvc
-                    }
-                    schedule = []
-                }
+                    backup = _backupSnippet
                 }
             }
         }
