@@ -247,6 +247,8 @@ _ConsumerAppExternalServices = [
     } for serviceName in parameters?.consumerAppsExternalServices or []
 ]
 
+_caBundleUrl = parameters?.caBundleUrl or "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
+
 _CaBundleRequest = {
     apiVersion = "http.crossplane.io/v1alpha2"
     kind = "DisposableRequest"
@@ -259,7 +261,7 @@ _CaBundleRequest = {
     spec = {
         deletionPolicy = "Orphan"
         forProvider = {
-            url = parameters?.caBundleUrl
+            url = _caBundleUrl
             method = "GET"
         }
         providerConfigRef = {
