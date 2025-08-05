@@ -9,9 +9,22 @@ spec:
   providerConfigsRef:
       awsProviderConfigName: "aws-provider"
       ccK8sProviderName: "provider-kubernetes"
+      httpProviderConfigName: "http-conf"
   parameters:
     externalServiceName: "example-rds-aurora-cluster"
     appNamespace: "default"
+    caBundleUrl: "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
+    consumerAppsSecret:
+         name: global-ca-bundle
+         key: "ca-bundle.pem"
+         namespaces:
+            - mojaloop
+            - mcm
+            - adiffone
+    consumerAppsExternalServices:
+       - account-lookup-db-svc
+       - central-ledger-db-svc
+       - mcm-db-svc
     allowMajorVersionUpgrade: false
     applyImmediately: false
     backupRetentionPeriod: 7
@@ -34,6 +47,7 @@ spec:
     port: 3306
     preferredBackupWindow: "02:00-04:00"
     preferredMaintenanceWindow: "Tue:23:45-Wed:00:15"
+    publiclyAccessible: true
     region: "eu-west-1"
     skipFinalSnapshot: true
     finalSnapshotIdentifier: "example-rds-aurora-cluster"
@@ -43,3 +57,4 @@ spec:
     username: "mojaloop"
     vpcCidr: "10.0.0.0/16"
     vpcId: "vpc-093a94cea27a9ff99"
+    snapshotIdentifier: "arn:aws:rds:af-south-1:557690596740:cluster-snapshot:controlcenter-test-envdb-plt-p52kb-cluster-final-snapshot"
