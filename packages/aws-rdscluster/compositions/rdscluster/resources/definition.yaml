@@ -65,10 +65,12 @@ spec:
                     type: string
                     description: Namespace for the consumer application
                   caBundleUrl:
+                    default: "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
                     type: string
                     description: URL to the CA bundle of AWS
                   consumerAppsSecret:
                     type: object
+                    default: {}
                     properties:
                       name:
                         type: string
@@ -83,6 +85,7 @@ spec:
                         description: List of namespaces where the secret is available
                   consumerAppsExternalServices:
                     type: array
+                    default: []
                     items:
                       type: string
                     description: List of externalservice names for the consumer applications

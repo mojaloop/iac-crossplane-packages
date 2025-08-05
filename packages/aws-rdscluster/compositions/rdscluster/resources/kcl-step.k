@@ -299,7 +299,7 @@ _ConsumerAppCASecrets = [
                 name = spec.providerConfigsRef.ccK8sProviderName
             }
         }
-    } for secretNs in parameters?.consumerAppsSecret.namespaces or []
+    } for secretNs in parameters?.consumerAppsSecret?.namespaces or []
 ]
 
 _items += [_SecurityGroupRule, _SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster, _ExternalService , _CaBundleRequest] + _ClusterInstances + _ConsumerAppExternalServices + _ConsumerAppCASecrets
