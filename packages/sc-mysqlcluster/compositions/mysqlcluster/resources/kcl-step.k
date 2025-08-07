@@ -6,6 +6,19 @@ spec = oxr.spec
 parameters = spec.parameters
 # Initialize the items list
 _items = []
+
+_backupScheduleSnippet = []
+if parameters?.backup?.enabled == True:
+    _backupScheduleSnippet =  [
+        {
+            name =  parameters?.backup?.scheduleName,
+            schedule =  parameters?.backup?.cronScheduleExpression,
+            keep =  parameters?.backup?.backupRetention,
+            storageName =  "s3-backup-storage"
+        }
+    ]
+
+
 ## Adding resources
 _MysqlCluster = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -146,15 +159,8 @@ _MysqlCluster = {
                         }
                         if parameters?.backup?.pvc : "fs-pvc" = parameters?.backup?.pvc
                     }
-                    schedule = [
-                        {
-                            name = parameters?.backup?.scheduleName
-                            schedule = parameters?.backup?.cronScheduleExpression
-                            keep = parameters?.backup?.backupRetention
-                            storageName = "s3-backup-storage"
-                        }
-                    ]
-                }
+                    schedule = _backupScheduleSnippet
+                   }
                 }
             }
         }
