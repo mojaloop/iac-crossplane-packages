@@ -36,7 +36,7 @@ _MysqlCluster = {
                 kind = "PerconaXtraDBCluster"
                 metadata = {
                     name = parameters.clusterName
-                    namespace = parameters.appNamespace
+                    namespace = parameters.scAppNamespace
                 }
                 spec = {
                     crVersion = parameters?.crVersion
@@ -164,10 +164,10 @@ _MysqlCluster = {
                 }
             }
         }
-        readiness = {
-            policy = "DeriveFromCelQuery"
-            celQuery = '"status" in object && "conditions" in object.status && object.status.conditions.exists(c, c.type == "ready" && c.status == "True" )'
-        }
+        #readiness = {
+        #    policy = "DeriveFromCelQuery"
+        #    celQuery = '"status" in object && "conditions" in object.status && object.status.conditions.exists(c, c.type == "ready" && c.status == "True" )'
+        #}
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
             name = spec.providerConfigsRef.scK8sProviderName
@@ -185,8 +185,8 @@ _Secret = {
         parameters = {
             objectType = "Secret"
             source = {
-                name = parameters?.dbSecret
-                namespace = parameters?.appNamespace
+                name = parameters?.dbsourceSecret
+                namespace = parameters?.scAppNamespace
             }
             destination = {
                 name = parameters?.dbSecret
@@ -200,6 +200,76 @@ _Secret = {
         managementPolicies = spec?.managementPolicies
     }
 }
+
+_clientsourceSecret = {
+  apiVersion = "kubernetes.crossplane.io/v1alpha2"
+  kind = "Object"
+  metadata = {
+    name = "{}-client-tls-ss".format(oxr.metadata.name)
+    annotations = {
+      "krm.kcl.dev/composition-resource-name": "client-tls-ss"
+    }
+  }
+  spec = {
+    forProvider = {
+      manifest = {
+        apiVersion = "v1"
+        kind = "Secret"
+        metadata = {
+          name = "{}-ssl".format(parameters.clusterName)
+          namespace = parameters?.scAppNamespace
+        }
+      }
+    }
+    managementPolicies = ["Observe"]
+    providerConfigRef = {
+      name = spec.providerConfigsRef.scK8sProviderName
+    }
+  }
+}
+
+
+_tlsRawData = ocds["client-tls-ss"]?.Resource?.status?.atProvider?.manifest?.data
+_tlsData = _tlsRawData if _tlsRawData != None else {}
+
+_tlsCrt = base64.decode(str(_tlsData["tls.crt"])).strip() if "tls.crt" in _tlsData else ""
+_tlsKey = base64.decode(str(_tlsData["tls.key"])).strip() if "tls.key" in _tlsData else ""
+_tlscaCrt = base64.decode(str(_tlsData["ca.crt"])).strip() if "tls.crt" in _tlsData else ""
+
+_caBundle = "{}\n{}\n{}".format(_tlsCrt, _tlsKey, _tlscaCrt)
+
+_ConsumerAppCASecrets = [
+  {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+      name = "{}-ca-secret-{}".format(oxr.metadata.name, secretNs)
+      annotations = {
+        "krm.kcl.dev/composition-resource-name": "ca-secret-{}".format(secretNs)
+      }
+    }
+    spec = {
+      forProvider = {
+        manifest = {
+          apiVersion = "v1"
+          kind = "Secret"
+          metadata = {
+            name = parameters?.consumerAppsSecret?.name
+            namespace = secretNs
+          }
+          type = "Opaque"
+          stringData = {
+            parameters?.consumerAppsSecret?.key: _caBundle
+          }
+        }
+      }
+      managementPolicies = ["*"]
+      providerConfigRef = {
+        name = spec.providerConfigsRef.ccK8sProviderName
+      }
+    }
+  } for secretNs in parameters?.consumerAppsSecret?.namespaces or []
+]
 
 _ip = [ocds["percona-sql-db"]?.Resource?.status?.atProvider?.manifest?.status?.host] if ocds["percona-sql-db"]?.Resource?.status?.atProvider?.manifest?.status?.host else []
 
@@ -225,6 +295,7 @@ _DnsRecord = {
         providerConfigsRef = {
             awsProviderConfigName = spec?.providerConfigsRef?.awsProviderName
         }
+        managementPolicies = spec.managementPolicies
     }
 }
 
@@ -295,7 +366,7 @@ _Policy = {
                                             "StatefulSet"
                                         ]
                                         namespaces = [
-                                            parameters?.appNamespace
+                                            parameters?.scAppNamespace
                                         ]
                                         names = [
                                             "{}-pxc".format(parameters.clusterName)
@@ -361,7 +432,40 @@ _Policy = {
     }
 }
 
-_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _ExternalService]
+_ConsumerAppExternalServices = [
+    {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-en-svc-{}".format(oxr.metadata.name, serviceName)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "mysql-{}".format(serviceName)
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "v1"
+                    kind = "Service"
+                    metadata = {
+                        name = serviceName
+                        namespace = parameters?.appNamespace
+                    }
+                    spec = {
+                        type = "ExternalName"
+                        externalName = _externalName
+                    }
+                }
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.ccK8sProviderName
+            }
+        }
+    } for serviceName in parameters?.consumerAppsExternalServices or []
+]
+
+_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }

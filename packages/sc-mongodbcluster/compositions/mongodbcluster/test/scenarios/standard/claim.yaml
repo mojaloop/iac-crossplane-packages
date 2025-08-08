@@ -8,10 +8,21 @@ spec:
     clusterName: env
     externalServiceName: my-cluster-service
     appNamespace: env
+    scAppNamespace: env
     crVersion: "1.19.1"
     image: percona/percona-server-mongodb:7.0.15-9-multi
     imagePullPolicy: IfNotPresent
     dbSecret: my-db-secret
+    dbsourceSecret: my-db-source-secret
+    consumerAppsSecret:
+      name: my-ca-bundle
+      key: my-ca-bundle.pem
+      namespaces:
+        - env1
+        - env2
+    consumerAppsExternalServices:
+      - ttk-mongodb-svc
+      - bulk-mongodb-svc
     backup:
       enabled: false
       image: percona/percona-backup-mongodb:2.8.0-multi

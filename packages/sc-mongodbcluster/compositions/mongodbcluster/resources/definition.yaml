@@ -74,9 +74,31 @@ spec:
                   appNamespace:
                     type: string
                     description: Namespace for the consumer application
+                  scAppNamespace:
+                    type: string
+                    description: Storage cluster namespace
                   dbSecret:
                     type: string
                     description: Secret name for the database credentials
+                  dbsourceSecret:
+                    type: string
+                    description: Secret name for the database credentials
+                  consumerAppsSecret:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      key:
+                        type: string
+                      namespaces:
+                        type: array
+                        items:
+                          type: string
+                  consumerAppsExternalServices:
+                    type: array
+                    items:
+                      type: string
+                    description: List of externalservice names for consumer applications
                   crVersion:
                     type: string
                   image:

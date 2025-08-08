@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: mongodbcluster
+  name: perconarole
   labels:
-    crossplane.io/xrd: xmongodbcluster.sc.mojaloop.io
+    crossplane.io/xrd: xperconarole.utils.mojaloop.io
 spec:
   compositeTypeRef:
-    apiVersion: sc.mojaloop.io/v1alpha1
-    kind: XMongodbCluster
+    apiVersion: utils.mojaloop.io/v1alpha1
+    kind: XPerconaRole
   mode: Pipeline
   pipeline:
 
