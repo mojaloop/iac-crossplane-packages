@@ -35,27 +35,6 @@ _cc_network_resource_group = {
   }
 }
 
-_sc_network_resource_group = {
-  apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-  kind = "NbGroup"
-  metadata = {
-    name = "{}-sc-network-resource-group".format(oxr.metadata.name)
-    annotations = {
-      "krm.kcl.dev/composition-resource-name": "sc-network-resource-group"
-      "crossplane.io/external-name": parameters.envProperties.groupNames.scNetworkResource
-    }
-  }
-  spec = {
-    forProvider = {
-      name = parameters.envProperties.groupNames.scNetworkResource
-    }
-    providerConfigRef = {
-      name = spec?.providerConfigsRef?.netbirdProviderConfigName
-    }
-    managementPolicies = ["Observe"]
-  }
-}
-
 _env_k8s_nodes_group = {
     apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
     kind = "NbGroup"
@@ -191,33 +170,30 @@ _push_secret_env_k8s_nodes_setup_key = {
   }
 }
 
-_env_k8s_nodes_network_policy = {
+_env_k8s_nodes_cc_network_policy = {
     apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
     kind = "NbPolicy"
     metadata = {
-        name = "{}-env-k8s-nodes-network-policy".format(oxr.metadata.name)
+        name = "{}-env-k8s-nodes-cc-network-policy".format(oxr.metadata.name)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "env-k8s-nodes-network-policy"
+            "krm.kcl.dev/composition-resource-name": "env-k8s-nodes-cc-network-policy"
         }
     }
     spec = {
         forProvider = {
-            name = "{}-env-k8s-nodes-network-policy".format(oxr.metadata.name)
+            name = "{}-env-k8s-nodes-cc-network-policy".format(oxr.metadata.name)
             enabled = True
-            description = "Policy for connecting to internal network for env k8s nodes for {}".format(oxr.metadata.name)
+            description = "Policy for connecting to internal cc network for env k8s nodes for {}".format(oxr.metadata.name)
             rules = [
                 {
                     action = "accept"
-                    bidirectional = True
-                    description = "internal network accept"
-                    name = "internal-network-accept-rule"
+                    bidirectional = False
+                    description = "internal cc network accept"
+                    name = "internal-cc-network-accept-rule"
                     enabled = True
                     destinations = [
                         {
                             id = ocds["cc-network-resource-group"]?.Resource?.status?.atProvider?.id or ""
-                        },
-                        {
-                            id = ocds["sc-network-resource-group"]?.Resource?.status?.atProvider?.id or ""
                         }
                     ]
                     sources = [
@@ -226,6 +202,7 @@ _env_k8s_nodes_network_policy = {
                         }
                     ]
                     protocol = "tcp"
+                    port_ranges = cc_port_ranges_formatted
                 }
             ]
         }
@@ -235,13 +212,14 @@ _env_k8s_nodes_network_policy = {
         managementPolicies = spec.managementPolicies
     }
 }
-_usage_env_k8s_nodes_network_policy = {
+
+_usage_env_k8s_nodes_cc_network_policy = {
     apiVersion = "apiextensions.crossplane.io/v1alpha1"
     kind = "Usage"
     metadata = {
-      name = "{}-env-k8s-nodes-network-policy-usage".format(oxr.metadata.name)
+      name = "{}-env-k8s-nodes-cc-network-policy-usage".format(oxr.metadata.name)
       annotations = {
-        "krm.kcl.dev/composition-resource-name": "env-k8s-nodes-network-policy-usage"
+        "krm.kcl.dev/composition-resource-name": "env-k8s-nodes-cc-network-policy-usage"
       }
   }
     spec: {
@@ -250,7 +228,7 @@ _usage_env_k8s_nodes_network_policy = {
             apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
             kind = "NbPolicy"
             resourceRef = {
-              name = "{}-env-k8s-nodes-network-policy".format(oxr.metadata.name)
+              name = "{}-env-k8s-nodes-cc-network-policy".format(oxr.metadata.name)
             }
         }
         of = {
@@ -263,245 +241,32 @@ _usage_env_k8s_nodes_network_policy = {
     }
 }
 
-if parameters.managedService.enabled:
-  _env_managed_svc_group = {
-    apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-    kind = "NbGroup"
-    metadata = {
-        name = "{}-env-managed-svc-group".format(oxr.metadata.name)
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "env-managed-svc-group"
-        }
-    }
-    spec = {
-        forProvider = {
-            name = parameters.managedService.groupNames.managedSvc
-        }
-        providerConfigRef = {
-            name = spec.providerConfigsRef.netbirdProviderConfigName
-        }
-        managementPolicies = spec.managementPolicies
-    }
-  }
-  _env_managed_svc_setup_key = {
-    apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-    kind = "NbSetupKey"
-    metadata = {
-      name = "{}-env-managed-svc-setup-key".format(oxr.metadata.name)
-      annotations = {
-        "krm.kcl.dev/composition-resource-name": "env-managed-svc-setup-key"
-      }
-    }
-    spec = {
-      forProvider = {
-        name = "{} env managed svc setup key".format(parameters.managedService.setupKey.name)
-        type = "reusable"
-        auto_groups = [
-          ocds["env-managed-svc-group"]?.Resource?.status?.atProvider?.id or ""
-        ]
-        ephemeral = True
-        usage_limit = 0
-        expires_in = 7776000
-        allow_extra_dns_labels = False
-        revoked = False
-      }
-      providerConfigRef = {
-        name = spec.providerConfigsRef.netbirdProviderConfigName
-      }
-      writeConnectionSecretToRef = {
-        name = parameters.managedService.setupKey.name
-        namespace = parameters.managedService.setupKey.namespace
-      }
-      managementPolicies = spec.managementPolicies
-    }
-  }
-  _usage_env_managed_svc_setup_key = {
-    apiVersion = "apiextensions.crossplane.io/v1alpha1"
-    kind = "Usage"
-    metadata = {
-      name = "{}-env-managed-svc-setup-key-usage".format(oxr.metadata.name)
-      annotations = {
-        "krm.kcl.dev/composition-resource-name": "env-managed-svc-setup-key-usage"
-      }
-  }
-    spec: {
-        replayDeletion = True
-        by = {
-            apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-            kind = "NbSetupKey"
-            resourceRef = {
-              name = "{}-env-managed-svc-setup-key".format(oxr.metadata.name)
-            }
-        }
-        of = {
-            apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-            kind = "NbGroup"
-            resourceRef = {
-              name = "{}-env-managed-svc-group".format(oxr.metadata.name)
-            }
-        }
-    }
-  }
-  _push_secret_env_managed_svc_setup_key = {
-    apiVersion = "kubernetes.crossplane.io/v1alpha2"
-    kind = "Object"
-    metadata = {
-      name = "{}-push-secret-env-managed-svc-setup-key".format(oxr.metadata.name)
-      annotations = {
-        "krm.kcl.dev/composition-resource-name": "push-secret-env-managed-svc-setup-key"
-      }
-    }
-    spec = {
-      forProvider = {
-        manifest = {
-          apiVersion = "external-secrets.io/v1alpha1"
-          kind = "PushSecret"
-          metadata = {
-            name = parameters.managedService.setupKey.name
-            namespace = parameters.managedService.setupKey.namespace
-          }
-          spec = {
-            updatePolicy = parameters.pushSecret.esoUpdatePolicy
-            deletionPolicy = parameters.pushSecret.esoDeletePolicy
-            refreshInterval = parameters.pushSecret.esoRefreshInterval
-            secretStoreRefs = [
-              {
-                name = parameters.pushSecret.vaultSecretStore
-                kind = parameters.pushSecret.vaultSecretStoreKind
-              }
-            ]
-            selector = {
-              secret = {
-                name = parameters.managedService.setupKey.name
-              }
-            }
-            data = [
-              {
-                match = {
-                  secretKey = "password"
-                  remoteRef = {
-                    remoteKey = parameters.managedService.setupKey.vaultSecretPath
-                    property = "value"
-                  }
-                }
-              }
-            ]
-          }
-        }
-      }
-      managementPolicies = spec.managementPolicies
-      providerConfigRef = {
-        name = spec.providerConfigsRef.k8sProviderConfigName
-      }
-    }
-  }
-  _env_managed_svc_network_policy = {
-    apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-    kind = "NbPolicy"
-    metadata = {
-        name = "{}-env-managed-svc-cc-internal-network-policy".format(oxr.metadata.name)
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "env-managed-svc-internal-network-policy"
-        }
-    }
-    spec = {
-        forProvider = {
-            name = "{}-env-managed-svc-network-policy".format(oxr.metadata.name)
-            enabled = True
-            description = "Policy for connecting to internal network for env managed svcs for {}".format(oxr.metadata.name)
-            rules = [
-                {
-                    action = "accept"
-                    bidirectional = True
-                    description = "internal network accept"
-                    name = "internal-network-accept-rule"
-                    enabled = True
-                    destinations = [
-                        {
-                            id = ocds["cc-network-resource-group"]?.Resource?.status?.atProvider?.id or ""
-                        },
-                        {
-                            id = ocds["sc-network-resource-group"]?.Resource?.status?.atProvider?.id or ""
-                        }
-                    ]
-                    sources = [
-                        {
-                            id = ocds["env-managed-svc-group"]?.Resource?.status?.atProvider?.id or ""
-                        }
-                    ]
-                    protocol = "tcp"
-                }
-            ]
-        }
-        providerConfigRef = {
-            name = spec.providerConfigsRef.netbirdProviderConfigName
-        }
-        managementPolicies = spec.managementPolicies
-    }
-  }
-  _usage_env_managed_svc_network_policy = {
-    apiVersion = "apiextensions.crossplane.io/v1alpha1"
-    kind = "Usage"
-    metadata = {
-      name = "{}-env-managed-svc-cc-internal-network-policy-usage".format(oxr.metadata.name)
-      annotations = {
-        "krm.kcl.dev/composition-resource-name": "env-managed-svc-cc-internal-network-policy-usage"
-      }
-    }
-    spec: {
-      replayDeletion = True
-      by = {
-        apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-        kind = "NbPolicy"
-        resourceRef = {
-          name = "{}-env-managed-svc-cc-internal-network-policy".format(oxr.metadata.name)
-        }
-      }
-      of = {
-        apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-        kind = "NbGroup"
-        resourceRef = {
-          name = "{}-env-managed-svc-group".format(oxr.metadata.name)
-        }
-      }
-    }
-  }
+cc_ports_str = parameters.envProperties.policy.ccPorts or ""
+cc_port_entries = [p.strip() for p in cc_ports_str.split(",") if p.strip() != ""]
 
+# Convert all ports to port ranges (individual ports become ranges with same start/end)
+cc_port_ranges_formatted = [
+    {
+        start = int(p.split("-")[0])
+        end = int(p.split("-")[1]) if "-" in p else int(p.split("-")[0])
+    } for p in cc_port_entries
+] if cc_port_entries else []
 
 # Add the resources to the items list
 _items += [
   _cc_network_resource_group,
-  _sc_network_resource_group,
   _env_k8s_nodes_group,
 ]
-if readyBasedOnConditions(ocds["cc-network-resource-group"]) and readyBasedOnConditions(ocds["sc-network-resource-group"]) and readyBasedOnConditions(ocds["env-k8s-nodes-group"]):
+if readyBasedOnConditions(ocds["env-k8s-nodes-group"]):
     _items += [
       _env_k8s_nodes_setup_key,
-      _env_k8s_nodes_network_policy,
       _usage_env_k8s_nodes_setup_key,
-      _usage_env_k8s_nodes_network_policy,
+      _env_k8s_nodes_cc_network_policy,
+      _usage_env_k8s_nodes_cc_network_policy,
     ]
     if parameters.pushSecret.esoPushSecret:
       _items += [
         _push_secret_env_k8s_nodes_setup_key,
-      ]
-
-if parameters?.managedService?.enabled and readyBasedOnConditions(ocds["cc-network-resource-group"]) and readyBasedOnConditions(ocds["sc-network-resource-group"]):
-    _items += [
-      _env_managed_svc_group,
-    ]
-if parameters?.managedService?.enabled and readyBasedOnConditions(ocds["env-managed-svc-group"]):
-    _items += [
-      _env_managed_svc_setup_key,
-      _push_secret_env_managed_svc_setup_key,
-      _env_managed_svc_network_policy,
-      _usage_env_managed_svc_setup_key,
-      _usage_env_managed_svc_network_policy,
-
-    ]
-    if parameters.pushSecret.esoPushSecret:
-      _items += [
-        _push_secret_env_managed_svc_setup_key,
       ]
 
 dxr = {

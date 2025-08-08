@@ -1,0 +1,17 @@
+apiVersion: nb.mojaloop.io/v1alpha1
+kind: XNetbirdEnvPolicyConfig
+metadata:
+  name: example-env-policy-config
+  namespace: testa
+spec:
+  parameters:
+    envProperties:
+      groupNames:
+        scNetworkResource: sc-net
+        envK8sNodes: env-test-nodes
+      policy:
+        scPorts: "8080,443,6443,3000-3005"
+  providerConfigsRef:
+    netbirdProviderConfigName: "netbird-provider-config"
+  managementPolicies:
+    - "*"

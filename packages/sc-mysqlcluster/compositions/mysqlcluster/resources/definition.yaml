@@ -373,6 +373,10 @@ spec:
                   backup:
                     type: object
                     properties:
+                      enabled:
+                        type: boolean
+                        description: Enable backup for PXC
+                        default: false
                       image:
                         type: string
                         description: Backup image
