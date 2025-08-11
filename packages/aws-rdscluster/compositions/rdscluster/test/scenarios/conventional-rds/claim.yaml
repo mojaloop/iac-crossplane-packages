@@ -9,6 +9,7 @@ spec:
   providerConfigsRef:
       awsProviderConfigName: "aws-provider"
       ccK8sProviderName: "provider-kubernetes"
+      httpProviderConfigName: "http-conf"
   parameters:
     externalServiceName: "example-rds-aurora-cluster"
     appNamespace: "default"

@@ -9,8 +9,21 @@ spec:
   providerConfigsRef:
       awsProviderConfigName: "aws-provider"
       ccK8sProviderName: "provider-kubernetes"
+      httpProviderConfigName: "provider-http"
   parameters:
     allowMajorVersionUpgrade: false
+    appNamespace: "stateful-resources"
+    caBundleUrl: "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem"
+    consumerAppsSecret:
+        name: global-ca-bundle
+        key: "ca-bundle.crt"
+        namespaces:
+          - mojaloop
+          - mcm
+          - adiffone
+    consumerAppsExternalServices:
+      - ttk-mongodb-svc
+      - bulk-mongodb-svc
     applyImmediately: false
     backupRetentionPeriod: 7
     databaseName: "exampledb"
@@ -40,3 +53,4 @@ spec:
     username: "mojaloop"
     vpcCidr: "10.0.0.0/16"
     vpcId: "vpc-07ff0e8c129aa5db0"
+    snapshotIdentifier: "arn:aws:rds:eu-west-1:123456789012:cluster-snapshot:example-documentdb-cluster-snapshot"

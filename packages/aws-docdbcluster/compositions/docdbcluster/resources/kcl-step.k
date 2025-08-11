@@ -1,3 +1,5 @@
+import base64
+
 # Read the XR and the OCDs
 oxr = option("params").oxr
 ocds = option("params").ocds
@@ -120,7 +122,6 @@ _Cluster = {
             region = parameters?.region
             restoreToPointInTime = parameters?.restoreToPointInTime
             skipFinalSnapshot = parameters?.skipFinalSnapshot
-            snapshotIdentifier = parameters?.snapshotIdentifier
             storageEncrypted = parameters?.storageEncrypted
             storageType = parameters?.storageType
             vpcSecurityGroupIdSelector = { matchControllerRef = True }
@@ -130,7 +131,10 @@ _Cluster = {
                             namespace = parameters?.passwordSecret?.namespace
                         }
 
-            }
+        }
+        initProvider = {
+            snapshotIdentifier = parameters?.snapshotIdentifier
+        }
         providerConfigRef = {
             name = spec?.providerConfigsRef?.awsProviderConfigName
         }
@@ -199,7 +203,95 @@ _ExternalService = {
     }
 }
 
-_items += [_SecurityGroupRule, _SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster, _ExternalService] + _ClusterInstances
+_ConsumerAppExternalServices = [
+    {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-en-svc-{}".format(oxr.metadata.name, serviceName)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "aws-docdbcluster-{}".format(serviceName)
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "v1"
+                    kind = "Service"
+                    metadata = {
+                        name = serviceName
+                        namespace = parameters?.appNamespace
+                    }
+                    spec = {
+                        type = "ExternalName"
+                        externalName = _externalName
+                    }
+                }
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.ccK8sProviderName
+            }
+        }
+    } for serviceName in parameters?.consumerAppsExternalServices or []
+]
+
+_CaBundleRequest = {
+    apiVersion = "http.crossplane.io/v1alpha2"
+    kind = "DisposableRequest"
+    metadata = {
+        name = "{}-download-ca".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "aws-docdbcluster-ca"
+        }
+    }
+    spec = {
+        deletionPolicy = "Orphan"
+        forProvider = {
+            url = parameters?.caBundleUrl
+            method = "GET"
+        }
+        providerConfigRef = {
+            name = spec.providerConfigsRef.httpProviderConfigName
+        }
+    }
+}
+
+_caBundle  =  ocds["aws-docdbcluster-ca"]?.Resource?.status?.response?.body or ""
+
+_ConsumerAppCASecrets = [
+    {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-ca-secret-{}".format(oxr.metadata.name, secretNs)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "ca-secret-{}".format(secretNs)
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "v1"
+                    kind = "Secret"
+                    metadata = {
+                        name = parameters?.consumerAppsSecret?.name
+                        namespace = secretNs
+                    }
+                    data = {
+                        parameters?.consumerAppsSecret?.key = base64.encode(_caBundle)
+                    }
+                }
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.ccK8sProviderName
+            }
+        }
+    } for secretNs in parameters?.consumerAppsSecret.namespaces or []
+]
+
+_items += [_SecurityGroupRule, _SecurityGroup, _SubnetGroup, _ClusterParameterGroup, _Cluster, _ExternalService, _CaBundleRequest] + _ClusterInstances + _ConsumerAppExternalServices + _ConsumerAppCASecrets
 
 print(_items)
 

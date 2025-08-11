@@ -51,6 +51,10 @@ spec:
                     type: string
                     description: |-
                       The name of the provider config to use for the local k8s provider.
+                  httpProviderConfigName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the HTTP provider.
               parameters:
                 type: object
                 properties:
@@ -60,6 +64,28 @@ spec:
                   appNamespace:
                     type: string
                     description: Namespace for the consumer application
+                  caBundleUrl:
+                    type: string
+                    description: URL to the CA bundle of AWS
+                  consumerAppsSecret:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: Name of the secret
+                      key:
+                        type: string
+                        description: Key in the secret
+                      namespaces:
+                        type: array
+                        items:
+                          type: string
+                        description: List of namespaces where the secret is available
+                  consumerAppsExternalServices:
+                    type: array
+                    items:
+                      type: string
+                    description: List of externalservice names for the consumer applications
                   databaseName:
                     type: string
                     description: Name for the created DB
