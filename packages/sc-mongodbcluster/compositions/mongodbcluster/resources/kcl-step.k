@@ -373,15 +373,32 @@ _ConsumerAppExternalServices = [
         spec = {
             forProvider = {
                 manifest = {
-                    apiVersion = "v1"
-                    kind = "Service"
+                    apiVersion = "networking.istio.io/v1beta1"
+                    kind = "ServiceEntry"
                     metadata = {
-                        name = serviceName
+                        name = "{}.{}".format("mongodb", serviceName)
                         namespace = parameters?.appNamespace
+                        labels = {
+                            "istio.io/use-waypoint": "parameters?.WaypointName"
+                            "istio.io/use-waypoint-namespace": "parameters?.WaypointNamespace"
+                        }
                     }
                     spec = {
-                        type = "ExternalName"
-                        externalName = _externalName
+                        location = "MESH_EXTERNAL"
+                        resolution = "DNS"
+                        hosts = ["{}.{}.svc.cluster.local".format(serviceName, parameters?.appNamespace)]
+                        endpoints = [
+                            {
+                                address = _externalName
+                            }
+                        ]
+                        ports = [
+                            {
+                                number = 27017
+                                name = "mongodb"
+                                protocol = "TCP"
+                            }
+                        ]
                     }
                 }
             }

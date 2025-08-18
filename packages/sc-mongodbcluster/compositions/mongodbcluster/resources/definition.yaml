@@ -99,6 +99,14 @@ spec:
                     items:
                       type: string
                     description: List of externalservice names for consumer applications
+                  waypointName:
+                    type: string
+                    description: Name of the waypoint for the consumer applications
+                    default: "egress-waypoint"
+                  waypointNamespace:
+                    type: string
+                    description: Namespace of the waypoint for the consumer applications
+                    default: "istio-system"
                   crVersion:
                     type: string
                   image:
