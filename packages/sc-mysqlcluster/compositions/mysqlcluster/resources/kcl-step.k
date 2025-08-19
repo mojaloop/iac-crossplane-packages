@@ -303,9 +303,9 @@ if parameters?.backup?.enabled == True:
         apiVersion = "utils.aws.mojaloop.io/v1alpha1"
         kind = "XObjectStore"
         metadata = {
-            name = "{}-backup-bucket".format(oxr.metadata.name)
+            name = "{}-backups-bucket".format(oxr.metadata.name)
             annotations = {
-                "krm.kcl.dev/composition-resource-name": "backup-bucket"
+                "krm.kcl.dev/composition-resource-name": "backups-bucket"
             }
         }
 
