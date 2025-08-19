@@ -303,7 +303,7 @@ _ns = parameters?.backup?.appNamespace if parameters?.backup?.appNamespace else 
 
 if parameters?.backup?.enabled == True:
     _s3Bucket = {
-        apiVersion = "utils.aws.mojaloop.io/v1alpha1"
+        apiVersion = "objectstore.mojaloop.io/v1alpha1"
         kind = "XObjectStore"
         metadata = {
             name = "{}-backups-bucket".format(oxr.metadata.name)
