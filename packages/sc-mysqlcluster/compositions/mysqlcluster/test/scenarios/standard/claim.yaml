@@ -87,6 +87,11 @@ spec:
           memory: 500Mi
           cpu: 200m
     backup:
+      enabled: true
+      backuptype: s3
+      objectStoreProvider: s3
+      forceDestroy: false
+      deletionPolicy: Delete
       image: "percona/percona-xtradb-cluster-operator:1.17.0-pxc8.4-backup-pxb8.4.0" # example
       imagePullPolicy: IfNotPresent
       verifyTLS: true

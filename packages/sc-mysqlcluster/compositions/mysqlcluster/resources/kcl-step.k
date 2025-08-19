@@ -298,6 +298,32 @@ _DnsRecord = {
         managementPolicies = spec.managementPolicies
     }
 }
+if parameters?.backup?.enabled == True:
+    _s3Bucket = {
+        apiVersion = "utils.aws.mojaloop.io/v1alpha1"
+        kind = "XObjectStore"
+        metadata = {
+            name = "{}-backup-bucket".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "backup-bucket"
+            }
+        }
+
+        spec = {
+            parameters = {
+                objectStoreProvider = parameters?.backup?.objectStoreProvider
+                bucketName = parameters?.backup?.bucket
+                ccK8sProviderName = "kubernetes-provider"
+                namespace = parameters?.appNamespace
+            }
+            s3 = {
+                awsProviderName = spec?.providerConfigsRef?.awsProviderName
+                bucketRegion = parameters?.backup?.bucketRegion
+                forceDestroy = parameters?.backup?.forceDestroy
+                deletionPolicy = parameters?.backup?.deletionPolicy
+            }
+        }
+    }
 
 # TODO - clean up , this is not required this can be directly pushed to vault to share with env, keeping it because to make the code compatible with rds
 
@@ -465,7 +491,7 @@ _ConsumerAppExternalServices = [
     } for serviceName in parameters?.consumerAppsExternalServices or []
 ]
 
-_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _s3Bucket, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }
