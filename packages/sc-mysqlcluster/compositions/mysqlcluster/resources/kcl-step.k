@@ -298,6 +298,9 @@ _DnsRecord = {
         managementPolicies = spec.managementPolicies
     }
 }
+
+_ns = parameters?.backup?.appNamespace if parameters?.backup?.appNamespace else parameters?.appNamespace
+
 if parameters?.backup?.enabled == True:
     _s3Bucket = {
         apiVersion = "utils.aws.mojaloop.io/v1alpha1"
@@ -308,12 +311,11 @@ if parameters?.backup?.enabled == True:
                 "krm.kcl.dev/composition-resource-name": "backups-bucket"
             }
         }
-
         spec = {
             parameters = {
                 objectStoreProvider = parameters?.backup?.objectStoreProvider
                 bucketName = parameters?.backup?.bucket
-                ccK8sProviderName = "kubernetes-provider"
+                ccK8sProviderName = "kubernetes-provider"  # keep as you had it
                 namespace = parameters?.appNamespace
             }
             s3 = {
@@ -321,6 +323,143 @@ if parameters?.backup?.enabled == True:
                 bucketRegion = parameters?.backup?.bucketRegion
                 forceDestroy = parameters?.backup?.forceDestroy
                 deletionPolicy = parameters?.backup?.deletionPolicy
+            }
+        }
+    }
+
+    # Bundle s3 backup K8s bits into one Object
+    _BucketBackupsBundle = {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-bucket-backups-bundle".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "bucket-backups-bundle"
+            }
+        }
+        spec = {
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.ccK8sProviderName
+            }
+            forProvider = {
+                manifest = {
+                    apiVersion = "v1"
+                    kind = "List"
+                    items = [
+
+                        # ServiceAccount
+                        {
+                            apiVersion = "v1"
+                            kind = "ServiceAccount"
+                            metadata = {
+                                name = "{}-secret-creator".format(oxr.metadata.name)
+                                namespace = _ns
+                            }
+                        },
+
+                        # Role
+                        {
+                            apiVersion = "rbac.authorization.k8s.io/v1"
+                            kind = "Role"
+                            metadata = {
+                                name = "{}-secret-role".format(oxr.metadata.name)
+                                namespace = _ns
+                            }
+                            rules = [
+                                { apiGroups = [""], resources = ["secrets"], verbs = ["get", "list", "watch"] },
+                                { apiGroups = ["authorization.k8s.io"], resources = ["selfsubjectrulesreviews"], verbs = ["create"] },
+                            ]
+                        },
+
+                        # RoleBinding
+                        {
+                            apiVersion = "rbac.authorization.k8s.io/v1"
+                            kind = "RoleBinding"
+                            metadata = {
+                                name = "{}-secret-rolebinding".format(oxr.metadata.name)
+                                namespace = _ns
+                            }
+                            subjects = [
+                                {
+                                    kind = "ServiceAccount"
+                                    name = "{}-secret-creator".format(oxr.metadata.name)
+                                    namespace = _ns
+                                }
+                            ]
+                            roleRef = {
+                                apiGroup = "rbac.authorization.k8s.io"
+                                kind = "Role"
+                                name = "{}-secret-role".format(oxr.metadata.name)
+                            }
+                        },
+
+                        # SecretStore
+                        {
+                            apiVersion = "external-secrets.io/v1beta1"
+                            kind = "SecretStore"
+                            metadata = {
+                                name = "{}-secret-store".format(oxr.metadata.name)
+                                namespace = _ns
+                            }
+                            spec = {
+                                provider = {
+                                    kubernetes = {
+                                        auth = { serviceAccount = { name = "{}-secret-creator".format(oxr.metadata.name) } }
+                                        remoteNamespace = _ns
+                                        server = {
+                                            caProvider = { type = "ConfigMap", name = "kube-root-ca.crt", key = "ca.crt" }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+
+                        # ExternalSecret
+                        {
+                            apiVersion = "external-secrets.io/v1beta1"
+                            kind = "ExternalSecret"
+                            metadata = {
+                                name = parameters?.backup?.credentialsSecret
+                                namespace = _ns
+                            }
+                            spec = {
+                                refreshInterval = "1m"
+                                secretStoreRef = {
+                                    kind = "SecretStore"
+                                    name = "{}-secret-store".format(oxr.metadata.name)
+                                }
+                                data = [
+                                    {
+                                        secretKey = "username"
+                                        remoteRef = {
+                                            key = parameters?.backup?.bucket
+                                            property = "username"
+                                        }
+                                    },
+                                    {
+                                        secretKey = "password"
+                                        remoteRef = {
+                                            key = parameters?.backup?.bucket
+                                            property = "password"
+                                        }
+                                    }
+                                ]
+                                target = {
+                                    name = parameters?.backup?.credentialsSecret
+                                    creationPolicy = "Owner"
+                                    template = {
+                                        data = {
+                                            "AWS_SECRET_ACCESS_KEY" = "{{ .password }}"
+                                            "AWS_ACCESS_KEY_ID"     = "{{ .username }}"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+
+                    ]
+                }
             }
         }
     }
@@ -491,7 +630,7 @@ _ConsumerAppExternalServices = [
     } for serviceName in parameters?.consumerAppsExternalServices or []
 ]
 
-_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _s3Bucket, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _s3Bucket, _BucketBackupsBundle, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }
