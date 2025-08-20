@@ -303,8 +303,8 @@ _ns = parameters?.backup?.appNamespace if parameters?.backup?.appNamespace else 
 
 if parameters?.backup?.enabled == True:
     _s3Bucket = {
-        apiVersion = "objectstore.mojaloop.io/v1alpha1"
-        kind = "XObjectStore"
+        apiVersion = "aws.mojaloop.io/v1alpha1"
+        kind = "XS3Bucket"
         metadata = {
             name = "{}-backups-bucket".format(oxr.metadata.name)
             annotations = {
@@ -313,17 +313,23 @@ if parameters?.backup?.enabled == True:
         }
         spec = {
             parameters = {
-                objectStoreProvider = parameters?.backup?.objectStoreProvider
-                bucketName = parameters?.backup?.bucket
-                ccK8sProviderName = "kubernetes-provider"  # keep as you had it
-                namespace = parameters?.appNamespace
+                bucket = {
+                    bucketName = parameters?.backup?.bucket
+                    bucketRegion = parameters?.backup?.bucketRegion
+                    forceDestroy = parameters?.backup?.forceDestroy
+                    deletionPolicy = parameters?.backup?.deletionPolicy
+                }
+                secret = {
+                    name = parameters?.backup?.credentialsSecret
+                    namespace = parameters?.appNamespace
+                    esoPushSecret = false
+                }
             }
-            s3 = {
+            providerConfigsRef = {
                 awsProviderName = spec?.providerConfigsRef?.awsProviderName
-                bucketRegion = parameters?.backup?.bucketRegion
-                forceDestroy = parameters?.backup?.forceDestroy
-                deletionPolicy = parameters?.backup?.deletionPolicy
+                k8sProviderName = spec.providerConfigsRef.ccK8sProviderName
             }
+            managementPolicies = spec.managementPolicies
         }
     }
 
