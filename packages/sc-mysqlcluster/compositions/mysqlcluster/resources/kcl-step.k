@@ -348,7 +348,6 @@ if parameters?.backup?.enabled == True:
                 bucketsourceSecret = parameters?.backup?.credentialsSecret
                 bucketdestinationSecret = parameters?.backup?.credentialsSecret
                 bucketName = parameters?.backup?.bucket
-                deletionPolicy = parameters?.backup?.deletionPolicy
             }
             providerConfigsRef = {
                 scK8sProviderName = spec?.providerConfigsRef?.scK8sProviderName
