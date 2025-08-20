@@ -312,6 +312,64 @@ _DnsRecord = {
     }
 }
 
+_ns = parameters?.backup?.appNamespace if parameters?.backup?.appNamespace else parameters?.appNamespace
+
+if parameters?.backup?.enabled == True:
+    _s3Bucket = {
+        apiVersion = "aws.mojaloop.io/v1alpha1"
+        kind = "XS3Bucket"
+        metadata = {
+            name = "{}-backups-bucket".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "backups-bucket"
+            }
+        }
+        spec = {
+            parameters = {
+                bucket = {
+                    bucketName = parameters?.backup?.bucket
+                    bucketRegion = parameters?.backup?.bucketRegion
+                    forceDestroy = parameters?.backup?.forceDestroy
+                    deletionPolicy = parameters?.backup?.deletionPolicy
+                }
+                secret = {
+                    name = parameters?.backup?.bucket
+                    namespace = parameters?.appNamespace
+                }
+            }
+            providerConfigsRef = {
+                awsProviderName = spec?.providerConfigsRef?.awsProviderName
+                k8sProviderName = spec.providerConfigsRef.ccK8sProviderName
+            }
+            managementPolicies = spec.managementPolicies
+        }
+    }
+
+    _s3Secret = {
+        apiVersion = "utils.mojaloop.io/v1alpha1"
+        kind = "XBucketSecret"
+        metadata = {
+            name = "{}-bucket-secret-sync".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "bucket-secrets"
+            }
+        }
+        spec = {
+            parameters = {
+                scAppNamespace = parameters.scAppNamespace
+                appNamespace = parameters?.appNamespace
+                bucketsourceSecret = parameters?.backup?.credentialsSecret
+                bucketdestinationSecret = parameters?.backup?.credentialsSecret
+                bucketName = parameters?.backup?.bucket
+            }
+            providerConfigsRef = {
+                scK8sProviderName = spec?.providerConfigsRef?.scK8sProviderName
+                localK8sProviderName = spec.providerConfigsRef.ccK8sProviderName
+            }
+            managementPolicies = spec.managementPolicies
+        }
+    }
+
 ## TODO - clean up , this is not required this can be directly pushed to vault to share with env, keeping it because to make the code compatible with rds
 
 _externalName = ocds["dns-record"]?.Resource?.status?.fqdn or ""
@@ -381,7 +439,7 @@ _ConsumerAppExternalServices = [
 ]
 
 
-_items += [_MongodbCluster, _Secret, _clientsourceSecret, _DnsRecord, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+_items += [_MongodbCluster, _Secret, _clientsourceSecret, _DnsRecord, _s3Bucket, _s3Secret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }

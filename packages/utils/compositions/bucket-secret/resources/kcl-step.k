@@ -205,7 +205,12 @@ _bucketExternalSecret = {
           target = {
             name = parameters?.bucketsourceSecret
             creationPolicy = "Owner"
-            template = { type = "Opaque" }
+            template = {
+              data = {
+                AWS_ACCESS_KEY_ID = "{{ .username }}"
+                AWS_SECRET_ACCESS_KEY = "{{ .password }}"
+              }
+            }
           }
         }
       }
