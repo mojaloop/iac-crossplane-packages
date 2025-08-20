@@ -1,0 +1,18 @@
+apiVersion: utils.mojaloop.io/v1alpha1
+kind: XBucketSecret
+metadata:
+  name: bucket-secret-claim
+  namespace: default
+spec:
+  parameters:
+    scAppNamespace: sc-app-namespace
+    appNamespace: app-namespace
+    bucketsourceSecret: bucket-source-secret
+    bucketdestinationSecret: bucket-destination-secret
+    bucketName: bucket-name
+    credentialsSecret: credentials-secret
+  providerConfigsRef:
+    scK8sProviderName: sc-kubernetes-provider
+    localK8sProviderName: kubernetes-provider
+  managementPolicies:
+    - "*"
