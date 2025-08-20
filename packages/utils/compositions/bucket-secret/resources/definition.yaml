@@ -94,7 +94,3 @@ spec:
                     type: string
                     description: |-
                       The name of the bucket to use.
-                  credentialsSecret:
-                    type: string
-                    description: |-
-                      The name of the credentials secret to use.

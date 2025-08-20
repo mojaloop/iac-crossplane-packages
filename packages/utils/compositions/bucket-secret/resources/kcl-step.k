@@ -177,7 +177,7 @@ _bucketExternalSecret = {
         apiVersion = "external-secrets.io/v1beta1"
         kind = "ExternalSecret"
         metadata = {
-          name = parameters?.backup?.credentialsSecret
+          name = parameters?.bucketsourceSecret
           namespace = _appNS
         }
         spec = {
@@ -203,7 +203,7 @@ _bucketExternalSecret = {
             }
           ]
           target = {
-            name = parameters?.credentialsSecret
+            name = parameters?.bucketsourceSecret
             creationPolicy = "Owner"
             template = { type = "Opaque" }
           }

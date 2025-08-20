@@ -332,6 +332,33 @@ if parameters?.backup?.enabled == True:
         }
     }
 
+    _s3Secret = {
+        apiVersion = "utils.mojaloop.io/v1alpha1"
+        kind = "XBucketSecret"
+        metadata = {
+            name = "{}-bucket-secret-sync".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "bucket-secrets"
+            }
+        }
+        spec = {
+            parameters = {
+                scAppNamespace = parameters.scAppNamespace
+                appNamespace = parameters?.appNamespace
+                bucketsourceSecret = parameters?.backup?.credentialsSecret
+                bucketdestinationSecret = parameters?.backup?.credentialsSecret
+                bucketName = parameters?.backup?.bucket
+                deletionPolicy = parameters?.backup?.deletionPolicy
+            }
+            providerConfigsRef = {
+                scK8sProviderName = spec?.providerConfigsRef?.scK8sProviderName
+                localK8sProviderName = spec.providerConfigsRef.ccK8sProviderName
+            }
+            managementPolicies = spec.managementPolicies
+        }
+    }
+
+
 # TODO - clean up , this is not required this can be directly pushed to vault to share with env, keeping it because to make the code compatible with rds
 
 _externalName = ocds["dns-record"]?.Resource?.status?.fqdn or ""

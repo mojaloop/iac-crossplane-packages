@@ -10,7 +10,6 @@ spec:
     bucketsourceSecret: bucket-source-secret
     bucketdestinationSecret: bucket-destination-secret
     bucketName: bucket-name
-    credentialsSecret: credentials-secret
   providerConfigsRef:
     scK8sProviderName: sc-kubernetes-provider
     localK8sProviderName: kubernetes-provider
