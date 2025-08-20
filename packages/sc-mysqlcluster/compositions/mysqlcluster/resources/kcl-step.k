@@ -322,7 +322,6 @@ if parameters?.backup?.enabled == True:
                 secret = {
                     name = parameters?.backup?.credentialsSecret
                     namespace = parameters?.appNamespace
-                    esoPushSecret = false
                 }
             }
             providerConfigsRef = {
