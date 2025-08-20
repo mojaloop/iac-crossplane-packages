@@ -412,6 +412,9 @@ spec:
                       bucketRegion:
                         type: string
                         description: S3 bucket region.
+                      endpointUrl:
+                        type: string
+                        description: S3 endpoint URL.
                       scheduleName:
                         type: string
                         description: Name of the backup schedule.

@@ -155,6 +155,7 @@ _MysqlCluster = {
                                 bucket = parameters?.backup?.bucket
                                 credentialsSecret = parameters?.backup?.credentialsSecret
                                 region = parameters?.backup?.bucketRegion
+                                endpointUrl = parameters?.backup?.endpointUrl
                             }
                         }
                         if parameters?.backup?.pvc : "fs-pvc" = parameters?.backup?.pvc
