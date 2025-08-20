@@ -320,7 +320,7 @@ if parameters?.backup?.enabled == True:
                     deletionPolicy = parameters?.backup?.deletionPolicy
                 }
                 secret = {
-                    name = parameters?.backup?.credentialsSecret
+                    name = parameters?.backup?.bucket
                     namespace = parameters?.appNamespace
                 }
             }
