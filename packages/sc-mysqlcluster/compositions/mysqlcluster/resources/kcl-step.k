@@ -180,7 +180,7 @@ _MysqlCluster = {
             name = spec.providerConfigsRef.scK8sProviderName
         }
     }
-} if (parameters?.backup?.enabled != True or (ready(ocds["backups-bucket"]) and ready(ocds["bucket-secrets"]))) else Undefined
+}
 
 _Secret = {
     apiVersion = "utils.mojaloop.io/v1alpha1"
