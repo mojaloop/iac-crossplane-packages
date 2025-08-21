@@ -180,7 +180,7 @@ _MysqlCluster = {
             name = spec.providerConfigsRef.scK8sProviderName
         }
     }
-} if (not parameters.backup.enabled or (ready(ocds["backups-bucket"]) and ready(ocds["bucket-secrets"]))) else Undefined
+} if (parameters?.backup?.enabled != True or (ready(ocds["backups-bucket"]) and ready(ocds["bucket-secrets"]))) else Undefined
 
 _Secret = {
     apiVersion = "utils.mojaloop.io/v1alpha1"
@@ -530,7 +530,12 @@ _ConsumerAppExternalServices = [
     } for serviceName in parameters?.consumerAppsExternalServices or []
 ]
 
-_items += [_s3Bucket, _s3Secret, _Policy, _MysqlCluster, _Secret, _DnsRecord, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+if parameters?.backup?.enabled == True:
+    _MysqlClusterConditional = _MysqlCluster if (ready(ocds["backups-bucket"]) and ready(ocds["bucket-secrets"])) else Undefined
+    _items += [_s3Bucket, _s3Secret, _Policy, _MysqlClusterConditional, _Secret, _DnsRecord, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+else:
+    _items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+
 dxr = {
     **oxr
 }
