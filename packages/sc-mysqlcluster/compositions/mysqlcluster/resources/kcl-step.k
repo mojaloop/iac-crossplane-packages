@@ -530,17 +530,7 @@ _ConsumerAppExternalServices = [
     } for serviceName in parameters?.consumerAppsExternalServices or []
 ]
 
-if parameters?.backup?.enabled == True:
-    _baseItems = [_s3Bucket, _s3Secret, _Policy, _Secret, _DnsRecord, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
-
-    # Only add MySQL cluster if backup dependencies are ready
-    if ready(ocds["backups-bucket"]) and ready(ocds["bucket-secrets"]):
-        _items += _baseItems + [_MysqlCluster]
-    else:
-        _items += _baseItems
-else:
-    _items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
-
+_items += [_s3Bucket, _s3Secret, _Policy, _MysqlCluster, _Secret, _DnsRecord, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }
