@@ -20,6 +20,12 @@ if parameters?.backup?.enabled == True:
 
 
 ## Adding resources
+ready = lambda o, statusPath="atProvider" -> bool {
+    status = o?.Resource?.status
+    objstatus = status?.conditions or []
+    len(objstatus) > 0 and all_true([c.status == "True" for c in objstatus]) and status and statusPath in status
+}
+
 _MysqlCluster = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
@@ -174,7 +180,7 @@ _MysqlCluster = {
             name = spec.providerConfigsRef.scK8sProviderName
         }
     }
-}
+} if (not parameters.backup.enabled or (ready(ocds["backups-bucket"]) and ready(ocds["bucket-secrets"]))) else Undefined
 
 _Secret = {
     apiVersion = "utils.mojaloop.io/v1alpha1"
