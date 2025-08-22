@@ -39,6 +39,9 @@ _MongodbCluster = {
                         terminationGracePeriod = True
                         backupIfUnhealthy = True
                     }
+                    tls = {
+                        mode = "requireTLS"
+                    }
                     replsets = [
                         {
                             name = "rs0"
