@@ -32,6 +32,9 @@ _MongodbCluster = {
                     secrets = {
                         users = parameters?.dbSecret
                     }
+                    tls = {
+                        allowConnectionsWithoutCertificates = True
+                    }
                     unsafeFlags = {
                         tls = True
                         replsetSize = True
