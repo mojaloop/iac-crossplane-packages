@@ -96,6 +96,7 @@ spec:
       imagePullPolicy: IfNotPresent
       verifyTLS: true
       bucket: "s3-bucket-name"
+      endpointUrl: https://s3.eu-west-1.amazonaws.com
       credentialsSecret: "s3-credentials"
       bucketRegion: "us-east-1"
       scheduleName: "daily-backup"
