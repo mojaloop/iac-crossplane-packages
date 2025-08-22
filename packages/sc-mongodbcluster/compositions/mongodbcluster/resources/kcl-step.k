@@ -39,9 +39,7 @@ _MongodbCluster = {
                         terminationGracePeriod = True
                         backupIfUnhealthy = True
                     }
-                    tls = {
-                        mode = "requireTLS"
-                    }
+
                     replsets = [
                         {
                             name = "rs0"
@@ -130,6 +128,11 @@ net:
                         }
                         mongos = {
                             size = parameters?.sharding?.mongos?.size
+                            configuration = """
+net:
+  tls:
+    allowConnectionsWithoutCertificates: true
+"""
                             affinity = {
                                 antiAffinityTopologyKey = "kubernetes.io/hostname"
                             }
