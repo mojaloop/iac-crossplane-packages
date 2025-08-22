@@ -439,7 +439,7 @@ _ConsumerAppExternalServices = [
 ]
 
 
-_items += [_MongodbCluster, _Secret, _clientsourceSecret, _DnsRecord, _s3Bucket, _s3Secret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+_items += [_s3Bucket, _s3Secret, _MongodbCluster, _Secret, _clientsourceSecret, _DnsRecord, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }
