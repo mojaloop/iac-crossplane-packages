@@ -32,9 +32,6 @@ _MongodbCluster = {
                     secrets = {
                         users = parameters?.dbSecret
                     }
-                    tls = {
-                        allowConnectionsWithoutCertificates = True
-                    }
                     unsafeFlags = {
                         tls = True
                         replsetSize = True
@@ -72,6 +69,11 @@ _MongodbCluster = {
                                     }
                                 }
                             }
+                            configuration = """
+net:
+  tls:
+    allowConnectionsWithoutCertificates: true
+"""
 
                             podDisruptionBudget = {
                                 maxUnavailable = parameters?.sharding?.mongos?.podDisruptionBudget?.maxUnavailable
