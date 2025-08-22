@@ -39,6 +39,9 @@ _MongodbCluster = {
                         terminationGracePeriod = True
                         backupIfUnhealthy = True
                     }
+                    tls = {
+                        mode = "requireTLS"
+                    }
                     replsets = [
                         {
                             name = "rs0"
@@ -69,6 +72,11 @@ _MongodbCluster = {
                                     }
                                 }
                             }
+                            configuration = """
+net:
+  tls:
+    allowConnectionsWithoutCertificates: true
+"""
 
                             podDisruptionBudget = {
                                 maxUnavailable = parameters?.sharding?.mongos?.podDisruptionBudget?.maxUnavailable
@@ -122,6 +130,11 @@ _MongodbCluster = {
                         }
                         mongos = {
                             size = parameters?.sharding?.mongos?.size
+                            configuration = """
+net:
+  tls:
+    allowConnectionsWithoutCertificates: true
+"""
                             affinity = {
                                 antiAffinityTopologyKey = "kubernetes.io/hostname"
                             }
