@@ -1,3 +1,4 @@
+import base64
 # Read the XR and the OCDs
 oxr = option("params").oxr
 ocds = option("params").ocds
@@ -303,6 +304,53 @@ _DnsRecord = {
 
 _externalName = ocds["dns-record"]?.Resource?.status?.fqdn or ""
 
+_ExternalService = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-en-svc".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "percona-mysql-svc"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "networking.istio.io/v1beta1"
+                kind = "ServiceEntry"
+                metadata = {
+                    name = "{}.{}".format("mysql", parameters?.externalServiceName)
+                    namespace = parameters?.appNamespace
+                    labels = {
+                        "istio.io/use-waypoint": parameters?.WaypointName
+                        "istio.io/use-waypoint-namespace": parameters?.WaypointNamespace
+                    }
+                }
+                spec = {
+                    location = "MESH_EXTERNAL"
+                    resolution = "DNS"
+                    hosts = ["{}.{}.svc.cluster.local".format(parameters?.externalServiceName, parameters?.appNamespace)]
+                    endpoints = [
+                        {
+                            address = _externalName
+                        }
+                    ]
+                    ports = [
+                        {
+                            number = 3306
+                            name = "mysql"
+                            protocol = "TCP"
+                        }
+                    ]
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.ccK8sProviderName
+        }
+    }
+}
 
 _Policy = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -452,7 +500,7 @@ _ConsumerAppExternalServices = [
     } for serviceName in parameters?.consumerAppsExternalServices or []
 ]
 
-_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _clientsourceSecret] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }
