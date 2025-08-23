@@ -303,36 +303,6 @@ _DnsRecord = {
 
 _externalName = ocds["dns-record"]?.Resource?.status?.fqdn or ""
 
-_ExternalService = {
-    apiVersion = "kubernetes.crossplane.io/v1alpha2"
-    kind = "Object"
-    metadata = {
-        name = "{}-en-svc".format(oxr.metadata.name)
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "percona"
-        }
-    }
-    spec = {
-        forProvider = {
-            manifest = {
-                apiVersion = "v1"
-                kind = "Service"
-                metadata = {
-                    name = parameters?.externalServiceName
-                    namespace = parameters?.appNamespace
-                }
-                spec = {
-                    type = "ExternalName"
-                    externalName = _externalName
-                }
-            }
-        }
-        managementPolicies = spec.managementPolicies
-        providerConfigRef = {
-            name = spec.providerConfigsRef.ccK8sProviderName
-        }
-    }
-}
 
 _Policy = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -482,7 +452,7 @@ _ConsumerAppExternalServices = [
     } for serviceName in parameters?.consumerAppsExternalServices or []
 ]
 
-_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+_items += [_Policy, _MysqlCluster, _Secret, _DnsRecord, _clientsourceSecret] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }
