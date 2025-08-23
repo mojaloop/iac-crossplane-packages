@@ -348,8 +348,8 @@ _ExternalService = {
                     name = "{}.{}".format("mongodb", parameters?.externalServiceName)
                     namespace = parameters?.appNamespace
                     labels = {
-                        "istio.io/use-waypoint": parameters?.WaypointName
-                        "istio.io/use-waypoint-namespace": parameters?.WaypointNamespace
+                        "istio.io/use-waypoint": parameters?.waypointName
+                        "istio.io/use-waypoint-namespace": parameters?.waypointNamespace
                     }
                 }
                 spec = {
@@ -397,8 +397,8 @@ _ConsumerAppExternalServices = [
                         name = "{}.{}".format("mongodb", serviceName)
                         namespace = parameters?.appNamespace
                         labels = {
-                            "istio.io/use-waypoint": parameters?.WaypointName
-                            "istio.io/use-waypoint-namespace": parameters?.WaypointNamespace
+                            "istio.io/use-waypoint": parameters?.waypointName
+                            "istio.io/use-waypoint-namespace": parameters?.waypointNamespace
                         }
                     }
                     spec = {
