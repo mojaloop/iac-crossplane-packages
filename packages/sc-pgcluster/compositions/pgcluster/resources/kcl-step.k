@@ -27,7 +27,7 @@ _PGCluster = {
                 }
                 spec = {
                     crVersion = parameters?.crVersion
-                    image = parameters?.image #"percona/percona-postgresql-operator:2.5.0-ppg16.4-postgres"
+                    image = parameters?.image
                     postgresVersion = parameters?.pgVersion
                     port = 5432
                     imagePullPolicy = "IfNotPresent"
@@ -99,10 +99,10 @@ _PGCluster = {
                     ]
                     backups = {
                         pgbackrest = {
-                            image =  parameters?.backup?.image #"percona/percona-postgresql-operator:2.5.0-ppg16.4-pgbackrest2.53-1"
+                            image =  parameters?.backup?.image
                             repos = [
                                 {
-                                    name = "repo2"
+                                    name = "s3repo"
                                     s3 = {
                                         endpoint =  parameters?.backup?.objectStoreEndpoint
                                         bucket   = parameters?.backup?.bucket
@@ -118,7 +118,7 @@ _PGCluster = {
                     }
                     proxy = {
                         pgBouncer = {
-                            image = parameters?.proxy?.pgBouncer?.image #"percona/percona-postgresql-operator:2.5.0-ppg16.4-pgbouncer1.23.1"
+                            image = parameters?.proxy?.pgBouncer?.image
                             replicas = parameters?.proxy?.pgBouncer?.replicas
                             affinity = {
                                 podAntiAffinity = {
@@ -330,7 +330,63 @@ _Secret = {
     }
 }
 
-_items += [_PGCluster, _Secret, _HeadlessService, _Endpoint, _LBService]
+if parameters?.backup?.enabled == True:
+    _s3Bucket = {
+        apiVersion = "aws.mojaloop.io/v1alpha1"
+        kind = "XS3Bucket"
+        metadata = {
+            name = "{}-backups-bucket".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "backups-bucket"
+            }
+        }
+        spec = {
+            parameters = {
+                bucket = {
+                    bucketName = parameters?.backup?.bucket
+                    bucketRegion = parameters?.backup?.bucketRegion
+                    forceDestroy = parameters?.backup?.forceDestroy
+                    deletionPolicy = parameters?.backup?.deletionPolicy
+                }
+                secret = {
+                    name = parameters?.backup?.bucket
+                    namespace = parameters?.appNamespace
+                }
+            }
+            providerConfigsRef = {
+                awsProviderName = spec?.providerConfigsRef?.awsProviderName
+                k8sProviderName = spec.providerConfigsRef.ccK8sProviderName
+            }
+            managementPolicies = spec.managementPolicies
+        }
+    }
+
+    _s3Secret = {
+        apiVersion = "utils.mojaloop.io/v1alpha1"
+        kind = "XBucketSecret"
+        metadata = {
+            name = "{}-bucket-secret-sync".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "bucket-secrets"
+            }
+        }
+        spec = {
+            parameters = {
+                scAppNamespace = parameters.clusterName
+                appNamespace = parameters?.appNamespace
+                bucketsourceSecret = parameters?.backup?.credentialsSecret
+                bucketdestinationSecret = parameters?.backup?.credentialsSecret
+                bucketName = parameters?.backup?.bucket
+            }
+            providerConfigsRef = {
+                scK8sProviderName = spec?.providerConfigsRef?.scK8sProviderName
+                localK8sProviderName = spec.providerConfigsRef.ccK8sProviderName
+            }
+            managementPolicies = spec.managementPolicies
+        }
+    }
+
+_items += [_s3Bucket, _s3Secret, _PGCluster, _Secret, _HeadlessService, _Endpoint, _LBService]
 dxr = {
     **oxr
 }

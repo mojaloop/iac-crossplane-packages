@@ -218,31 +218,32 @@ _bucketExternalSecret = {
   }
 }
 
-_syncSecret = {
-    apiVersion = "utils.mojaloop.io/v1alpha1"
-    kind = "XObjectSyncer"
-    metadata = {
-        name = "{}-bucket-secret".format(oxr.metadata.name)
-    }
-    spec = {
-        parameters = {
-            objectType = "Secret"
-            source = {
-                name = parameters?.bucketsourceSecret
-                namespace = _appNS
-            }
-            destination = {
-                name = parameters?.bucketdestinationSecret
-                namespace = parameters?.scAppNamespace
-            }
-        }
-        providerConfigsRef = {
-            sourceK8sProviderName = spec?.providerConfigsRef?.localK8sProviderName
-            destinationK8sProviderName = spec?.providerConfigsRef?.scK8sProviderName
-        }
-        managementPolicies = spec?.managementPolicies
-    }
-}
+if parameters?.syncBucketSecret == True:
+  _syncSecret = {
+      apiVersion = "utils.mojaloop.io/v1alpha1"
+      kind = "XObjectSyncer"
+      metadata = {
+          name = "{}-bucket-secret".format(oxr.metadata.name)
+      }
+      spec = {
+          parameters = {
+              objectType = "Secret"
+              source = {
+                  name = parameters?.bucketsourceSecret
+                  namespace = _appNS
+              }
+              destination = {
+                  name = parameters?.bucketdestinationSecret
+                  namespace = parameters?.scAppNamespace
+              }
+          }
+          providerConfigsRef = {
+              sourceK8sProviderName = spec?.providerConfigsRef?.localK8sProviderName
+              destinationK8sProviderName = spec?.providerConfigsRef?.scK8sProviderName
+          }
+          managementPolicies = spec?.managementPolicies
+      }
+  }
 
 _items += [
   _serviceAccount,

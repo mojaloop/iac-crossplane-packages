@@ -94,3 +94,8 @@ spec:
                     type: string
                     description: |-
                       The name of the bucket to use.
+                  syncBucketSecret:
+                    type: boolean
+                    description: |-
+                      Whether to sync bucket secrets.
+                    default: true
