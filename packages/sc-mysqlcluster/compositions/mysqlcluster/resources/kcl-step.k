@@ -1,3 +1,4 @@
+import base64
 # Read the XR and the OCDs
 oxr = option("params").oxr
 ocds = option("params").ocds
@@ -300,7 +301,6 @@ _DnsRecord = {
 }
 
 # TODO - clean up , this is not required this can be directly pushed to vault to share with env, keeping it because to make the code compatible with rds
-
 _externalName = ocds["dns-record"]?.Resource?.status?.fqdn or ""
 
 _ExternalService = {
@@ -309,21 +309,38 @@ _ExternalService = {
     metadata = {
         name = "{}-en-svc".format(oxr.metadata.name)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "percona"
+            "krm.kcl.dev/composition-resource-name": "percona-mysql-svc"
         }
     }
     spec = {
         forProvider = {
             manifest = {
-                apiVersion = "v1"
-                kind = "Service"
+                apiVersion = "networking.istio.io/v1beta1"
+                kind = "ServiceEntry"
                 metadata = {
-                    name = parameters?.externalServiceName
+                    name = "{}.{}".format("mysql", parameters?.externalServiceName)
                     namespace = parameters?.appNamespace
+                    labels = {
+                        "istio.io/use-waypoint": parameters?.waypointName
+                        "istio.io/use-waypoint-namespace": parameters?.waypointNamespace
+                    }
                 }
                 spec = {
-                    type = "ExternalName"
-                    externalName = _externalName
+                    location = "MESH_EXTERNAL"
+                    resolution = "DNS"
+                    hosts = ["{}.{}.svc.cluster.local".format(parameters?.externalServiceName, parameters?.appNamespace)]
+                    endpoints = [
+                        {
+                            address = _externalName
+                        }
+                    ]
+                    ports = [
+                        {
+                            number = 3306
+                            name = "mysql"
+                            protocol = "TCP"
+                        }
+                    ]
                 }
             }
         }
@@ -445,15 +462,32 @@ _ConsumerAppExternalServices = [
         spec = {
             forProvider = {
                 manifest = {
-                    apiVersion = "v1"
-                    kind = "Service"
+                    apiVersion = "networking.istio.io/v1beta1"
+                    kind = "ServiceEntry"
                     metadata = {
-                        name = serviceName
+                        name = "{}.{}".format("mysql", serviceName)
                         namespace = parameters?.appNamespace
+                        labels = {
+                            "istio.io/use-waypoint": parameters?.waypointName
+                            "istio.io/use-waypoint-namespace": parameters?.waypointNamespace
+                        }
                     }
                     spec = {
-                        type = "ExternalName"
-                        externalName = _externalName
+                        location = "MESH_EXTERNAL"
+                        resolution = "DNS"
+                        hosts = ["{}.{}.svc.cluster.local".format(serviceName, parameters?.appNamespace)]
+                        endpoints = [
+                            {
+                                address = _externalName
+                            }
+                        ]
+                        ports = [
+                            {
+                                number = 3306
+                                name = "mysql"
+                                protocol = "TCP"
+                            }
+                        ]
                     }
                 }
             }
