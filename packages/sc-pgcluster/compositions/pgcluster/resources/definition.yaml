@@ -48,6 +48,7 @@ spec:
                 required:
                   - scK8sProviderName
                   - ccK8sProviderName
+                  - awsProviderName
                 properties:
                   ccK8sProviderName:
                     type: string
@@ -57,6 +58,10 @@ spec:
                     type: string
                     description: |-
                       The name of the provider config to use for the remote k8s provider.
+                  awsProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the aws provider.
               parameters:
                 type: object
                 properties:
