@@ -102,7 +102,7 @@ _PGCluster = {
                             image =  parameters?.backup?.image
                             repos = [
                                 {
-                                    name = "s3repo"
+                                    name = "repo2"
                                     s3 = {
                                         endpoint =  parameters?.backup?.objectStoreEndpoint
                                         bucket   = parameters?.backup?.bucket
