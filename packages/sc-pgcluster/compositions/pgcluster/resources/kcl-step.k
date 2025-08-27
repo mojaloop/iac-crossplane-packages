@@ -103,7 +103,7 @@ _PGCluster = {
                             configuration = [
                                 {
                                     secret = {
-                                        name = parameters?.backup?.bucket
+                                        name = parameters?.backup?.credentialsSecret
                                     }
                                 }
                             ]
