@@ -100,6 +100,13 @@ _PGCluster = {
                     backups = {
                         pgbackrest = {
                             image =  parameters?.backup?.image
+                            configuration = [
+                                {
+                                    secret = {
+                                        name = parameters?.backup?.bucket
+                                    }
+                                }
+                            ]
                             repos = [
                                 {
                                     name = "repo2"
