@@ -384,6 +384,7 @@ if parameters?.backup?.enabled == True:
                 bucketsourceSecret = parameters?.backup?.credentialsSecret
                 bucketdestinationSecret = parameters?.backup?.credentialsSecret
                 bucketName = parameters?.backup?.bucket
+                secretType = "pgbackrest"
             }
             providerConfigsRef = {
                 scK8sProviderName = spec?.providerConfigsRef?.scK8sProviderName

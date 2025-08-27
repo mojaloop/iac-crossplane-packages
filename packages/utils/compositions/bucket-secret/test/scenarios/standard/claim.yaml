@@ -10,6 +10,7 @@ spec:
     bucketsourceSecret: bucket-source-secret
     bucketdestinationSecret: bucket-destination-secret
     bucketName: bucket-name
+    secretType: pgbackrest
   providerConfigsRef:
     scK8sProviderName: sc-kubernetes-provider
     localK8sProviderName: kubernetes-provider

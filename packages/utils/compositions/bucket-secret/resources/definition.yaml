@@ -99,3 +99,11 @@ spec:
                     description: |-
                       Whether to sync bucket secrets.
                     default: true
+                  secretType:
+                    type: string
+                    description: |-
+                      The type of the secret to use.
+                    default: "standard"
+                    enum:
+                      - standard
+                      - pgbackrest

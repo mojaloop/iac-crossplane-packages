@@ -160,6 +160,16 @@ _bucketSecretStore = {
   }
 }
 
+secretType = parameters?.secretType or "standard"  # or "pgbackrest"
+
+_templateData = {
+  AWS_ACCESS_KEY_ID = "{{ .username }}"
+  AWS_SECRET_ACCESS_KEY = "{{ .password }}"
+} if secretType == "standard" else {
+  "s3.conf" = "[global]\nrepo2-s3-key={{ .username }}\nrepo2-s3-key-secret={{ .password }}"
+}
+
+
 _bucketExternalSecret = {
   apiVersion = "kubernetes.crossplane.io/v1alpha2"
   kind = "Object"
@@ -206,10 +216,7 @@ _bucketExternalSecret = {
             name = parameters?.bucketsourceSecret
             creationPolicy = "Owner"
             template = {
-              data = {
-                AWS_ACCESS_KEY_ID = "{{ .username }}"
-                AWS_SECRET_ACCESS_KEY = "{{ .password }}"
-              }
+              data = _templateData
             }
           }
         }
