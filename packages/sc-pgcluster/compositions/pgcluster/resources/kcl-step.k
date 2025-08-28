@@ -7,6 +7,35 @@ parameters = spec.parameters
 # Initialize the items list
 _items = []
 ## Adding resources
+
+_basePgbackrest = {
+    image = parameters?.backup?.image
+    repos = [
+        {
+            name = "repo2"
+            s3 = {
+                endpoint = parameters?.backup?.objectStoreEndpoint
+                bucket = parameters?.backup?.bucket
+                region = parameters?.backup?.bucketRegion
+            }
+            schedules = {
+                full = parameters?.backup?.fullBackupCronSchedule
+                differential = parameters?.backup?.differentialBackupCronSchedule
+            }
+        }
+    ]
+}
+# Add backup credentials configuration section conditionally
+_pgbackrestWithConfig = _basePgbackrest | ({
+    configuration = [
+        {
+            secret = {
+                name = parameters?.backup?.credentialsSecret
+            }
+        }
+    ]
+} if parameters?.backup?.enabled == True else {})
+
 _PGCluster = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
@@ -68,7 +97,6 @@ _PGCluster = {
                                     }
                                 }
                             }
-
                             resources = {
                                 limits = {
                                     cpu = parameters?.resources?.limits?.cpu
@@ -81,7 +109,6 @@ _PGCluster = {
                             }
                             tolerations = parameters?.tolerations
                             priorityClassName = parameters?.priorityClassName
-
                         }
                     ]
                     users = [
@@ -98,30 +125,7 @@ _PGCluster = {
                         }
                     ]
                     backups = {
-                        pgbackrest = {
-                            image =  parameters?.backup?.image
-                            configuration = [
-                                {
-                                    secret = {
-                                        name = parameters?.backup?.credentialsSecret
-                                    }
-                                }
-                            ]
-                            repos = [
-                                {
-                                    name = "repo2"
-                                    s3 = {
-                                        endpoint =  parameters?.backup?.objectStoreEndpoint
-                                        bucket   = parameters?.backup?.bucket
-                                        region   = parameters?.backup?.bucketRegion
-                                    }
-                                    schedules = {
-                                        full = parameters?.backup?.fullBackupCronSchedule
-                                        differential = parameters?.backup?.differentialBackupCronSchedule
-                                    }
-                                }
-                            ]
-                        }
+                        pgbackrest = _pgbackrestWithConfig
                     }
                     proxy = {
                         pgBouncer = {
