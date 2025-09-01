@@ -13,7 +13,7 @@ spec:
     image: percona/percona-server-mongodb:7.0.15-9-multi
     imagePullPolicy: IfNotPresent
     dbSecret: my-db-secret
-    dbsourceSecret: my-db-source-secret
+    dbsourceSecret: my-db-secret
     consumerAppsSecret:
       name: my-ca-bundle
       key: my-ca-bundle.pem

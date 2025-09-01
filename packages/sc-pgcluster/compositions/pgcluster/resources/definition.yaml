@@ -48,6 +48,7 @@ spec:
                 required:
                   - scK8sProviderName
                   - ccK8sProviderName
+                  - awsProviderName
                 properties:
                   ccK8sProviderName:
                     type: string
@@ -57,6 +58,10 @@ spec:
                     type: string
                     description: |-
                       The name of the provider config to use for the remote k8s provider.
+                  awsProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the aws provider.
               parameters:
                 type: object
                 properties:
@@ -136,6 +141,10 @@ spec:
                     type: object
                     description: Backup configuration
                     properties:
+                      enabled:
+                        type: boolean
+                        description: Enable backup.
+                        default: false
                       image:
                         type: string
                         description: Image used for pgbackrest
@@ -143,12 +152,27 @@ spec:
                         type: string
                       bucket:
                         type: string
+                      forceDestroy:
+                        type: boolean
+                        description: Force destroy the bucket.
+                        default: false
+                      deletionPolicy:
+                        type: string
+                        description: Deletion policy for the bucket.
+                        default: Delete
                       bucketRegion:
                         type: string
                       fullBackupCronSchedule:
                         type: string
                       differentialBackupCronSchedule:
                         type: string
+                      credentialsSecret:
+                        type: string
+                        description: S3 credentials secret name.
+                      endpointUrl:
+                        type: string
+                        description: S3 endpoint URL.
+
                   proxy:
                     type: object
                     description: Proxy configuration for PgBouncer
