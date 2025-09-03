@@ -93,6 +93,14 @@ spec:
                     items:
                       type: string
                     description: List of externalservice names for the consumer applications
+                  waypointName:
+                    type: string
+                    description: Name of the waypoint for the consumer applications
+                    default: "egress-waypoint"
+                  waypointNamespace:
+                    type: string
+                    description: Namespace of the waypoint for the consumer applications
+                    default: "istio-system"
                   crVersion:
                     type: string
                     description: Type of object to be synced
