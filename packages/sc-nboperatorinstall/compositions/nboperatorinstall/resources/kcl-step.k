@@ -80,6 +80,10 @@ _sc_argocd_operator_app_install = {
                     }
                   }
                   managementURL = parameters.nbManagmentURI
+                  webhook = {
+                    failurePolicy = "Ignore"
+                  }
+                  routingClientImage = "netbirdio/netbird:{}".format(parameters.nbImageVersion)
                 }
               }
             }

@@ -76,3 +76,6 @@ spec:
                     operatorClusterName:
                       type: string
                       description: Cluster name for k8s operator.
+                    nbImageVersion:
+                      type: string
+                      description: Version of netbird image to use.
