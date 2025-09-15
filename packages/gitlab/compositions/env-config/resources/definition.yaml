@@ -82,7 +82,7 @@ spec:
                     type: string
                     description: |-
                       A comma separated list of environments to create.
-                  groupIdRef:
+                  groupName:
                     type: string
                     description: |-
                       The  reference to the gitlab group

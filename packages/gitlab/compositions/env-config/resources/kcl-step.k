@@ -26,8 +26,10 @@ _environmentProjects = [{
         parameters = {
             project = {
                 name = projectName
-                groupIdRef = {
-                    name = parameters?.groupIdRef
+                groupIdSelector = {
+                  matchLabels = {
+                    "gitlab.mojaloop.com/group-name" = parameters?.groupName
+
                 }
             }
         }
@@ -51,8 +53,10 @@ _projectAccessTokens = [{
     }
     spec = {
         forProvider = {
-            projectIdRef = {
-                name = projectName
+            projectIdSelector = {
+                matchLabels = {
+                   "gitlab.mojaloop.com/project-name" = projectName
+                }
             }
             name = "Argocd project access token"
             accessLevel = 20
@@ -81,8 +85,10 @@ _groupVariables = [ {
     }
     spec = {
         forProvider = {
-            groupIdRef = {
-                name = parameters?.groupIdRef
+            groupIdSelector = {
+                matchLabels = {
+                "gitlab.mojaloop.com/group-name" = parameters?.groupName
+                }
             }
             key = variable.key
             value = variable.value
