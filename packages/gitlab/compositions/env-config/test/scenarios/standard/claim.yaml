@@ -1,0 +1,20 @@
+apiVersion: gitlab.mojaloop.io/v1alpha1
+kind: XEnvConfig
+metadata:
+  name: post
+  namespace: default
+spec:
+  parameters:
+    namespace: foo
+    environments: "mw,region,pm"
+    groupIdRef: "iac"
+    groupVariables:
+      - key: "lokibucket"
+        value: "my-mw-bucket"
+        protected: true
+        masked: false
+        environmentScope: "*"
+  providerConfigsRef:
+    gitlabProvider: gitlab-provider
+    kubernetesProvider: kubernetes-provider
+    vaultProvider: vault-provider

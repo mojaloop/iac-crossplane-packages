@@ -1,0 +1,114 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xenvconfig.gitlab.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: gitlab.mojaloop.io
+  names:
+    kind: XEnvConfig
+    plural: xenvconfig
+  claimNames:
+    kind: EnvConfig
+    plural: envconfig
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the gitlab providers.
+                properties:
+                  gitlabProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the gitlab provider.
+                    default: gitlab-provider
+                  kubernetesProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the kubernetes provider.
+                    default: kubernetes-provider
+                  vaultProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the vault provider.
+                    default: vault-provider
+              parameters:
+                type: object
+                properties:
+                  namespace:
+                    type: string
+                    description: |-
+                      The namespace to create the resources in.
+                  vaultFqdn:
+                    type: string
+                    description: |-
+                      The fqdn for vault api.
+                    default: vault.cluster.mojaloop.io
+                  gitlabFqdn:
+                    type: string
+                    description: |-
+                      The fqdn for gitlab.
+                    default: gitlab.cluster.mojaloop.io
+                  environments:
+                    type: string
+                    description: |-
+                      A comma separated list of environments to create.
+                  groupIdRef:
+                    type: string
+                    description: |-
+                      The  reference to the gitlab group
+                    default: iac
+                  groupVariables:
+                    type: array
+                    description: |-
+                      An array of map of variables to set at the group level.
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        value:
+                          type: string
+                        protected:
+                          type: boolean
+                        masked:
+                          type: boolean
+                        environmentScope:
+                          type: string
+
+
+
+          status:
+            type: object
+            properties:
+              tokenExpireAt:
+                type: string
