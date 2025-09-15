@@ -29,7 +29,7 @@ _environmentProjects = [{
                 groupIdSelector = {
                   matchLabels = {
                     "gitlab.mojaloop.com/group-name" = parameters?.groupName
-
+                  }
                 }
             }
         }
