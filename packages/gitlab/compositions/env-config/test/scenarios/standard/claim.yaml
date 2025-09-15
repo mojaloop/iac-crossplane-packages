@@ -1,13 +1,13 @@
 apiVersion: gitlab.mojaloop.io/v1alpha1
 kind: XEnvConfig
 metadata:
-  name: post
+  name: environments
   namespace: default
 spec:
   parameters:
-    namespace: foo
-    environments: "mw,region,pm"
-    groupIdRef: "iac"
+    namespace: default
+    environments: "test-repo"
+    groupName: "iac"
     groupVariables:
       - key: "lokibucket"
         value: "my-mw-bucket"

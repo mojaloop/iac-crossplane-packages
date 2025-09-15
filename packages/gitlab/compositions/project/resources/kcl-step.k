@@ -35,6 +35,7 @@ _project = {
     apiVersion = "projects.gitlab.crossplane.io/v1alpha1"
     kind = "Project"
     metadata.annotations = {"krm.kcl.dev/composition-resource-name" = "project"}
+    metadata.labels = {"gitlab.mojaloop.com/project-name"= p?.project?.name }
     spec = {
         forProvider = {
             name = p?.project?.name
