@@ -301,4 +301,4 @@ spec:
                   defaultBranch:
                     type: string
                   id:
-                    type: string
+                    type: number
