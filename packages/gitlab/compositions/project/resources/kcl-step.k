@@ -93,8 +93,25 @@ _projectMembers += [{
     }
 } if (members) else {} for i, m in members]
 
+_httpUrlToRepo = ocds["project"]?.Resource?.status?.atProvider?.httpUrlToRepo
+_webUrl = ocds["project"]?.Resource?.status?.atProvider?.webUrl
+_sshUrlToRepo = ocds["project"]?.Resource?.status?.atProvider?.sshUrlToRepo
+_pathWithNamespace = ocds["project"]?.Resource?.status?.atProvider?.pathWithNamespace
+_defaultBranch = ocds["project"]?.Resource?.status?.atProvider?.defaultBranch
+_id = ocds["project"]?.Resource?.status?.atProvider?.id
+
 dxr = {
     **oxr
+    status = {
+        atProvider = {
+            httpUrlToRepo = _httpUrlToRepo
+            webUrl = _webUrl
+            sshUrlToRepo = _sshUrlToRepo
+            pathWithNamespace = _pathWithNamespace
+            defaultBranch = _defaultBranch
+            id = _id
+        }
+    }
 }
 
 items = [dxr, _project] + _projectMembers
