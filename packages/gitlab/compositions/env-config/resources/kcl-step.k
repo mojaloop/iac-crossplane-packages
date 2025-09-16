@@ -142,9 +142,9 @@ _repoSecrets = [{
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "{}-repo-secret".format(projectName)
+        name = "{}-repo-creds".format(projectName)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "repo-secret-{}".format(projectName)
+            "krm.kcl.dev/composition-resource-name": "repo-creds-{}".format(projectName)
         }
     }
     spec = {
@@ -153,8 +153,11 @@ _repoSecrets = [{
                 apiVersion = "v1"
                 kind = "Secret"
                 metadata = {
-                    name = "{}-repo-secret".format(projectName)
-                    namespace = parameters?.namespace
+                    name = "{}-repo-creds".format(projectName)
+                    namespace = parameters?.argocdNamespace
+                }
+                labels = {
+                    "argocd.argoproj.io/secret-type" = "repo-creds"
                 }
                 data = {
                     "password"  = ocds["repo-secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["token"]

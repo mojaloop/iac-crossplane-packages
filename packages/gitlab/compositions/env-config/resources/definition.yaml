@@ -68,6 +68,11 @@ spec:
                     type: string
                     description: |-
                       The namespace to create the resources in.
+                  argocdNamespace:
+                    type: string
+                    description: |-
+                      The namespace where argocd is installed, to create the repo creds for argocd repository sync
+                    default: argocd
                   environments:
                     type: string
                     description: |-
