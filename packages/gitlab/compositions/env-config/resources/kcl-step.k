@@ -53,6 +53,7 @@ _projectAccessTokens = [{
         name = "accesstoken-{}".format(projectName)
         annotations = {
                 "krm.kcl.dev/composition-resource-name" = "accesstoken-{}".format(projectName)
+                 "crossplane.io/external-name" = "accesstoken-{}".format(projectName)
         }
 
     }
@@ -63,7 +64,7 @@ _projectAccessTokens = [{
                    "gitlab.mojaloop.com/project-name" = projectName
                 }
             }
-            name = "Argocd project access token"
+            name = "accesstoken-{}".format(projectName)
             accessLevel = 20
             scopes = ["read_api", "read_registry"]
             expiresAt = parameters?.expiresAt
