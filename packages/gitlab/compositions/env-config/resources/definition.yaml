@@ -68,16 +68,6 @@ spec:
                     type: string
                     description: |-
                       The namespace to create the resources in.
-                  vaultFqdn:
-                    type: string
-                    description: |-
-                      The fqdn for vault api.
-                    default: vault.cluster.mojaloop.io
-                  gitlabFqdn:
-                    type: string
-                    description: |-
-                      The fqdn for gitlab.
-                    default: gitlab.cluster.mojaloop.io
                   environments:
                     type: string
                     description: |-
