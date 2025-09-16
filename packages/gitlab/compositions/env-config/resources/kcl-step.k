@@ -161,7 +161,7 @@ _repoSecrets = [{
                 }
                 data = {
                     "password"  = ocds["repo-secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["token"]
-                    "url"       = base64.encode(ocds["project-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.httpUrlToRepo)
+                    "url"       = base64.encode(ocds["project-{}".format(projectName)]?.Resource?.status?.atProvider?.httpUrlToRepo)
                     "type"      = base64.encode("git")
                     "project"   = base64.encode("default")
                     "username"  = base64.encode("token")
