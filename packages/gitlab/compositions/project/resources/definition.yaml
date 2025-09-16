@@ -283,3 +283,22 @@ spec:
                         default: ".gitlab-ci.yml"
                     required:
                       - name
+
+          status:
+            type: object
+            properties:
+              atProvider:
+                type: object
+                properties:
+                  httpUrlToRepo:
+                    type: string
+                  webUrl:
+                    type: string
+                  sshUrlToRepo:
+                    type: string
+                  pathWithNamespace:
+                    type: string
+                  defaultBranch:
+                    type: string
+                  id:
+                    type: string
