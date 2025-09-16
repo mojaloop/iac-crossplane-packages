@@ -34,7 +34,10 @@ if p?.project?.groupName:
 _project = {
     apiVersion = "projects.gitlab.crossplane.io/v1alpha1"
     kind = "Project"
-    metadata.annotations = {"krm.kcl.dev/composition-resource-name" = "project"}
+    metadata.annotations = {
+        "krm.kcl.dev/composition-resource-name" = "project"
+        "crossplane.io/external-name" = p?.project?.name
+        }
     metadata.labels = {"gitlab.mojaloop.com/project-name" = p?.project?.name }
     spec = {
         forProvider = {
