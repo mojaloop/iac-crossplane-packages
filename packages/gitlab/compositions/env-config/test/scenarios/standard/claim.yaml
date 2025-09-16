@@ -6,11 +6,16 @@ metadata:
 spec:
   parameters:
     namespace: default
-    environments: "test-repo"
+    environments: "test-repo1,test-repo2,test-repo3"
     groupName: "iac"
     groupVariables:
       - key: "lokibucket"
         value: "my-mw-bucket"
+        protected: true
+        masked: false
+        environmentScope: "*"
+      - key: "vault_addr"
+        value: "https://vault.mojaloop.io"
         protected: true
         masked: false
         environmentScope: "*"

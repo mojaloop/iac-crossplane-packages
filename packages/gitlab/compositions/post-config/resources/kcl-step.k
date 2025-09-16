@@ -32,6 +32,9 @@ _groupIAC = {
         annotations = {
             "krm.kcl.dev/composition-resource-name" = p?.iacGroupName
         }
+        labels = {
+            "gitlab.mojaloop.com/group-name" = p?.iacGroupName
+        }
     }
     spec = {
         forProvider = {
