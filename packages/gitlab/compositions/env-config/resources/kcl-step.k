@@ -61,7 +61,7 @@ _projectAccessTokens = [{
             name = "Argocd project access token"
             accessLevel = 20
             scopes = ["read_api", "read_registry"]
-            expiresAt = 365
+            expiresAt = parameters?.expiresAt
         }
         providerConfigRef = {
             name = spec?.providerConfigsRef?.gitlabProvider
