@@ -1,5 +1,6 @@
 import datetime
 import regex
+import base64
 
 # Read the XR
 oxr = option("params").oxr
@@ -104,9 +105,73 @@ _groupVariables = [ {
 } for variable in parameters?.groupVariables or []
 ]
 
+_observe_repo_secret = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-repo-secret-observe".format(projectName)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "repo-secret-observe-{}".format(projectName)
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = "{}-repo-secret".format(projectName)
+                    namespace = parameters?.namespace
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.kubernetesProvider
+        }
+    }
+} for projectName in _environments or []
+]
 
+_repo_tokens = {
+  projectName: ocds["repo-secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["token"] or ""
+  for projectName in _environments or []
+}
 
-_items += _environmentProjects + _projectAccessTokens + _groupVariables
+_repoSecrets = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-repo-secret".format(projectName)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "repo-secret-{}".format(projectName)
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = "{}-repo-secret".format(projectName)
+                    namespace = parameters?.namespace
+                }
+                data = {
+                    "password"  = ocds["repo-secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["token"]
+                    "url"       = base64.encode(ocds["project-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.httpUrlToRepo)
+                    "type"      = base64.encode("git")
+                    "project"   = base64.encode("default")
+                    "username"  = base64.encode("token")
+                }
+            }
+        }
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.kubernetesProvider
+        }
+    }
+} for projectName in _environments or []
+]
+_items += _environmentProjects + _projectAccessTokens + _groupVariables + _observe_repo_secret + _repoSecrets
 
 dxr = {
     **oxr
