@@ -30,7 +30,7 @@ if p?.project?.groupName:
         }
     }
 
-_projectID = ocds["project"]?.Resource?.status?.atProvider?.id
+_projectID = ocds["project"]?.Resource?.status?.atProvider?.id if ocds["project"]?.Resource?.status?.atProvider?.id else ""
 
 #render project
 _project = {
