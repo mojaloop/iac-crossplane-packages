@@ -185,6 +185,9 @@ spec:
                           - private
                           - enabled
                         default: enabled
+                      approvalsBeforeMerge:
+                        type: integer
+                        default: 1
                       initializeWithReadme:
                         type: boolean
                         default: true
@@ -254,6 +257,9 @@ spec:
                           - rebase_merge
                           - ff
                         default: merge
+                      allowMergeOnSkippedPipeline:
+                        type: boolean
+                        default: false
                       onlyAllowMergeIfPipelineSucceeds:
                         type: boolean
                         default: true
@@ -271,6 +277,10 @@ spec:
                       importUrl:
                         type: string
                         description: Url for the repository to import as base
+                      ciConfigPath:
+                        type: string
+                        description: Path of the gitlab ci yml file
+                        default: ".gitlab-ci.yml"
                     required:
                       - name
 
