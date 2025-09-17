@@ -68,6 +68,7 @@ _projectAccessTokens = [{
             scopes = ["read_api", "read_registry"]
             expiresAt = parameters?.expiresAt
         }
+        managementPolicies = spec.managementPolicies
         providerConfigRef = {
             name = spec?.providerConfigsRef?.gitlabProvider
         }
@@ -102,6 +103,7 @@ _groupVariables = [ {
             masked = variable.masked
             environmentScope = variable.environmentScope
         }
+        managementPolicies = spec.managementPolicies
         providerConfigRef = {
             name = spec?.providerConfigsRef?.gitlabProvider
         }
@@ -172,6 +174,7 @@ _repoSecrets = [{
                 }
             }
         }
+        managementPolicies = spec.managementPolicies
         providerConfigRef = {
             name = spec?.providerConfigsRef?.kubernetesProvider
         }
