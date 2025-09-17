@@ -70,3 +70,8 @@ spec:
                     type: string
                     description: |-
                       A comma separated list of environments to create.
+                  secretBasePath:
+                    type: string
+                    description: |-
+                      The base path in vault to create the secrets in.
+                    default: "secret/data/"

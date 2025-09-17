@@ -54,10 +54,48 @@ _transitSecretBackendKeys = [{
             name = "unseal-key-{}".format(env)
             deletionAllowed = True
         }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.vaultProvider
+        }
     }
 } for env in _environments or []]
 
-_items += [_mountObject] + _transitSecretBackendKeys
+_transitPolicies = [{
+    apiVersion = "vault.vault.upbound.io/v1alpha1"
+    kind = "Policy"
+    metadata = {
+        name = "env-transit-{}".format(env)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "env-transit-{}".format(env)
+        }
+    }
+    spec = {
+        forProvider = {
+            name = "env-transit-{}".format(env)
+            policy = """
+                path "secret/data/{}/*"{{
+                    capabilities = ["read", "list","create","update","delete"]
+                }}
+                path "secret/metadata/{}/*" {{
+                    capabilities = ["read", "list","create","update","delete"]
+                }}
+                path "secret/data/tenancy/*" {{
+                    capabilities = ["read", "list"]
+                }}
+                path "auth/token/*" {{
+                    capabilities = ["read","create","update"]
+                }}
+                """.format(env,env)
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.vaultProvider
+        }
+    }
+} for env in _environments or []]
+
+_items += [_mountObject] + _transitSecretBackendKeys + _transitPolicies
 
 dxr = {
     **oxr
