@@ -1,0 +1,72 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xvaultenvconfig.vault.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: vault.mojaloop.io
+  names:
+    kind: XVaultEnvConfig
+    plural: xvaultenvconfig
+  claimNames:
+    kind: VaultEnvConfig
+    plural: vaultenvconfig
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                properties:
+                  gitlabProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the gitlab provider.
+                    default: gitlab-provider
+                  kubernetesProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the kubernetes provider.
+                    default: kubernetes-provider
+                  vaultProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the vault provider.
+                    default: vault-provider
+              parameters:
+                type: object
+                properties:
+                  namespace:
+                    type: string
+                    description: |-
+                      The namespace to create the resources in.
+                  environments:
+                    type: string
+                    description: |-
+                      A comma separated list of environments to create.

@@ -1,0 +1,66 @@
+import base64
+import json
+# Read the XR and the OCDs
+oxr = option("params").oxr
+ocds = option("params").ocds
+
+spec = oxr.spec
+parameters = spec.parameters
+# Initialize the items list
+_items = []
+
+_environments = (parameters?.environments or "").split(",")
+
+
+## Adding resources
+_mountObject = {
+    apiVersion = "vault.vault.upbound.io/v1alpha1"
+    kind = "Mount"
+    metadata = {
+        name = "transit-mount"
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "transit-mount"
+        }
+    }
+    spec = {
+        deletionPolicy = "Delete"
+        forProvider = {
+            path = "transit"
+            type = "transit"
+            description = "Transit secrets engine for unsealing and encryption"
+
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.vaultProvider
+        }
+    }
+}
+
+_transitSecretBackendKeys = [{
+    apiVersion = "transit.vault.upbound.io/v1alpha1"
+    kind = "SecretBackendKey"
+    metadata = {
+        name = "unseal-key-{}".format(env)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "unseal-key-{}".format(env)
+        }
+    }
+    spec = {
+        forProvider = {
+            backendSelector = {
+                matchControllerRef = True
+            }
+            name = "unseal-key-{}".format(env)
+            deletionAllowed = True
+        }
+    }
+} for env in _environments or []]
+
+_items += [_mountObject] + _transitSecretBackendKeys
+
+dxr = {
+    **oxr
+}
+
+items = _items + [dxr]
