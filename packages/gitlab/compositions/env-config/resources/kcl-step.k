@@ -53,7 +53,7 @@ _projectAccessTokens = [{
         name = "accesstoken-{}".format(projectName)
         annotations = {
                 "krm.kcl.dev/composition-resource-name" = "accesstoken-{}".format(projectName)
-                 "crossplane.io/external-name" = ocds["accesstoken-{}".format(projectName)]?.Resource?.status?.atProvider?.id
+                 "crossplane.io/external-name" = ocds["accesstoken-{}".format(projectName)]?.Resource?.status?.atProvider?.id if ocds["accesstoken-{}".format(projectName)]?.Resource?.status?.atProvider?.id else ""
         }
 
     }
