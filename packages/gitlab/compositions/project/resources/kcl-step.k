@@ -30,15 +30,12 @@ if p?.project?.groupName:
         }
     }
 
-_projectID = ocds["project"]?.Resource?.status?.atProvider?.id if ocds["project"]?.Resource?.status?.atProvider?.id else ""
-
 #render project
 _project = {
     apiVersion = "projects.gitlab.crossplane.io/v1alpha1"
     kind = "Project"
     metadata.annotations = {
         "krm.kcl.dev/composition-resource-name" = "project"
-        "crossplane.io/external-name" = _projectID
         }
     metadata.labels = {"gitlab.mojaloop.com/project-name" = p?.project?.name }
     spec = {
