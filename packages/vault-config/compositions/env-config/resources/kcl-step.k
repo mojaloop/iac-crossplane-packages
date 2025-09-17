@@ -61,6 +61,12 @@ _transitSecretBackendKeys = [{
     }
 } for env in _environments or []]
 
+
+_unsealkeys = {
+  env : ocds["unseal-key-{}".format(env)]?.Resource?.status?.atProvider?.name or ""
+  for env in _environments or []
+}
+
 _transitPolicies = [{
     apiVersion = "vault.vault.upbound.io/v1alpha1"
     kind = "Policy"
@@ -86,7 +92,22 @@ _transitPolicies = [{
                 path "auth/token/*" {{
                     capabilities = ["read","create","update"]
                 }}
-                """.format(env,env)
+                path "transit/encrypt/{}" {{
+                capabilities = [ "update" ]
+                }}
+
+                path "transit/decrypt/{}" {{
+                capabilities = [ "update" ]
+                }}
+
+                path "transit/encrypt/{}-migrated" {{
+                capabilities = [ "update" ]
+                }}
+
+                path "transit/decrypt/{}-migrated" {{
+                capabilities = [ "update" ]
+                }}
+                """.format(env,env,_unsealkeys[env],_unsealkeys[env],_unsealkeys[env],_unsealkeys[env])
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
