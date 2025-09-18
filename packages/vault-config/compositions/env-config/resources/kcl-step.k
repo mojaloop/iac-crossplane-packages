@@ -232,7 +232,7 @@ _envTokenSecrets = [{
     }
 }for env in _environments or []]
 
-_items += [_mountObject] + _transitSecretBackendKeys + _transitPolicies + _envTokens + _envTokenSecrets
+_items += [_mountObject] + _transitSecretBackendKeys + _transitPolicies + _envTokens + _k8sObserveSecret + _k8sSecrets +_envTokenSecrets
 
 dxr = {
     **oxr
