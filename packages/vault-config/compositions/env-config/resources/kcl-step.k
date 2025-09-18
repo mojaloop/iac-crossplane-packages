@@ -146,21 +146,80 @@ _envTokens = [{
 } for env in _environments or []
 ]
 
+_k8sObserveSecret = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "env-token-k8secret-observe-{}".format(env)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "env-token-k8secret-observe-{}".format(env)
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = "env-token-secret-{}".format(env)
+                    namespace = env
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
+    }
+}for env in _environments or []
+]
+
+_k8sSecrets = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "env-token-k8secret-{}".format(env)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "env-token-k8secret-{}".format(env)
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = "env-token-k8secret-{}".format(env)
+                    namespace = env
+                }
+                data = {
+                    value = ocds["env-token-k8secret-observe-{}".format(env)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"]
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
+    }
+}for env in _environments or []
+]
+
 
 _envTokenSecrets = [{
     apiVersion = "generic.vault.upbound.io/v1alpha1"
     kind = "Secret"
     metadata = {
-        name = "env-token-secret-{}".format(env)
+        name = "env-token-vault-secret-{}".format(env)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "env-token-secret-{}".format(env)
+            "krm.kcl.dev/composition-resource-name": "env-token-vault-secret-{}".format(env)
         }
     }
     spec = {
         forProvider = {
             dataJsonSecretRef = {
-                key = "attribute.client_token"
-                name = "env-token-secret-{}".format(env)
+                key = "value"
+                name = "env-token-k8secret-{}".format(env)
                 namespace = env
             }
             deleteAllVersions = True
