@@ -149,7 +149,7 @@ _envTokens = [] if _policyNames == {} else [{
         }
     }
 
-} for env in _environments or []
+} for env in _environments or [] if _policyNames.get(env, None) != None
 ]
 
 
