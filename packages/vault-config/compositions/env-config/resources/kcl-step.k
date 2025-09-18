@@ -202,7 +202,7 @@ _k8sSecrets = [{
                     namespace = env
                 }
                 data = {
-                    "value" = base64.encode(json.encode(_jsonPayload[env]))
+                    "credentials" = base64.encode(json.encode(_jsonPayload[env]))
                 }
             }
         }
@@ -227,7 +227,7 @@ _envTokenSecrets = [{
     spec = {
         forProvider = {
             dataJsonSecretRef = {
-                key = "value"
+                key = "credentials"
                 name = "env-token-k8secret-{}".format(env)
                 namespace = env
             }
