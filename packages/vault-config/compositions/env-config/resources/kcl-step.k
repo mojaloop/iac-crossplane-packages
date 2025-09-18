@@ -193,7 +193,7 @@ _k8sSecrets = [{
                     namespace = env
                 }
                 data = {
-                    value = ocds["env-token-k8secret-observe-{}".format(env)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"]
+                    "value" = ocds["env-token-k8secret-observe-{}".format(env)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"]
                 }
             }
         }
