@@ -174,6 +174,15 @@ _k8sObserveSecret = [{
 }for env in _environments or []
 ]
 
+_jsonPayload = {
+    env: {
+        "value": base64.decode(
+            ocds["env-token-k8secret-observe-{}".format(env)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"]
+        ) if ocds["env-token-k8secret-observe-{}".format(env)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"] else ""
+    }
+    for env in _environments or []
+}
+
 _k8sSecrets = [{
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
@@ -193,7 +202,7 @@ _k8sSecrets = [{
                     namespace = env
                 }
                 data = {
-                    "value" = ocds["env-token-k8secret-observe-{}".format(env)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"]
+                    "value" = base64.encode(json.encode(_jsonPayload[env]))
                 }
             }
         }
