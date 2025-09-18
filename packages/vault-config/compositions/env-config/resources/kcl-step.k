@@ -157,7 +157,7 @@ _envTokenSecrets = [{
     spec = {
         forProvider = {
             dataJsonSecretRef = {
-                key = "password"
+                key = "attribute.client_token"
                 name = "env-token-secret-{}".format(env)
                 namespace = env
             }
