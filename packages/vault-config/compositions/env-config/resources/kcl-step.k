@@ -80,13 +80,13 @@ _transitPolicies = [{
         forProvider = {
             name = "env-transit-{}".format(env)
             policy = """
-                path "secret/data/{}/*"{{
+                path "{}/data/{}/*"{{
                     capabilities = ["read", "list","create","update","delete"]
                 }}
-                path "secret/metadata/{}/*" {{
+                path "{}/metadata/{}/*" {{
                     capabilities = ["read", "list","create","update","delete"]
                 }}
-                path "secret/data/tenancy/*" {{
+                path "{}/data/tenancy/*" {{
                     capabilities = ["read", "list"]
                 }}
                 path "auth/token/*" {{
@@ -107,7 +107,7 @@ _transitPolicies = [{
                 path "transit/decrypt/{}-migrated" {{
                 capabilities = [ "update" ]
                 }}
-                """.format(env,env,_unsealkeys[env],_unsealkeys[env],_unsealkeys[env],_unsealkeys[env])
+                """.format(parameters.kvPath,env,parameters.kvPath,env,parameters.kvPath,_unsealkeys[env],_unsealkeys[env],_unsealkeys[env],_unsealkeys[env])
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {

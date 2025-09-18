@@ -5,6 +5,8 @@ metadata:
 spec:
   parameters:
     environments: "dev,staging,prod"
+    kvPath: "secret"
+    envTokenTTL: "14d"
   providerConfigsRef:
     vaultProvider: provider-vault
     kubernetesProvider: provider-kubernetes
