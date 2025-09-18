@@ -70,8 +70,13 @@ spec:
                     type: string
                     description: |-
                       A comma separated list of environments to create.
-                  secretBasePath:
+                  kvPath:
                     type: string
                     description: |-
                       The base path in vault to create the secrets in.
                     default: "secret/data/"
+                  envTokenTTL:
+                    type: string
+                    description: |-
+                      The TTL for the environment tokens.
+                    default: "24h"

@@ -116,7 +116,62 @@ _transitPolicies = [{
     }
 } for env in _environments or []]
 
-_items += [_mountObject] + _transitSecretBackendKeys + _transitPolicies
+_envTokens = [{
+    apiVersion = "vault.vault.upbound.io/v1alpha1"
+    kind = "Token"
+    metadata = {
+        name = "env-token-{}".format(env)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "env-token-{}".format(env)
+        }
+    }
+    spec = {
+        forProvider = {
+            policies = [ ocds["env-transit-{}".format(env)]?.Resource?.status?.atProvider?.name or "" ]
+            noParent = True
+            ttl = parameters?.envTokenTTL
+
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.vaultProvider
+        }
+        writeConnectionSecretToRef = {
+            name = "env-token-secret-{}".format(env)
+            namespace = env
+        }
+    }
+
+} for env in _environments or []]
+
+
+_envTokenSecrets = [{
+    apiVersion = "generic.vault.upbound.io/v1alpha1"
+    kind = "Secret"
+    metadata = {
+        name = "env-token-secret-{}".format(env)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "env-token-secret-{}".format(env)
+        }
+    }
+    spec = {
+        forProvider = {
+            dataJsonSecretRef = {
+                key = "password"
+                name = "env-token-secret-{}".format(env)
+                namespace = env
+            }
+            deleteAllVersions = True
+            path = "{}/{}/env_token".format(parameters.kvPath, env)
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.vaultProvider
+        }
+    }
+}for env in _environments or []]
+
+_items += [_mountObject] + _transitSecretBackendKeys + _transitPolicies + _envTokens + _envTokenSecrets
 
 dxr = {
     **oxr
