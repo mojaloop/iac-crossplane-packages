@@ -116,6 +116,13 @@ _transitPolicies = [{
     }
 } for env in _environments or []]
 
+
+_policyNames = {
+  env : ocds["env-transit-{}".format(env)]?.Resource?.status?.atProvider?.name
+  for env in _environments or []
+}
+
+
 _envTokens = [{
     apiVersion = "vault.vault.upbound.io/v1alpha1"
     kind = "Token"
@@ -127,7 +134,7 @@ _envTokens = [{
     }
     spec = {
         forProvider = {
-            policies = [ ocds["env-transit-{}".format(env)]?.Resource?.status?.atProvider?.name or "" ]
+            policies = [_policyNames[env]] if _policyNames[env] else []
             noParent = True
             ttl = parameters?.envTokenTTL
 
@@ -142,7 +149,8 @@ _envTokens = [{
         }
     }
 
-} for env in _environments or []]
+} for env in _environments or []  if _policyNames.get(env, None) != None
+]
 
 
 _envTokenSecrets = [{
