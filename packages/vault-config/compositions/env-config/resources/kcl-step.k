@@ -123,7 +123,7 @@ _policyNames = {
 }
 
 
-_envTokens = [{
+_envTokens = [] if _policyNames == {} else [{
     apiVersion = "vault.vault.upbound.io/v1alpha1"
     kind = "Token"
     metadata = {
@@ -149,7 +149,7 @@ _envTokens = [{
         }
     }
 
-} for env in _environments or []  if _policyNames.get(env, None) != None
+} for env in _environments or []
 ]
 
 
