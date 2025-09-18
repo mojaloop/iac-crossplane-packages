@@ -168,7 +168,7 @@ _k8sObserveSecret = [{
         }
         managementPolicies = ["Observe"]
         providerConfigRef = {
-            name = spec.providerConfigsRef.kubernetesProviderName
+            name = spec.providerConfigsRef.kubernetesProvider
         }
     }
 }for env in _environments or []
@@ -199,7 +199,7 @@ _k8sSecrets = [{
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
-            name = spec.providerConfigsRef.kubernetesProviderName
+            name = spec.providerConfigsRef.kubernetesProvider
         }
     }
 }for env in _environments or []
