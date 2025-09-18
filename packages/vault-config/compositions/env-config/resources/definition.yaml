@@ -74,9 +74,9 @@ spec:
                     type: string
                     description: |-
                       The base path in vault to create the secrets in.
-                    default: "secret/data/"
+                    default: "secret"
                   envTokenTTL:
                     type: string
                     description: |-
                       The TTL for the environment tokens.
-                    default: "24h"
+                    default: "14d"
