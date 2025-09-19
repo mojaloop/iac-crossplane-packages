@@ -146,7 +146,7 @@ _observe_repo_secret = [{
 ]
 
 _repo_tokens = {
-  projectName: ocds["repo-secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["token"] or ""
+  projectName: base64.decode(ocds["repo-secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["token"]) or ""
   for projectName in _environments or []
 }
 
@@ -217,7 +217,7 @@ _k8sObserveSecret = [{
 ]
 
 _envVaulttokens = {
-  projectName: base64.decode(ocds["gitlab-env-token-k8secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"]) or ""
+  projectName: ocds["gitlab-env-token-k8secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"] or ""
   for projectName in _environments or []
 }
 
