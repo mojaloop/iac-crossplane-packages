@@ -68,7 +68,16 @@ spec:
                     default: http-conf
               parameters:
                 type: object
+                required:
+                  - gitlabFqdn
+                  - namespace
+                  - environments
+                  - expiresAt
                 properties:
+                  gitlabFqdn:
+                    type: string
+                    description: |-
+                      The gitlab instance FQDN, e.g. gitlab.mojaloop.io
                   namespace:
                     type: string
                     description: |-
