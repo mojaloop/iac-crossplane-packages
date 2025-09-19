@@ -25,3 +25,4 @@ spec:
     gitlabProvider: gitlab-provider
     kubernetesProvider: kubernetes-provider
     vaultProvider: vault-provider
+    httpProvider: http-conf

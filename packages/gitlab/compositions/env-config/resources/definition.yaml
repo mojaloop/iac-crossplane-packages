@@ -61,6 +61,11 @@ spec:
                     description: |-
                       The name of the provider config to use for the vault provider.
                     default: vault-provider
+                  httpProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the http provider.
+                    default: http-conf
               parameters:
                 type: object
                 properties:
