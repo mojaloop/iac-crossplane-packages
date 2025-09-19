@@ -211,10 +211,7 @@ _k8sSecrets = [{
             name = spec.providerConfigsRef.kubernetesProvider
         }
     }
-}
- for env in _environments or []
- if _jsonPayload[env]["value"] != ""
-
+}for env in _environments or []
 ]
 
 
