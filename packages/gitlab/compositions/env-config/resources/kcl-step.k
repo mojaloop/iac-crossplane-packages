@@ -46,6 +46,12 @@ _environmentProjects = [{
 } for projectName in _environments or []
 ]
 
+_projectIds = {
+  projectName: ocds["project-{}".format(projectName)]?.Resource?.status?.atProvider?.id or ""
+  for projectName in _environments or []
+}
+
+
 _projectAccessTokens = [{
     apiVersion = "projects.gitlab.crossplane.io/v1alpha1"
     kind = "AccessToken"
@@ -65,7 +71,7 @@ _projectAccessTokens = [{
             }
             name = "accesstoken-{}".format(projectName)
             accessLevel = 20
-            scopes = ["read_api", "read_registry"]
+            scopes = ["read_api", "read_registry", "read_repository", "write_repository"]
             expiresAt = parameters?.expiresAt
         }
         managementPolicies = spec.managementPolicies
@@ -181,7 +187,76 @@ _repoSecrets = [{
     }
 } for projectName in _environments or []
 ]
-_items += _environmentProjects + _projectAccessTokens + _groupVariables + _observe_repo_secret + _repoSecrets
+
+_k8sObserveSecret = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "gitlab-env-token-k8secret-observe-{}".format(projectName)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "gitlab-env-token-k8secret-observe-{}".format(projectName)
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = "env-token-secret-{}".format(projectName)
+                    namespace = projectName
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProvider
+        }
+    }
+}for projectName in _environments or []
+]
+
+_envVaulttokens = {
+  projectName: ocds["gitlab-env-token-k8secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"] or ""
+  for projectName in _environments or []
+}
+
+_vaultTokenUpdateRequests = [{
+    apiVersion = "http.crossplane.io/v1alpha2"
+    kind = "DisposableRequest"
+    metadata = {
+        name = "{}-vault-token-update-request".format(projectName)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "{}-vault-token-update-request".format(projectName)
+        }
+    }
+    spec = {
+        deletionPolicy = "Orphan"
+        forProvider = {
+            url = "https://{}/api/v4/projects/{}/.vault_token_trigger".format(parameters?.gitlabFqdn, _projectIds[projectName])
+            method = "PUT"
+            headers = {
+                "PRIVATE-TOKEN" = [_repo_tokens[projectName]]
+                "Content-Type" =  ["application/json"]
+            }
+            body = """
+                {{
+                    "branch": "main",
+                    "commit_message": "tf_trigger: vault_token_update",
+                    "content": {},
+                    "encoding": "text",
+                    "author_name": "Crossplane"
+                }}
+                """.format(_envVaulttokens[projectName])
+        }
+        providerConfigRef = {
+            name = spec.providerConfigsRef.httpProvider
+        }
+    }
+} for projectName in _environments or []
+]
+
+_items += _environmentProjects + _projectAccessTokens + _groupVariables + _observe_repo_secret + _repoSecrets + _k8sObserveSecret + _vaultTokenUpdateRequests
 
 dxr = {
     **oxr
