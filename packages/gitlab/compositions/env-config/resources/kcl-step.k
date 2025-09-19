@@ -70,7 +70,7 @@ _projectAccessTokens = [{
                 }
             }
             name = "accesstoken-{}".format(projectName)
-            accessLevel = 20
+            accessLevel = 40
             scopes = ["read_api", "read_registry", "read_repository", "write_repository"]
             expiresAt = parameters?.expiresAt
         }
@@ -217,13 +217,13 @@ _k8sObserveSecret = [{
 ]
 
 _envVaulttokens = {
-  projectName: ocds["gitlab-env-token-k8secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"] or ""
+  projectName: base64.decode(ocds["gitlab-env-token-k8secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"]) or ""
   for projectName in _environments or []
 }
 
 _vaultTokenUpdateRequests = [{
     apiVersion = "http.crossplane.io/v1alpha2"
-    kind = "DisposableRequest"
+    kind = "Request"
     metadata = {
         name = "{}-vault-token-update-request".format(projectName)
         annotations = {
@@ -233,21 +233,56 @@ _vaultTokenUpdateRequests = [{
     spec = {
         deletionPolicy = "Orphan"
         forProvider = {
-            url = "https://{}/api/v4/projects/{}/.vault_token_trigger".format(parameters?.gitlabFqdn, _projectIds[projectName])
-            method = "POST"
+            payload = {
+               baseUrl = "https://{}/api/v4/projects/{}/repository/files/%2Evault_token_trigger?ref=main".format(parameters?.gitlabFqdn, _projectIds[projectName])
+               body = """
+                    {{
+                        "branch": "main",
+                        "commit_message": "tf_trigger: vault_token_update",
+                        "content": "{}",
+                        "encoding": "text",
+                        "author_name": "Crossplane"
+                    }}
+                    """.format(_envVaulttokens[projectName])
+            }
             headers = {
                 "PRIVATE-TOKEN" = [_repo_tokens[projectName]]
                 "Content-Type" =  ["application/json"]
             }
-            body = """
-                {{
-                    "branch": "main",
-                    "commit_message": "tf_trigger: vault_token_update",
-                    "content": "{}",
-                    "encoding": "text",
-                    "author_name": "Crossplane"
-                }}
-                """.format(_envVaulttokens[projectName])
+            mappings = [
+                {
+                    action = "OBSERVE"
+                    method = "GET"
+                    url = ".payload.baseUrl"
+                },
+                {
+                    action = "CREATE"
+                    method = "POST"
+                    body = ".payload.body"
+                    url = ".payload.baseUrl"
+                },
+                {
+                    action = "UPDATE"
+                    method = "PUT"
+                    url = ".payload.baseUrl"
+                    body = ".payload.body"
+                }
+            ]
+            expectedResponseCheck = {
+                type = "CUSTOM"
+                logic = """
+            if (.response.statusCode == 200)
+            and (.response.body.content == .payload.body.content)
+            then true else false end
+            """
+            }
+
+            isRemovedCheck = {
+                type = "CUSTOM"
+                logic = """
+            if .response.statusCode == 404 then true else false end
+            """
+            }
         }
         providerConfigRef = {
             name = spec.providerConfigsRef.httpProvider
