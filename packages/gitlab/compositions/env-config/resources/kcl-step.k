@@ -243,7 +243,7 @@ _vaultTokenUpdateRequests = [{
                 {{
                     "branch": "main",
                     "commit_message": "tf_trigger: vault_token_update",
-                    "content": {},
+                    "content": "{}",
                     "encoding": "text",
                     "author_name": "Crossplane"
                 }}
