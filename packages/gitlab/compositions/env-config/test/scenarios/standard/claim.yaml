@@ -5,6 +5,7 @@ metadata:
   namespace: default
 spec:
   parameters:
+    gitlabFqdn: "gitlab.ccinfra05.drpp-onprem.global"
     namespace: default
     argocdNamespace: argocd
     environments: "test-repo1,test-repo2,test-repo3"
