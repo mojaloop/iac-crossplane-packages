@@ -241,7 +241,37 @@ _envTokenSecrets = [{
     }
 }for env in _environments or []]
 
-_items += [_mountObject] + _transitSecretBackendKeys + _transitPolicies + _envTokens + _k8sObserveSecret + _k8sSecrets +_envTokenSecrets
+
+_unsealVariables = [ {
+    apiVersion = "projects.gitlab.crossplane.io/v1alpha1"
+    kind = "Variable"
+    metadata = {
+        name = "project-var-{}".format(env)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "project-var-{}".format(env)
+        }
+    }
+    spec = {
+        forProvider = {
+            projectIdSelector = {
+                matchLabels = {
+                   "gitlab.mojaloop.com/project-name" = env
+                }
+            }
+            key = "TRANSIT_VAULT_UNSEAL_KEY_NAME"
+            value = _unsealkeys[env]
+            protected = False
+            masked = False
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.gitlabProvider
+        }
+    }
+} for env in _environments or []
+]
+
+_items += [_mountObject] + _transitSecretBackendKeys + _transitPolicies + _envTokens + _k8sObserveSecret + _k8sSecrets + _envTokenSecrets + _unsealVariables
 
 dxr = {
     **oxr
