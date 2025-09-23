@@ -291,7 +291,7 @@ _vaultTokenUpdateRequests = [{
 } for projectName in _environments or []
 ]
 
-_items += _environmentProjects + _projectAccessTokens + _groupVariables + _observe_repo_secret + _repoSecrets + _k8sObserveSecret + _vaultTokenUpdateRequests
+_items += _environmentProjects + _projectAccessTokens + _groupVariables + _observe_repo_secret + _repoSecrets + _k8sObserveSecret
 
 dxr = {
     **oxr
