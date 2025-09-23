@@ -89,6 +89,9 @@ _transitPolicies = [{
                 path "{}/data/tenancy/*" {{
                     capabilities = ["read", "list"]
                 }}
+                path "{}/data/gitlab/*" {{
+                capabilities = ["read", "list"]
+                }}
                 path "auth/token/*" {{
                     capabilities = ["read","create","update"]
                 }}
@@ -107,7 +110,7 @@ _transitPolicies = [{
                 path "transit/decrypt/{}-migrated" {{
                 capabilities = [ "update" ]
                 }}
-                """.format(parameters.kvPath,env,parameters.kvPath,env,parameters.kvPath,_unsealkeys[env],_unsealkeys[env],_unsealkeys[env],_unsealkeys[env])
+                """.format(parameters.kvPath, env, parameters.kvPath, env, parameters.kvPath, parameters.kvPath, _unsealkeys[env], _unsealkeys[env], _unsealkeys[env], _unsealkeys[env])
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {
