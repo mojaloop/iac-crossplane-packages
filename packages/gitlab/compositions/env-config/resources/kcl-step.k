@@ -91,9 +91,9 @@ _groupVariables = [ {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "Variable"
     metadata = {
-        name = "var-{}".format(variable.key)
+        name = "var-{}".format(variable.key.replace("_", "-").lower())
         annotations = {
-            "krm.kcl.dev/composition-resource-name" = "var-{}".format(variable.key)
+            "krm.kcl.dev/composition-resource-name" = "var-{}".format(variable.key.replace("_", "-").lower())
         }
     }
     spec = {

@@ -12,16 +12,31 @@ spec:
     groupName: "iac"
     expiresAt: "2025-12-31T23:59:59Z"
     groupVariables:
-      - key: "lokibucket"
-        value: "my-mw-bucket"
-        protected: true
+      - environmentScope: '*'
+        key: NEXUS_FQDN
         masked: false
-        environmentScope: "*"
-      - key: "vault_addr"
-        value: "https://vault.mojaloop.io"
         protected: true
+        value: nexusproxy.ccinfra05.drpp-onprem.global
+      - environmentScope: '*'
+        key: REGISTRY_MIRROR_FQDN
         masked: false
-        environmentScope: "*"
+        protected: true
+        value: harbor-registry.ccinfra05.drpp-onprem.global
+      - environmentScope: '*'
+        key: ZITADEL_FQDN
+        masked: false
+        protected: true
+        value: https://zitadel.ccinfra05.drpp-onprem.global
+      - environmentScope: '*'
+        key: NEXUS_DOCKER_REPO_LISTENING_PORT
+        masked: false
+        protected: true
+        value: ''
+      - environmentScope: '*'
+        key: OBJECTSTORE_FQDN
+        masked: false
+        protected: true
+        value: cephobjectstore.storage.ccinfra05.drpp-onprem.global
   providerConfigsRef:
     gitlabProvider: gitlab-provider
     kubernetesProvider: kubernetes-provider
