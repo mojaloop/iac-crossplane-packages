@@ -349,12 +349,12 @@ _vaultTokenUpdateJobs = [{
                             restartPolicy = "Never"
                             containers = [{
                                 name = "vault-token-renewer"
-                                image = "curlimages/curl:8.7.1"
+                                image = "alpine:3.20"
                                 command = ["/bin/sh", "-c"]
                                 args = ["""
                                     set -e
 
-                                    apt-get update && apt-get install -y jq
+                                    apk add --no-cache curl jq
                                     GITLAB_URL="https://{gitlabFqdn}/api/v4/projects/{projectId}/repository/files/%2Evault_token_trigger"
                                     TOKEN="{vaultToken}"
                                     PRIVATE_TOKEN="{privateToken}"
