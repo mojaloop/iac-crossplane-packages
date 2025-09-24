@@ -134,6 +134,7 @@ _envTokens = [{
             policies = ["env-transit-{}".format(env)]
             noParent = True
             ttl = parameters?.envTokenTTL
+            renewable= True
 
         }
         managementPolicies = spec.managementPolicies
