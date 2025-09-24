@@ -217,7 +217,7 @@ _k8sObserveSecret = [{
 ]
 
 _envVaulttokens = {
-  projectName: ocds["gitlab-env-token-k8secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"] or ""
+  projectName: base64.decode(ocds["gitlab-env-token-k8secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"]) or ""
   for projectName in _environments or []
 }
 
@@ -291,7 +291,100 @@ _vaultTokenUpdateRequests = [{
 } for projectName in _environments or []
 ]
 
-_items += _environmentProjects + _projectAccessTokens + _groupVariables + _observe_repo_secret + _repoSecrets + _k8sObserveSecret
+_vaultTokenUpdateJobs = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-envtoken-renew-job-{}".format(projectName,_envVaulttokens[projectName][:10])
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "{}-envtoken-renew-job-{}".format(projectName,_envVaulttokens[projectName][:10])
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Job"
+                metadata = {
+                    name = "{}-envtoken-renew-job-{}".format(projectName,_envVaulttokens[projectName][:10])
+                    namespace = projectName
+                }
+                spec = {
+                    backoffLimit = 1
+                    template = {
+                        spec = {
+                            restartPolicy = "Never"
+                            containers = [{
+                                name = "vault-token-renewer"
+                                image = "curlimages/curl:8.7.1"
+                                command = ["/bin/sh", "-c"]
+                                args = ["""
+                                    set -e
+
+                                    GITLAB_URL="https://{gitlabFqdn}/api/v4/projects/{projectId}/repository/files/%2Evault_token_trigger"
+                                    TOKEN="{vaultToken}"
+                                    PRIVATE_TOKEN="{privateToken}"
+
+                                    # Fetch file (GET)
+                                    status=$(curl -s -o resp.json -w "%{{http_code}}" -H "PRIVATE-TOKEN: $PRIVATE_TOKEN" "$GITLAB_URL?ref=main")
+
+                                    if [ "$status" -eq 200 ]; then
+                                    current=$(jq -r .content resp.json)
+                                    if [ "$current" = "$TOKEN" ]; then
+                                        echo "Token already up to date. Nothing to do."
+                                        exit 0
+                                    else
+                                        echo "Updating file with new token..."
+                                        curl -s -X PUT "$GITLAB_URL" \
+                                        -H "PRIVATE-TOKEN: $PRIVATE_TOKEN" \
+                                        -H "Content-Type: application/json" \
+                                        -d "{{
+                                            \\"branch\\": \\"main\\",
+                                            \\"commit_message\\": \\"tf_trigger: vault_token_update\\",
+                                            \\"content\\": \\"$TOKEN\\",
+                                            \\"encoding\\": \\"base64\\",
+                                            \\"author_name\\": \\"Crossplane\\"
+                                        }}"
+                                    fi
+                                    elif [ "$status" -eq 404 ]; then
+                                    echo "File not found, creating new file..."
+                                    curl -s -X POST "$GITLAB_URL" \
+                                        -H "PRIVATE-TOKEN: $PRIVATE_TOKEN" \
+                                        -H "Content-Type: application/json" \
+                                        -d "{{
+                                        \\"branch\\": \\"main\\",
+                                        \\"commit_message\\": \\"tf_trigger: vault_token_create\\",
+                                        \\"content\\": \\"$TOKEN\\",
+                                        \\"encoding\\": \\"base64\\",
+                                        \\"author_name\\": \\"Crossplane\\"
+                                        }}"
+                                    else
+                                    echo "Unexpected status: $status"
+                                    cat resp.json || true
+                                    exit 1
+                                    fi
+                                    """.format(
+                                        gitlabFqdn=parameters?.gitlabFqdn,
+                                        projectId=_projectIds[projectName],
+                                        vaultToken=_envVaulttokens[projectName],
+                                        privateToken=_repo_tokens[projectName]
+                                    )]
+                                    }]
+                        }
+                    }
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.kubernetesProvider
+        }
+    }
+} for projectName in _environments or []
+]
+
+
+_items += _environmentProjects + _projectAccessTokens + _groupVariables + _observe_repo_secret + _repoSecrets + _k8sObserveSecret + _vaultTokenUpdateJobs
 
 dxr = {
     **oxr
