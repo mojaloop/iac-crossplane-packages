@@ -359,6 +359,8 @@ _vaultTokenUpdateJobs = [{
                                     TOKEN="{vaultToken}"
                                     PRIVATE_TOKEN="{privateToken}"
 
+                                    ENCODED_TOKEN=$(echo -n "$TOKEN" | base64 | tr -d '\n')
+
                                     # Fetch file (GET)
                                     status=$(curl -s -o resp.json -w "%{{http_code}}" -H "PRIVATE-TOKEN: $PRIVATE_TOKEN" "$GITLAB_URL?ref=main")
 
@@ -375,7 +377,7 @@ _vaultTokenUpdateJobs = [{
                                         -d "{{
                                             \\"branch\\": \\"main\\",
                                             \\"commit_message\\": \\"tf_trigger: vault_token_update\\",
-                                            \\"content\\": \\"$TOKEN\\",
+                                            \\"content\\": \\"$ENCODED_TOKEN\\",
                                             \\"encoding\\": \\"base64\\",
                                             \\"author_name\\": \\"Crossplane\\"
                                         }}"
@@ -388,7 +390,7 @@ _vaultTokenUpdateJobs = [{
                                         -d "{{
                                         \\"branch\\": \\"main\\",
                                         \\"commit_message\\": \\"tf_trigger: vault_token_create\\",
-                                        \\"content\\": \\"$TOKEN\\",
+                                        \\"content\\": \\"$ENCODED_TOKEN\\",
                                         \\"encoding\\": \\"base64\\",
                                         \\"author_name\\": \\"Crossplane\\"
                                         }}"
