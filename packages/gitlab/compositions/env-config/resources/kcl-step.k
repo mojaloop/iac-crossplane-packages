@@ -349,7 +349,7 @@ _vaultTokenUpdateJobs = [{
                             restartPolicy = "Never"
                             containers = [{
                                 name = "vault-token-renewer"
-                                image = "curlimages/curl:8.7.1"
+                                image = "bitnami/minideb:bullseye"
                                 command = ["/bin/sh", "-c"]
                                 args = ["""
                                     set -e
