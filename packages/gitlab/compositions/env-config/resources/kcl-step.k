@@ -295,9 +295,31 @@ _vaultTokenUpdateJobs = [{
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "{}-envtoken-renew-job-{}".format(projectName,_envVaulttokens[projectName][:10])
+        name = "{}-envtoken-renew-job-{}".format(
+            projectName,
+            regex.replace(
+            regex.replace(
+                regex.replace(_envVaulttokens[projectName][-10:].lower(), r"[^a-z0-9-]", "-"),
+                r"^-+",
+                ""
+            ),
+            r"-+$",
+            ""
+            )
+        )
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "{}-envtoken-renew-job-{}".format(projectName,_envVaulttokens[projectName][:10])
+            "krm.kcl.dev/composition-resource-name": "{}-envtoken-renew-job-{}".format(
+                projectName,
+                regex.replace(
+                regex.replace(
+                    regex.replace(_envVaulttokens[projectName][-10:].lower(), r"[^a-z0-9-]", "-"),
+                    r"^-+",
+                    ""
+                ),
+                r"-+$",
+                ""
+                )
+            )
         }
     }
     spec = {
@@ -306,7 +328,18 @@ _vaultTokenUpdateJobs = [{
                 apiVersion = "v1"
                 kind = "Job"
                 metadata = {
-                    name = "{}-envtoken-renew-job-{}".format(projectName,_envVaulttokens[projectName][:10])
+                    name = "{}-envtoken-renew-job-{}".format(
+                        projectName,
+                        regex.replace(
+                            regex.replace(
+                                regex.replace(_envVaulttokens[projectName][-10:].lower(), r"[^a-z0-9-]", "-"),
+                                r"^-+",
+                                ""
+                            ),
+                            r"-+$",
+                            ""
+                            )
+                    )
                     namespace = projectName
                 }
                 spec = {
