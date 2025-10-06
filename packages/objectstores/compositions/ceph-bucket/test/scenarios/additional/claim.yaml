@@ -11,6 +11,21 @@ spec:
       bucketName: "my-example-bucket"
       storageClassName: "ceph-bucket"
       maxSize: "10Gi"
+      bucketPolicy:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource:
+              - arn:aws:s3:::report
+      bucketLifecycle:
+        Rules:
+          - ID: ExpireAfter7Days
+            Status: Enabled
+            Prefix: ""
+            Expiration:
+              Days: 7
     secret:
       scNamespace: "rook-ceph"
       name: "my-example-bucket"
@@ -18,18 +33,3 @@ spec:
       esoPushSecret: true
       vaultSecretStore: "vault-backend"
       vaultSecretPath: "mutai/my_example_bucket2"
-    bucketPolicy:
-      Version: "2012-10-17"
-      Statement:
-        - Effect: Allow
-          Principal: "*"
-          Action: s3:GetObject
-          Resource:
-            - arn:aws:s3:::report
-    bucketLifecycle:
-      Rules:
-        - ID: ExpireAfter7Days
-          Status: Enabled
-          Prefix: ""
-          Expiration:
-            Days: 7
