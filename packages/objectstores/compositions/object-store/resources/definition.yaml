@@ -112,11 +112,11 @@ spec:
                       bucketPolicy:
                         type: object
                         additionalProperties: true
-                        description: Bucket policy in JSON format
+                        description: Bucket policy
                       bucketLifecycle:
                         type: object
                         additionalProperties: true
-                        description: Bucket lifecycle policy in JSON format
+                        description: Bucket lifecycle
                   s3:
                     type: object
                     description: AWS bucket variables.
