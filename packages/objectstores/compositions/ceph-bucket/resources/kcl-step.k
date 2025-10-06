@@ -32,6 +32,8 @@ _cephBucket= {
           storageClassName   = parameters?.bucket?.storageClassName
           additionalConfig   = {
             maxSize    = parameters?.bucket?.maxSize
+            if parameters?.bucket?.bucketPolicy: bucketPolicy = parameters?.bucket?.bucketPolicy
+            if parameters?.bucket?.bucketLifecycle: bucketLifecycle = parameters?.bucket?.bucketLifecycle
           }
         }
       }
