@@ -86,10 +86,14 @@ spec:
                         description: Maximum number of objects in the bucket
                         default: "10000"
                       bucketPolicy:
-                        type: string
+                        type: object
+                        additionalProperties:
+                          type: string
                         description: Bucket policy in JSON format
                       bucketLifecycle:
-                        type: string
+                        type: object
+                        additionalProperties:
+                          type: string
                         description: Bucket lifecycle policy in JSON format
                   secret:
                     type: object
