@@ -109,7 +109,14 @@ spec:
                         type: string
                         description: Maximum number of objects in the bucket
                         default: "1000"
-
+                      bucketPolicy:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                        description: Bucket policy
+                      bucketLifecycle:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                        description: Bucket lifecycle
                   s3:
                     type: object
                     description: AWS bucket variables.

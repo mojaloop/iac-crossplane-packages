@@ -1,3 +1,4 @@
+import json
 # Read the XR and the OCDs
 oxr: any = option("params").oxr
 ocds: any = option("params").ocds
@@ -32,6 +33,8 @@ _cephBucket= {
           storageClassName   = parameters?.bucket?.storageClassName
           additionalConfig   = {
             maxSize    = parameters?.bucket?.maxSize
+            if parameters?.bucket?.bucketPolicy: bucketPolicy = json.encode(parameters?.bucket?.bucketPolicy)
+            if parameters?.bucket?.bucketLifecycle: bucketLifecycle = json.encode(parameters?.bucket?.bucketLifecycle)
           }
         }
       }
