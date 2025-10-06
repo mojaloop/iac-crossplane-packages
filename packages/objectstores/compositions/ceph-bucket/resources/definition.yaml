@@ -87,11 +87,11 @@ spec:
                         default: "10000"
                       bucketPolicy:
                         type: object
-                        additionalProperties: {}
+                        x-kubernetes-preserve-unknown-fields: true
                         description: Bucket policy
                       bucketLifecycle:
                         type: object
-                        additionalProperties: {}
+                        x-kubernetes-preserve-unknown-fields: true
                         description: Bucket lifecycle
                   secret:
                     type: object
