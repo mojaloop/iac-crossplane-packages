@@ -109,7 +109,16 @@ spec:
                         type: string
                         description: Maximum number of objects in the bucket
                         default: "1000"
-
+                      bucketPolicy:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        description: Bucket policy in JSON format
+                      bucketLifecycle:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        description: Bucket lifecycle policy in JSON format
                   s3:
                     type: object
                     description: AWS bucket variables.

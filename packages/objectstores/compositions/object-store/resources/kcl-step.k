@@ -26,6 +26,8 @@ if parameters?.objectStoreProvider == "ceph":
             bucketName               = parameters?.bucketName
             storageClassName         = parameters?.ceph?.storageClassName
             maxSize                  = parameters?.ceph?.maxSize
+            if parameters?.ceph?.bucketPolicy: bucketPolicy = parameters?.ceph?.bucketPolicy
+            if parameters?.ceph?.bucketLifecycle: bucketLifecycle = parameters?.ceph?.bucketLifecycle
           }
           secret = {
             name              = parameters?.bucketName
