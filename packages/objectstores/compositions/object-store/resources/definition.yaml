@@ -111,13 +111,11 @@ spec:
                         default: "1000"
                       bucketPolicy:
                         type: object
-                        additionalProperties:
-                          type: string
+                        additionalProperties: true
                         description: Bucket policy in JSON format
                       bucketLifecycle:
                         type: object
-                        additionalProperties:
-                          type: string
+                        additionalProperties: true
                         description: Bucket lifecycle policy in JSON format
                   s3:
                     type: object
