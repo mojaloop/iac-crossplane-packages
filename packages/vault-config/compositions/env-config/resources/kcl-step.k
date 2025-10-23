@@ -180,9 +180,7 @@ _k8sObserveSecret = [{
 
 _jsonPayload = {
     env: {
-        "value": base64.decode(
-            ocds["env-token-k8secret-observe-{}".format(env)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"]
-        )
+        "value": base64.decode(ocds["env-token-k8secret-observe-{}".format(env)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"] if ocds["env-token-k8secret-observe-{}".format(env)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"] else "")
     }
     for env in _environments or []
 }
