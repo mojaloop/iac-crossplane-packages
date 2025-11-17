@@ -45,7 +45,42 @@ _k8sObserveGitlabOidcSecret = {
 }
 
 # ============================================
-# 2. EXTRACT CLIENT CREDENTIALS FROM OBSERVED SECRET
+# 2. OBSERVE ZITADEL PROJECT
+# ============================================
+_k8sObserveZitadelProject = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "zitadel-project-observe-{}".format(projectName)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "zitadel-project-observe"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "zitadel.zitadel.crossplane.io/v1alpha1"
+                kind = "Project"
+                metadata = {
+                    labels = {
+                        "gitlab.mojaloop.io/zitadel-project" = "gitlab-oidc"
+                    }
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProvider
+        }
+    }
+}
+
+# Extract project ID from observed Zitadel project
+_observedZitadelProject = ocds.get("zitadel-project-observe", {})?.Resource?.status?.atProvider
+_observedProjectId = _observedZitadelProject?.id or ""
+
+# ============================================
+# 3. EXTRACT CLIENT CREDENTIALS FROM OBSERVED SECRET
 # ============================================
 _observedSecretData = ocds.get("gitlab-oidc-secret-observe", {})?.Resource?.status?.atProvider?.manifest?.data
 _providerDataEncoded = _observedSecretData?.get("provider", "") if _observedSecretData else ""
@@ -65,11 +100,11 @@ _clientId = _clientOptions.get("identifier", "") if _clientOptions else ""
 _clientSecret = _clientOptions.get("secret", "") if _clientOptions else ""
 _zitadelHost = _clientOptions.get("host", "") if _clientOptions else ""
 _zitadelUrl = "https://{}".format(_zitadelHost) if _zitadelHost else parameters?.zitadelUrl or ""
-_zitadelProjectId = parameters?.zitadelProjectId or ""
+_zitadelProjectId = parameters?.zitadelProjectId or _observedProjectId or ""
 _gitlabUrl = parameters?.gitlabUrl or ""
 
 # ============================================
-# 3. GET BEARER TOKEN FROM ZITADEL
+# 4. GET BEARER TOKEN FROM ZITADEL
 # ============================================
 _zitadelTokenRequest = {
     apiVersion = "http.crossplane.io/v1alpha2"
@@ -109,7 +144,7 @@ _tokenResponse = ocds.get("zitadel-token-request", {})?.Resource?.status?.atProv
 _bearerToken = _tokenResponse?.response?.body?.access_token if _tokenResponse else ""
 
 # ============================================
-# 4. GET ZITADEL USER GRANTS
+# 5. GET ZITADEL USER GRANTS
 # ============================================
 _zitadelUserGrantsRequest = {
     apiVersion = "http.crossplane.io/v1alpha2"
@@ -161,7 +196,7 @@ _zitadelUserGrants = _userGrantsResponse?.response?.body?.result if _userGrantsR
 
 
 # ============================================
-# 1. OBSERVE GITLAB ROOT TOKEN SECRET
+# 6. OBSERVE GITLAB ROOT TOKEN SECRET
 # ============================================
 _k8sObserveGitlabRootTokenSecret = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -195,7 +230,7 @@ _gitlabTokenEncoded = _observedRootTokenData?.get("token", "")
 _gitlabToken = base64.decode(_gitlabTokenEncoded)
 
 # ============================================
-# 5. GET ALL GITLAB USERS
+# 7. GET ALL GITLAB USERS
 # ============================================
 _gitlabUsersRequest = {
     apiVersion = "http.crossplane.io/v1alpha2"
@@ -231,7 +266,7 @@ _gitlabUsersResponse = ocds.get("gitlab-users", {})?.Resource?.status?.atProvide
 _gitlabUsers = _gitlabUsersResponse?.response?.body if _gitlabUsersResponse else []
 
 # ============================================
-# 6. GET GITLAB GROUP DETAILS
+# 8. GET GITLAB GROUP DETAILS
 # ============================================
 _gitlabGroupPath = parameters?.gitlabGroupPath or ""
 
@@ -274,6 +309,7 @@ _gitlabGroupId = str(_gitlabGroup.get("id", "")) if _gitlabGroup else ""
 # Add the resources to the items list
 _items += [
     _k8sObserveGitlabOidcSecret,
+    _k8sObserveZitadelProject,
     _k8sObserveGitlabRootTokenSecret
 ]
 

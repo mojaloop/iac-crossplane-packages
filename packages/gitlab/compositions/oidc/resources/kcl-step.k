@@ -49,6 +49,9 @@ _project = {
         annotations = {
             "krm.kcl.dev/composition-resource-name": "zitadel-project"
         }
+        labels = {
+            "gitlab.mojaloop.io/zitadel-project" = "gitlab-oidc"
+        }
     }
     spec = {
         forProvider = {
