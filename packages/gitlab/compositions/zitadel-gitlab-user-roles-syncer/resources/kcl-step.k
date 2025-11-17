@@ -134,8 +134,10 @@ _zitadelTokenRequest = {
             ]
             waitTimeout = "5m"
         }
-        providerConfigRef = spec.get("providerConfigRef", {})
-        managementPolicies = ["ObserveCreateUpdate"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.httpProvider
+        }
+        managementPolicies = spec.managementPolicies
     }
 } if _clientId and _clientSecret else None
 
@@ -185,8 +187,10 @@ _zitadelUserGrantsRequest = {
             ]
             waitTimeout = "5m"
         }
-        providerConfigRef = spec.get("providerConfigRef", {})
-        managementPolicies = ["ObserveCreateUpdate"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.httpProvider
+        }
+        managementPolicies = spec.managementPolicies
     }
 } if _bearerToken else None
 
@@ -256,8 +260,10 @@ _gitlabUsersRequest = {
             ]
             waitTimeout = "5m"
         }
-        providerConfigRef = spec.get("providerConfigRef", {})
-        managementPolicies = ["ObserveCreateUpdate"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.httpProvider
+        }
+        managementPolicies = spec.managementPolicies
     }
 } if _gitlabUrl and _gitlabToken else None
 
@@ -294,8 +300,10 @@ _gitlabGroupRequest = {
             ]
             waitTimeout = "5m"
         }
-        providerConfigRef = spec.get("providerConfigRef", {})
-        managementPolicies = ["ObserveCreateUpdate"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.httpProvider
+        }
+        managementPolicies = spec.managementPolicies
     }
 } if _gitlabUrl and _gitlabToken else None
 
