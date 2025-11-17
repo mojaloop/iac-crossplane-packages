@@ -100,7 +100,7 @@ _clientId = _clientOptions.get("identifier", "") if _clientOptions else ""
 _clientSecret = _clientOptions.get("secret", "") if _clientOptions else ""
 _zitadelHost = _clientOptions.get("host", "") if _clientOptions else ""
 _zitadelUrl = "https://{}".format(_zitadelHost) if _zitadelHost else parameters?.zitadelUrl or ""
-_zitadelProjectId = parameters?.zitadelProjectId or _observedProjectId or ""
+_zitadelProjectId = _observedProjectId or ""
 _gitlabUrl = parameters?.gitlabUrl or ""
 
 # ============================================

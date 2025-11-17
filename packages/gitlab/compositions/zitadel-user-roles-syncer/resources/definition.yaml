@@ -102,9 +102,6 @@ spec:
                     description: "Zitadel base URL"
                     example: "https://zitadel.example.com"
 
-                  zitadelProjectId:
-                    type: string
-                    description: "Zitadel project ID for OAuth scope"
 
                   zitadelProjectName:
                     type: string
