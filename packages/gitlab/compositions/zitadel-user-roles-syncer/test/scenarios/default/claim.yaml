@@ -1,0 +1,23 @@
+apiVersion: gitlab.mojaloop.io/v1alpha1
+kind: ZitadelUserRoleSyncer
+metadata:
+  name: example-zitadel-user-role-syncer
+  namespace: testa
+spec:
+  parameters:
+    zitadelUrl: https://zitadel.ccinfra1.drpp-onprem.global
+    zitadelProjectName: gitlab
+    gitlabGroupPath: iac
+    gitlabOidcSecret:
+      name: gitlab-oidc-secret
+      namespace: gitlab
+    gitlabRootTokenSecret:
+      name: root-token-secret
+      namespace: gitlab
+    gitlabUrl: https://gitlab.ccinfra1.drpp-onprem.global
+  providerConfigsRef:
+    gitlabProvider: gitlab-provider
+    kubernetesProvider: kubernetes-provider
+    httpProvider: http-provider
+  managementPolicies:
+    - "*"
