@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: zitadelgitlabuserrolesyncer
+  name: zitadeluserrolesyncer
   labels:
-    crossplane.io/xrd: xzitadelgitlabuserrolesyncer.nb.mojaloop.io
+    crossplane.io/xrd: xzitadeluserrolesyncer.nb.mojaloop.io
 spec:
   compositeTypeRef:
     apiVersion: nb.mojaloop.io/v1alpha1
-    kind: ZitadelGitlabUserRoleSyncer
+    kind: ZitadelUserRoleSyncer
   mode: Pipeline
   pipeline:
     - step: kcl
