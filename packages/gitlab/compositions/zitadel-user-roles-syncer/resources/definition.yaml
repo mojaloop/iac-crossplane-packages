@@ -1,16 +1,16 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xzitadeluserrolesyncer.gitlab.mojaloop.io
+  name: xzitadelgitlabuserrolesyncer.gitlab.mojaloop.io
 spec:
   defaultCompositeDeletePolicy: Foreground
   group: gitlab.mojaloop.io
   names:
-    kind: XZitadelUserRoleSyncer
-    plural: xzitadeluserrolesyncer
+    kind: XZitadelGitlabUserRoleSyncer
+    plural: xzitadelgitlabuserrolesyncer
   claimNames:
-    kind: ZitadelUserRoleSyncer
-    plural: zitadeluserrolesyncer
+    kind: ZitadelGitlabUserRoleSyncer
+    plural: zitadelgitlabuserrolesyncer
   versions:
   - name: v1alpha1
     served: true
