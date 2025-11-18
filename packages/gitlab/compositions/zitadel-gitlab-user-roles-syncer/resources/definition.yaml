@@ -68,6 +68,16 @@ spec:
                     type: string
                     description: "Name of the project for resource naming"
 
+                  zitadelProjectConfigMap:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        default: "gitlab-zitadel-project-config"
+                      namespace:
+                        type: string
+                        default: "crossplane-system"
+
                   # GitLab OIDC Secret (contains Zitadel credentials)
                   gitlabOidcSecret:
                     type: object

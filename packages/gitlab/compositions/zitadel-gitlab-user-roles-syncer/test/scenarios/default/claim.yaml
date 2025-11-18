@@ -8,6 +8,9 @@ spec:
     zitadelUrl: https://zitadel.ccinfra1.drpp-onprem.global
     zitadelProjectName: gitlab
     gitlabGroupPath: iac
+    zitadelProjectConfigMap:
+      name: gitlab-zitadel-project-config
+      namespace: gitlab
     gitlabOidcSecret:
       name: gitlab-oidc-secret
       namespace: gitlab

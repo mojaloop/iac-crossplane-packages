@@ -45,26 +45,25 @@ _k8sObserveGitlabOidcSecret = {
 }
 
 # ============================================
-# 2. OBSERVE ZITADEL PROJECT
+# OBSERVE ZITADEL PROJECT ID CONFIGMAP
 # ============================================
-_k8sObserveZitadelProject = {
+_k8sObserveZitadelProjectConfigMap = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "zitadel-project-observe-{}".format(projectName)
+        name = "zitadel-project-config-observe-{}".format(projectName)
         annotations = {
-            "krm.kcl.dev/composition-resource-name" = "zitadel-project-observe"
+            "krm.kcl.dev/composition-resource-name" = "zitadel-project-config-observe"
         }
     }
     spec = {
         forProvider = {
             manifest = {
-                apiVersion = "zitadel.zitadel.crossplane.io/v1alpha1"
-                kind = "Project"
+                apiVersion = "v1"
+                kind = "ConfigMap"
                 metadata = {
-                    labels = {
-                        "gitlab.mojaloop.io/zitadel-project" = "gitlab-oidc"
-                    }
+                    name = parameters.zitadelProjectConfigMap.name
+                    namespace = parameters.zitadelProjectConfigMap.namespace
                 }
             }
         }
@@ -75,9 +74,8 @@ _k8sObserveZitadelProject = {
     }
 }
 
-# Extract project ID from observed Zitadel project
-_observedZitadelProject = ocds.get("zitadel-project-observe", {})?.Resource?.status?.atProvider
-_observedProjectId = _observedZitadelProject?.id or ""
+# Extract project ID from ConfigMap
+_projectIdFromConfigMap = ocds["zitadel-project-config-observe"]?.Resource?.status?.atProvider?.manifest?.data?["projectId"] or ""
 
 # ============================================
 # 3. EXTRACT CLIENT CREDENTIALS FROM OBSERVED SECRET
@@ -100,7 +98,7 @@ _clientId = _clientOptions.get("identifier", "") if _clientOptions else ""
 _clientSecret = _clientOptions.get("secret", "") if _clientOptions else ""
 _zitadelHost = _clientOptions.get("host", "") if _clientOptions else ""
 _zitadelUrl = "https://{}".format(_zitadelHost) if _zitadelHost else parameters?.zitadelUrl or ""
-_zitadelProjectId = _observedProjectId or ""
+_zitadelProjectId = _projectIdFromConfigMap or ""
 _gitlabUrl = parameters?.gitlabUrl or ""
 
 # ============================================
@@ -317,7 +315,7 @@ _gitlabGroupId = str(_gitlabGroup.get("id", "")) if _gitlabGroup else ""
 # Add the resources to the items list
 _items += [
     _k8sObserveGitlabOidcSecret,
-    _k8sObserveZitadelProject,
+    _k8sObserveZitadelProjectConfigMap,
     _k8sObserveGitlabRootTokenSecret
 ]
 
