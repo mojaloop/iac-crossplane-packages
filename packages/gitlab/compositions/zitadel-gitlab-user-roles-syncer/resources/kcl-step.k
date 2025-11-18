@@ -193,8 +193,7 @@ _zitadelUserGrantsRequest = {
 } if _bearerToken else None
 
 # Extract user grants from response
-_userGrantsResponse = ocds.get("zitadel-user-grants", {})?.Resource?.status?.atProvider
-_zitadelUserGrants = _userGrantsResponse?.response?.body?.result if _userGrantsResponse else []
+_zitadelUserGrants = ocds["zitadel-user-grants"]?.Resource?.status?.atProvider?.response?.body?.result or ""
 
 
 # ============================================
@@ -228,8 +227,8 @@ _k8sObserveGitlabRootTokenSecret = {
 }
 
 _observedRootTokenData = ocds.get("gitlab-roottoken-secret-observe", {})?.Resource?.status?.atProvider?.manifest?.data
-_gitlabTokenEncoded = _observedRootTokenData?.get("token", "")
-_gitlabToken = base64.decode(_gitlabTokenEncoded)
+_gitlabTokenEncoded = _observedRootTokenData?.get("token", "") if _observedRootTokenData else ""
+_gitlabToken = base64.decode(_gitlabTokenEncoded) if _gitlabTokenEncoded else ""
 
 # ============================================
 # 7. GET ALL GITLAB USERS
@@ -263,11 +262,10 @@ _gitlabUsersRequest = {
         }
         managementPolicies = spec.managementPolicies
     }
-} if _gitlabUrl and _gitlabToken else None
+} if _gitlabToken else None
 
 # Extract GitLab users from response
-_gitlabUsersResponse = ocds.get("gitlab-users", {})?.Resource?.status?.atProvider
-_gitlabUsers = _gitlabUsersResponse?.response?.body if _gitlabUsersResponse else []
+_gitlabUsers = ocds["gitlab-users"]?.Resource?.status?.atProvider?.response?.body or ""
 
 # ============================================
 # 8. GET GITLAB GROUP DETAILS
@@ -303,12 +301,8 @@ _gitlabGroupRequest = {
         }
         managementPolicies = spec.managementPolicies
     }
-} if _gitlabUrl and _gitlabToken else None
+} if _gitlabToken else None
 
-# Extract group details
-_gitlabGroupResponse = ocds.get("gitlab-group", {})?.Resource?.status?.atProvider
-_gitlabGroup = _gitlabGroupResponse?.response?.body if _gitlabGroupResponse else {}
-_gitlabGroupId = str(_gitlabGroup.get("id", "")) if _gitlabGroup else ""
 
 
 
@@ -319,24 +313,17 @@ _items += [
     _k8sObserveGitlabRootTokenSecret
 ]
 
-# Add conditional resources using list concatenation (KCL compatible)
 _conditionalItems = []
-
 if _zitadelTokenRequest:
     _conditionalItems += [_zitadelTokenRequest]
-
 if _zitadelUserGrantsRequest:
     _conditionalItems += [_zitadelUserGrantsRequest]
-
 if _gitlabGroupRequest:
     _conditionalItems += [_gitlabGroupRequest]
-
 if _gitlabUsersRequest:
     _conditionalItems += [_gitlabUsersRequest]
 
-# Combine all items
 _items += _conditionalItems
-
 dxr = {
     **oxr
 }
