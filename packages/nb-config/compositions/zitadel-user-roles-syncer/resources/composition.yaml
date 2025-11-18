@@ -7,7 +7,7 @@ metadata:
 spec:
   compositeTypeRef:
     apiVersion: nb.mojaloop.io/v1alpha1
-    kind: ZitadelUserRoleSyncer
+    kind: XZitadelUserRoleSyncer
   mode: Pipeline
   pipeline:
     - step: kcl

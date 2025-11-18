@@ -16,8 +16,8 @@ spec:
       namespace: gitlab
     gitlabUrl: https://gitlab.ccinfra1.drpp-onprem.global
   providerConfigsRef:
-    gitlabProvider: gitlab-provider
-    kubernetesProvider: kubernetes-provider
-    httpProvider: http-provider
+    gitlabProvider: provider-gitlab
+    kubernetesProvider: provider-kubernetes
+    httpProvider: provider-http
   managementPolicies:
     - "*"
