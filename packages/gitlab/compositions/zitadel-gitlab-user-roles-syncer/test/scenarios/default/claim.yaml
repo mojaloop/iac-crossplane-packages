@@ -1,5 +1,5 @@
 apiVersion: gitlab.mojaloop.io/v1alpha1
-kind: ZitadelGitlabUserRoleSyncer
+kind: XZitadelGitlabUserRoleSyncer
 metadata:
   name: example-zitadel-user-role-syncer
   namespace: testa
