@@ -54,7 +54,7 @@ _sc_argocd_operator_app_install = {
             }
             source = {
               chart = "kubernetes-operator"
-              repoURL = "https://netbirdio.github.io/kubernetes-operator"
+              repoURL = "https://netbirdio.github.io/helms"
               targetRevision = parameters.operatorHelmVersion
               helm = {
                 valuesObject = {
