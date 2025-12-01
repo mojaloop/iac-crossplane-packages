@@ -24,6 +24,7 @@ _Group = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "Group"
     metadata.annotations: {"krm.kcl.dev/composition-resource-name" = "group"}
+    metadata.labels = {"gitlab.mojaloop.com/group-name" = p?.group?.name }
     spec = {
         forProvider = {
             name = p?.group.name

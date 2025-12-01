@@ -1,0 +1,44 @@
+apiVersion: gitlab.mojaloop.io/v1alpha1
+kind: XEnvConfig
+metadata:
+  name: environments
+  namespace: default
+spec:
+  parameters:
+    gitlabFqdn: "gitlab.ccinfra05.drpp-onprem.global"
+    namespace: default
+    argocdNamespace: argocd
+    environments: "test-repo1,test-repo2,test-repo3"
+    groupName: "iac"
+    expiresAt: "2025-12-31T23:59:59Z"
+    groupVariables:
+      - environmentScope: '*'
+        key: NEXUS_FQDN
+        masked: false
+        protected: true
+        value: nexusproxy.ccinfra05.drpp-onprem.global
+      - environmentScope: '*'
+        key: REGISTRY_MIRROR_FQDN
+        masked: false
+        protected: true
+        value: harbor-registry.ccinfra05.drpp-onprem.global
+      - environmentScope: '*'
+        key: ZITADEL_FQDN
+        masked: false
+        protected: true
+        value: https://zitadel.ccinfra05.drpp-onprem.global
+      - environmentScope: '*'
+        key: NEXUS_DOCKER_REPO_LISTENING_PORT
+        masked: false
+        protected: true
+        value: ''
+      - environmentScope: '*'
+        key: OBJECTSTORE_FQDN
+        masked: false
+        protected: true
+        value: cephobjectstore.storage.ccinfra05.drpp-onprem.global
+  providerConfigsRef:
+    gitlabProvider: gitlab-provider
+    kubernetesProvider: kubernetes-provider
+    vaultProvider: vault-provider
+    httpProvider: http-conf

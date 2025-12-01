@@ -34,7 +34,10 @@ if p?.project?.groupName:
 _project = {
     apiVersion = "projects.gitlab.crossplane.io/v1alpha1"
     kind = "Project"
-    metadata.annotations = {"krm.kcl.dev/composition-resource-name" = "project"}
+    metadata.annotations = {
+        "krm.kcl.dev/composition-resource-name" = "project"
+        }
+    metadata.labels = {"gitlab.mojaloop.com/project-name" = p?.project?.name }
     spec = {
         forProvider = {
             name = p?.project?.name
@@ -92,8 +95,25 @@ _projectMembers += [{
     }
 } if (members) else {} for i, m in members]
 
+_httpUrlToRepo = ocds["project"]?.Resource?.status?.atProvider?.httpUrlToRepo
+_webUrl = ocds["project"]?.Resource?.status?.atProvider?.webUrl
+_sshUrlToRepo = ocds["project"]?.Resource?.status?.atProvider?.sshUrlToRepo
+_pathWithNamespace = ocds["project"]?.Resource?.status?.atProvider?.pathWithNamespace
+_defaultBranch = ocds["project"]?.Resource?.status?.atProvider?.defaultBranch
+_id = ocds["project"]?.Resource?.status?.atProvider?.id
+
 dxr = {
     **oxr
+    status = {
+        atProvider = {
+            httpUrlToRepo = _httpUrlToRepo
+            webUrl = _webUrl
+            sshUrlToRepo = _sshUrlToRepo
+            pathWithNamespace = _pathWithNamespace
+            defaultBranch = _defaultBranch
+            id = _id
+        }
+    }
 }
 
 items = [dxr, _project] + _projectMembers
