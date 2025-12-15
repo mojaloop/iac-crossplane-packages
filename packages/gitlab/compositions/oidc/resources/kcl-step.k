@@ -65,6 +65,42 @@ _project = {
     }
 }
 
+_zitadelProjectIdConfigMap = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-zitadel-project-id-configmap".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "zitadel-project-id-configmap"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "ConfigMap"
+                metadata = {
+                    name = "gitlab-zitadel-project-config"
+                    namespace = parameters.gitlabNamespace
+                    labels = {
+                        "gitlab.mojaloop.io/zitadel-project-config" = "true"
+                        "app.kubernetes.io/part-of" = "gitlab-oidc"
+                    }
+                }
+                data = {
+                    projectId = ocds["zitadel-project"]?.Resource?.status?.atProvider?.id or ""
+                    projectName = "gitlab"
+                    orgId = _orgId
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
+    }
+}
+
 # Create OIDC Application
 _oidcApp = {
     apiVersion = "application.zitadel.crossplane.io/v1alpha1"
@@ -329,7 +365,7 @@ _oidcSecret = {
 }
 
 # Add all objects to _items in one line
-_items = [_observe_org_id_secret, _project, _zitadelAdminHumanUserIdObserveSecret, _oidcAppConnObserve, _oidcApp, _techopsAdminRole, _techopsMaintainerRole, _techopsUserRole, _userGrant, _oidcSecret]
+_items = [_observe_org_id_secret, _project, _zitadelProjectIdConfigMap, _zitadelAdminHumanUserIdObserveSecret, _oidcAppConnObserve, _oidcApp, _techopsAdminRole, _techopsMaintainerRole, _techopsUserRole, _userGrant, _oidcSecret]
 
 dxr = {
     **oxr
