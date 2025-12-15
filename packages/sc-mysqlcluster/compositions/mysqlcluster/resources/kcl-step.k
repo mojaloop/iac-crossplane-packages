@@ -12,9 +12,13 @@ _backupScheduleSnippet = []
 if parameters?.backup?.enabled == True:
     _backupScheduleSnippet =  [
         {
-            name =  parameters?.backup?.scheduleName,
-            schedule =  parameters?.backup?.cronScheduleExpression,
-            keep =  parameters?.backup?.backupRetention,
+            name =  parameters?.backup?.scheduleName
+            schedule =  parameters?.backup?.cronScheduleExpression
+            retention =  {
+                type = "count"
+                count = parameters?.backup?.backupRetention
+                deleteFromStorage = True
+            }
             storageName =  "s3-backup-storage"
         }
     ]
