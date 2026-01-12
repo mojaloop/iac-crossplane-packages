@@ -37,6 +37,10 @@ spec:
       bucketRegion: us-east-1
       fullBackupCronSchedule: "0 1 * * *"
       differentialBackupCronSchedule: "0 6 * * *"
+      process_max: "2"
+      archive_timeout: "600"
+      full_backup_retention: "2"
+      diff_backup_retention: "3"
 
     proxy:
       pgBouncer:
