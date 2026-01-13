@@ -1,0 +1,111 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xvaultbackupconfig.vault.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: vault.mojaloop.io
+  names:
+    kind: XVaultBackupConfig
+    plural: xvaultbackupconfig
+  claimNames:
+    kind: VaultBackupConfig
+    plural: vaultbackupconfig
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the source and destination k8s providers.
+                required:
+                  - vaultProviderName
+                properties:
+                  vaultProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the vault provider.
+                  kubernetesProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the kubernetes provider.
+              parameters:
+                type: object
+                properties:
+                  backupEnabled:
+                    type: boolean
+                    description: |-
+                      Enable or disable backups.
+                    default: true
+                  backupSchedule:
+                    type: string
+                    description: |-
+                      The cron schedule for backups.
+                    default: "0 2 * * *"
+                  backupRetentionDays:
+                    type: integer
+                    description: |-
+                      The number of days to retain backups.
+                    default: 7
+                  snapshotAuthPath:
+                    type: string
+                    description: |-
+                      The auth path for Snapshot authentication.
+                    default: "snapshot-auth"
+                  snapshotRoleName:
+                    type: string
+                    description: |-
+                      The name of the Snapshot role.
+                    default: "snapshot-role"
+                  snapshotPolicyName:
+                    type: string
+                    description: |-
+                      The name of the Snapshot policy.
+                    default: "snapshot-policy"
+                  snapshotTokenTTL:
+                    type: integer
+                    description: |-
+                      The TTL for Snapshot tokens in seconds.
+                    default: 3600
+                  snapshotSecretIdTTL:
+                    type: integer
+                    description: |-
+                      The TTL for Snapshot secret IDs in seconds.
+                    default: 7200
+                  snapshotSecretIdNumUses:
+                    type: integer
+                    description: |-
+                      The number of uses for Snapshot secret IDs.
+                    default: 0
+                  targetNamespace:
+                    type: string
+                    description: |-
+                      The target namespace for the backup and associated resources.
+                    default: "vault"

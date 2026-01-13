@@ -1,0 +1,20 @@
+apiVersion: vault.mojaloop.io/v1alpha1
+kind: XVaultBackupConfig
+metadata:
+  name: example-backupconfig-claim
+spec:
+  parameters:
+    backupEnabled: true
+    backupSchedule: "0 2 * * *"
+    backupRetentionDays: 7
+    snapshotAuthPath: "snapshot-auth"
+    snapshotRoleName: "snapshot-role"
+    snapshotPolicyName: "snapshot-policy"
+    snapshotTokenTTL: 3600
+    snapshotSecretIdTTL: 7200
+    targetNamespace: "vault"
+  providerConfigsRef:
+    vaultProviderName: vault-provider
+    kubernetesProviderName: kubernetes-provider
+  managementPolicies:
+    - "*"
