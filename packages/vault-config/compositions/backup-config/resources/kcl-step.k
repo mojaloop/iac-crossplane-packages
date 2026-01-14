@@ -201,7 +201,7 @@ if parameters.backupEnabled == True:
             }
             providerConfigsRef = {
                 awsProviderName = spec?.providerConfigsRef?.awsProviderName
-                k8sProviderName = spec.providerConfigsRef.ccK8sProviderName
+                k8sProviderName = spec.providerConfigsRef.kubernetesProviderName
             }
             managementPolicies = spec.managementPolicies
         }
