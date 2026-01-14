@@ -56,6 +56,10 @@ spec:
                     type: string
                     description: |-
                       The name of the provider config to use for the kubernetes provider.
+                  awsProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the AWS provider.
               parameters:
                 type: object
                 properties:
@@ -64,6 +68,15 @@ spec:
                     description: |-
                       Enable or disable backups.
                     default: true
+                  backupBucket:
+                    type: string
+                    description: |-
+                      The name of the S3 bucket to store backups.
+                  backupBucketRegion:
+                    type: string
+                    description: |-
+                      The region of the S3 bucket.
+                    default: af-south-1
                   backupSchedule:
                     type: string
                     description: |-
@@ -109,3 +122,8 @@ spec:
                     description: |-
                       The target namespace for the backup and associated resources.
                     default: "vault"
+                  vaultBackupImage:
+                    type: string
+                    description: |-
+                      The container image to use for Vault backup operations.
+                    default: "ghcr.io/mojaloop/vault-utils:0.0.4"

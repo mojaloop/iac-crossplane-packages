@@ -176,6 +176,104 @@ _snapshotCredsSecret = {
     }
 }
 
+if parameters.backupEnabled == True:
+    _s3Bucket = {
+        apiVersion = "aws.mojaloop.io/v1alpha1"
+        kind = "XS3Bucket"
+        metadata = {
+            name = "{}-vault-backups-bucket".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "vault-backups-bucket"
+            }
+        }
+        spec = {
+            parameters = {
+                bucket = {
+                    bucketName = parameters.backupBucket
+                    bucketRegion = parameters?.backup?.bucketRegion
+                    forceDestroy = False
+                    deletionPolicy = "Delete"
+                }
+                secret = {
+                    name = parameters.backupBucket
+                    namespace = parameters.targetNamespace
+                }
+            }
+            providerConfigsRef = {
+                awsProviderName = spec?.providerConfigsRef?.awsProviderName
+                k8sProviderName = spec.providerConfigsRef.ccK8sProviderName
+            }
+            managementPolicies = spec.managementPolicies
+        }
+    }
+
+    _vaultSnapshotCronJob = {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-vault-snapshot-cron".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "vault-snapshot-cronjob"
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "batch/v1"
+                    kind = "CronJob"
+                    metadata = {
+                        name = "vault-snapshot-cronjob"
+                        namespace = parameters.targetNamespace
+                    }
+                    spec = {
+                        schedule = parameters.backupSchedule # Ensure this exists in your parameters
+                        jobTemplate = {
+                            spec = {
+                                template = {
+                                    spec = {
+                                        volumes = [{ name = "share", emptyDir = {} }]
+                                        containers = [
+                                            {
+                                                name = "snapshot"
+                                                image = parameters.vaultBackupImage
+                                                imagePullPolicy = "IfNotPresent"
+                                                command = ["/bin/sh"]
+                                                args = [
+                                                    "-ec",
+                                                    "export VAULT_SKIP_VERIFY=true\nexport VAULT_TOKEN=$(vault write auth/approle/login role_id=$VAULT_SNAPSHOT_ROLE_ID secret_id=$VAULT_SNAPSHOT_SECRET_ID -format=json | jq -r .auth.client_token);\nvault operator raft snapshot save /share/vault-raft.snap;\n"
+                                                ]
+                                                envFrom = [{ secretRef = { name = "vault-snapshot-creds" } }]
+                                                env = [{ name = "VAULT_ADDR", value = "http://vault-active.vault.svc.cluster.local:8200" }]
+                                                volumeMounts = [{ mountPath = "/share", name = "share" }]
+                                            },
+                                            {
+                                                name = "upload"
+                                                image = "amazon/aws-cli:2.2.14"
+                                                imagePullPolicy = "IfNotPresent"
+                                                command = ["/bin/sh"]
+                                                args = [
+                                                    "-ec",
+                                                    "until [ -f /share/vault-raft.snap ]; do sleep 5; done;\naws s3 cp /share/vault-raft.snap s3://{}/vault_raft_$(date +\"%Y%m%d_%H%M%S\").snap --endpoint-url $AWS_ENDPOINT_URL --no-verify-ssl;\n".format(parameters.backupBucket)
+                                                ]
+                                                envFrom = [{ secretRef = { name = parameters.backupBucket } }]
+                                                volumeMounts = [{ mountPath = "/share", name = "share" }]
+                                            }
+                                        ]
+                                        restartPolicy = "OnFailure"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.kubernetesProviderName
+            }
+        }
+    }
+
 
 _items += [
     _backendObject
@@ -184,6 +282,8 @@ _items += [
     _authBackendRoleSecretIDObject
     _observeCredsSecret
     _snapshotCredsSecret
+    _s3Bucket
+    _vaultSnapshotCronJob
 ]
 
 dxr = {

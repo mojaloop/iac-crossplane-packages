@@ -5,6 +5,8 @@ metadata:
 spec:
   parameters:
     backupEnabled: true
+    backupBucket: "test-cc-vault-backups"
+    backupBucketRegion: "af-south-1"
     backupSchedule: "0 2 * * *"
     backupRetentionDays: 7
     snapshotAuthPath: "snapshot-auth"
@@ -13,8 +15,10 @@ spec:
     snapshotTokenTTL: 3600
     snapshotSecretIdTTL: 7200
     targetNamespace: "vault"
+    vaultBackupImage: "ghcr.io/mojaloop/vault-utils:0.0.4"
   providerConfigsRef:
     vaultProviderName: vault-provider
     kubernetesProviderName: kubernetes-provider
+    awsProviderName: aws-provider
   managementPolicies:
     - "*"
