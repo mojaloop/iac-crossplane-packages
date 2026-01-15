@@ -190,7 +190,7 @@ if parameters.backupEnabled == True:
             parameters = {
                 bucket = {
                     bucketName = parameters.backupBucket
-                    bucketRegion = parameters?.backup?.bucketRegion
+                    bucketRegion = parameters.backupBucketRegion
                     forceDestroy = False
                     deletionPolicy = "Delete"
                 }
