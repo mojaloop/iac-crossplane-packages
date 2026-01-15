@@ -207,6 +207,8 @@ if parameters.backupEnabled == True:
         }
     }
 
+    _s3Endpoint = "https://s3.{}.amazonaws.com".format(parameters.backupBucketRegion)
+
     _vaultSnapshotCronJob = {
         apiVersion = "kubernetes.crossplane.io/v1alpha2"
         kind = "Object"
@@ -253,7 +255,7 @@ if parameters.backupEnabled == True:
                                                 command = ["/bin/sh"]
                                                 args = [
                                                     "-ec",
-                                                    "until [ -f /share/vault-raft.snap ]; do sleep 5; done;\naws s3 cp /share/vault-raft.snap s3://{}/vault_raft_$(date +\"%Y%m%d_%H%M%S\").snap --endpoint-url $AWS_ENDPOINT_URL --no-verify-ssl;\n".format(parameters.backupBucket)
+                                                    "until [ -f /share/vault-raft.snap ]; do sleep 5; done;\naws s3 cp /share/vault-raft.snap s3://{}/vault_raft_$(date +\"%Y%m%d_%H%M%S\").snap --endpoint-url {} --no-verify-ssl;\n".format(parameters.backupBucket, _s3Endpoint)
                                                 ]
                                                 envFrom = [{ secretRef = { name = parameters.backupBucket } }]
                                                 volumeMounts = [{ mountPath = "/share", name = "share" }]
