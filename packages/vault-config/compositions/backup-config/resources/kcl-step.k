@@ -240,7 +240,7 @@ if parameters.backupEnabled == True:
                                                 command = ["/bin/sh"]
                                                 args = [
                                                     "-ec",
-                                                    "export VAULT_SKIP_VERIFY=true\nexport VAULT_TOKEN=$(vault write auth/approle/login role_id=$VAULT_SNAPSHOT_ROLE_ID secret_id=$VAULT_SNAPSHOT_SECRET_ID -format=json | jq -r .auth.client_token);\nvault operator raft snapshot save /share/vault-raft.snap;\n"
+                                                    "export VAULT_SKIP_VERIFY=true\nexport VAULT_TOKEN=$(vault write auth/{}/login role_id=$VAULT_SNAPSHOT_ROLE_ID secret_id=$VAULT_SNAPSHOT_SECRET_ID -format=json | jq -r .auth.client_token);\nvault operator raft snapshot save /share/vault-raft.snap;\n".format(parameters.snapshotAuthPath)
                                                 ]
                                                 envFrom = [{ secretRef = { name = "vault-snapshot-creds" } }]
                                                 env = [{ name = "VAULT_ADDR", value = "http://vault-active.vault.svc.cluster.local:8200" }]
