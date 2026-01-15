@@ -242,7 +242,21 @@ if parameters.backupEnabled == True:
                                                 command = ["/bin/sh"]
                                                 args = [
                                                     "-ec",
-                                                    "export VAULT_SKIP_VERIFY=true\nexport VAULT_TOKEN=$(vault write auth/{}/login role_id=$VAULT_SNAPSHOT_ROLE_ID secret_id=$VAULT_SNAPSHOT_SECRET_ID -format=json | jq -r .auth.client_token);\nvault operator raft snapshot save /share/vault-raft.snap;\n".format(parameters.snapshotAuthPath)
+                                                    """
+                                                       echo "[$(date)] INFO: Starting Vault Snapshot process..."
+                                                       export VAULT_SKIP_VERIFY=true
+                                                       echo "[$(date)] INFO: Authenticating with AppRole..."
+                                                       export VAULT_TOKEN=$(vault write auth/{}/login role_id=$VAULT_SNAPSHOT_ROLE_ID secret_id=$VAULT_SNAPSHOT_SECRET_ID -format=json | jq -r .auth.client_token);
+                                                       echo "[$(date)] INFO: Generating Raft snapshot..."
+                                                       vault operator raft snapshot save /share/vault-raft.snap;
+                                                       if [ $? -eq 0 ]; then
+                                                            echo "[$(date)] SUCCESS: Snapshot saved to /share/vault-raft.snap"
+                                                            touch /share/snapshot_complete
+                                                        else
+                                                            echo "[$(date)] ERROR: Vault snapshot command failed"
+                                                            exit 1
+                                                        fi
+                                                    """.format(parameters.snapshotAuthPath)
                                                 ]
                                                 envFrom = [{ secretRef = { name = "vault-snapshot-creds" } }]
                                                 env = [{ name = "VAULT_ADDR", value = "http://vault-active.vault.svc.cluster.local:8200" }]
@@ -255,9 +269,39 @@ if parameters.backupEnabled == True:
                                                 command = ["/bin/sh"]
                                                 args = [
                                                     "-ec",
-                                                    "until [ -f /share/vault-raft.snap ]; do sleep 5; done;\naws s3 cp /share/vault-raft.snap s3://{}/vault_raft_$(date +\"%Y%m%d_%H%M%S\").snap --endpoint-url {} --no-verify-ssl;\n".format(parameters.backupBucket, _s3Endpoint)
+                                                    """
+                                                        echo "[$(date)] INFO: Waiting for snapshot file to be ready..."
+                                                        until [ -f /share/vault-raft.snap ]; do sleep 5; done;
+                                                        echo "[$(date)] INFO: Uploading to s3";
+                                                        aws s3 cp /share/vault-raft.snap s3://{}/vault_raft_$(date +\"%Y%m%d_%H%M%S\").snap --endpoint-url {} --no-verify-ssl;
+                                                        if [ $? -eq 0 ]; then
+                                                            echo "[$(date)] SUCCESS: Upload completed successfully."
+                                                        else
+                                                            echo "[$(date)] ERROR: AWS S3 upload failed."
+                                                            exit 1
+                                                        fi
+                                                    """.format(parameters.backupBucket, _s3Endpoint)
                                                 ]
-                                                envFrom = [{ secretRef = { name = parameters.backupBucket } }]
+                                                env = [
+                                                    {
+                                                        name = "AWS_ACCESS_KEY_ID"
+                                                        valueFrom = {
+                                                            secretKeyRef = {
+                                                                name = parameters.backupBucket
+                                                                key = "username"
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        name = "AWS_SECRET_ACCESS_KEY"
+                                                        valueFrom = {
+                                                            secretKeyRef = {
+                                                                name = parameters.backupBucket
+                                                                key = "password"
+                                                            }
+                                                        }
+                                                    }
+                                                ]
                                                 volumeMounts = [{ mountPath = "/share", name = "share" }]
                                             }
                                         ]
