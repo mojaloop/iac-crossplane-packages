@@ -273,7 +273,7 @@ if parameters.backupEnabled == True:
                                                         echo "[$(date)] INFO: Waiting for snapshot file to be ready..."
                                                         until [ -f /share/vault-raft.snap ]; do sleep 5; done;
                                                         echo "[$(date)] INFO: Uploading to s3";
-                                                        aws s3 cp /share/vault-raft.snap s3://{}/vault_raft_$(date +\"%Y%m%d_%H%M%S\").snap --endpoint-url {} --no-verify-ssl;
+                                                        aws s3 cp /share/vault-raft.snap s3://{}/vault_raft_$(date +\"%Y%m%d_%H%M%S\").snap --endpoint-url {};
                                                         if [ $? -eq 0 ]; then
                                                             echo "[$(date)] SUCCESS: Upload completed successfully."
                                                         else
