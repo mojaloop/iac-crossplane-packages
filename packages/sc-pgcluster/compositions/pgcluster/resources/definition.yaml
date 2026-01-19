@@ -172,7 +172,22 @@ spec:
                       endpointUrl:
                         type: string
                         description: S3 endpoint URL.
-
+                      process_max:
+                        type: string
+                        description: Number of backup processes.
+                        default: "2"
+                      archive_timeout:
+                        type: string
+                        description: Archive timeout in milli seconds.
+                        default: "300"
+                      full_backup_retention:
+                        type: string
+                        description: Number of full backups to retain.
+                        default: "2"
+                      diff_backup_retention:
+                        type: string
+                        description: Number of differential backups to retain.
+                        default: "3"
                   proxy:
                     type: object
                     description: Proxy configuration for PgBouncer

@@ -24,6 +24,12 @@ _basePgbackrest = {
             }
         }
     ]
+    global = {
+        "process-max" = parameters?.backup?.process_max
+        "archive-timeout" = parameters?.backup?.archive_timeout
+        "repo2-retention-full" = parameters?.backup?.full_backup_retention
+        "repo2-retention-diff" = parameters?.backup?.diff_backup_retention
+    }
 }
 # Add backup credentials configuration section conditionally
 _pgbackrestWithConfig = _basePgbackrest | ({
