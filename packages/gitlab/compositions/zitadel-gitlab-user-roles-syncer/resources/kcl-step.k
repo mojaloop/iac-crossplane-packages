@@ -77,12 +77,9 @@ _k8sObserveZitadelProjectConfigMap = {
 # Extract project ID from ConfigMap
 _zitadelProjectId = ocds["zitadel-project-config-observe"]?.Resource?.status?.atProvider?.manifest?.data?["projectId"] or ""
 
-# Extract OIDC Secret ID and key
-_oidcSecretJson = json.decode(base64.decode(ocds["gitlab-oidc-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?["provider"])) if ocds["gitlab-oidc-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?["provider"] else {}
-_args = _oidcSecretJson["args"] if _oidcSecretJson and "args" in _oidcSecretJson else {}
-_clientOptions = _args["client_options"] if _args and "client_options" in _args else {}
-_clientId = _clientOptions["identifier"] if _clientOptions and "identifier" in _clientOptions else ""
-_clientSecret = _clientOptions["secret"] if _clientOptions and "secret" in _clientOptions else ""
+# Extract OIDC client ID and secret
+_clientId = base64.decode(ocds["gitlab-oidc-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"]) if ocds["gitlab-oidc-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"] else ""
+_clientSecret = base64.decode(ocds["gitlab-oidc-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_secret"]) if ocds["gitlab-oidc-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_secret"] else ""
 
 _part1 = "client_id=" + _clientId
 _part2 = "client_secret=" + _clientSecret
