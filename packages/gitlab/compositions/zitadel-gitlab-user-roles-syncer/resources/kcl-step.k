@@ -89,7 +89,7 @@ _part2 = "client_secret=" + _clientSecret
 _part3 = "grant_type=client_credentials"
 _part4 = "scope=openid%20email%20profile%20urn:iam:org:project:roles%20urn:zitadel:iam:org:projects:roles%20urn:zitadel:iam:org:project:id:" + _zitadelProjectId + ":aud"
 
-_body = _part1 + "&" + _part2 + "&" + _part3 + "&" + _part4
+_body_content = _part1 + "&" + _part2 + "&" + _part3 + "&" + _part4
 
 _zitadelTokenRequest = {
     apiVersion = "http.crossplane.io/v1alpha2"
@@ -113,7 +113,7 @@ _zitadelTokenRequest = {
                     action = "OBSERVE"
                     url = ".payload.baseUrl"
                     method = "POST"
-                    body = "client_id=" + _clientId + "&client_secret=" + _clientSecret + "&grant_type=client_credentials&scope=openid%20email%20profile%20urn:iam:org:project:roles%20urn:zitadel:iam:org:projects:roles%20urn:zitadel:iam:org:project:id:" + _zitadelProjectId + ":aud"
+                    body = """\n"{}"\n""".format(_body_content)
                 }
             ]
             waitTimeout = "5m"
