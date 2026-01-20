@@ -364,8 +364,66 @@ _oidcSecret = {
     }
 }
 
+# Create Zitadel Machine User (Service Account)
+_zitadelMachineUser = {
+    apiVersion = "machine.zitadel.crossplane.io/v1alpha1"
+    kind = "User"
+    metadata = {
+        name = "{}-sync-machine-user".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "zitadel-sync-machine-user"
+        }
+    }
+    spec = {
+        forProvider = {
+            userName = "gitlab-user-role-syncer"
+            name = "GitLab Sync Machine User"
+            description = "Machine user used to sync roles between GitLab and ZITADEL"
+            orgId = _orgId
+            accessTokenType = "ACCESS_TOKEN_TYPE_JWT"
+            withSecret = True
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.zitadelProviderName
+        }
+        # This writes the credentials to a secret we can observe later
+        writeConnectionSecretToRef = {
+            name = "zitadel-machine-user-creds"
+            namespace = parameters.gitlabNamespace
+        }
+    }
+}
+
+_zitadelMachineUserId = ocds[ "zitadel-sync-machine-user"]?.Resource?.status?.atProvider?.id or ""
+
+
+# Create User Grant for service account
+_machineUserGrant = {
+    apiVersion = "user.zitadel.crossplane.io/v1alpha1"
+    kind = "Grant"
+    metadata = {
+        name = "{}-machine-user-grant".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "zitadel-machine-user-grant"
+        }
+    }
+    spec = {
+        forProvider = {
+            projectId = ocds["zitadel-project"]?.Resource?.status?.atProvider?.id
+            orgId = _orgId
+            roleKeys = [ocds["zitadel-techops-admin-role"]?.Resource?.status?.atProvider?.roleKey or ""]
+            userId = _zitadelMachineUserId
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.zitadelProviderName
+        }
+    }
+}
+
 # Add all objects to _items in one line
-_items = [_observe_org_id_secret, _project, _zitadelProjectIdConfigMap, _zitadelAdminHumanUserIdObserveSecret, _oidcAppConnObserve, _oidcApp, _techopsAdminRole, _techopsMaintainerRole, _techopsUserRole, _userGrant, _oidcSecret]
+_items = [_observe_org_id_secret, _project, _zitadelProjectIdConfigMap, _zitadelAdminHumanUserIdObserveSecret, _oidcAppConnObserve, _oidcApp, _techopsAdminRole, _techopsMaintainerRole, _techopsUserRole, _userGrant, _oidcSecret, _zitadelMachineUser, _machineUserGrant]
 
 dxr = {
     **oxr
