@@ -112,6 +112,11 @@ _zitadelTokenRequest = {
                     method = "POST"
                     body = """\n"{}"\n""".format(_body_content)
                 }
+                {
+                    action = "REMOVE"
+                    url = ".payload.baseUrl"
+                    method = "DELETE"
+                }
             ]
             waitTimeout = "5m"
         }
@@ -181,6 +186,11 @@ _gitlabUsersRequest = {
                     action = "OBSERVE"
                     url = ".payload.baseUrl"
                     method = "GET"
+                }
+                {
+                    action = "REMOVE"
+                    url = ".payload.baseUrl"
+                    method = "DELETE"
                 }
             ]
             waitTimeout = "5m"
