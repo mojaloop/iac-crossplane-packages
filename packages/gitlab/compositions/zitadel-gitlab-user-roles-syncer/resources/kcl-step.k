@@ -76,7 +76,7 @@ _k8sObserveZitadelProjectConfigMap = {
 
 # Extract project ID from ConfigMap
 _zitadelProjectId = ocds["zitadel-project-config-observe"]?.Resource?.status?.atProvider?.manifest?.data?["projectId"] or ""
-_zitadelorgId = ocds["zitadel-project-config-observe"]?.Resource?.status?.atProvider?.manifest?.data?["orgId"] or ""
+_zitadelOrgId = ocds["zitadel-project-config-observe"]?.Resource?.status?.atProvider?.manifest?.data?["orgId"] or ""
 
 # Extract OIDC client ID and secret
 _clientId = base64.decode(ocds["gitlab-oidc-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"]) if ocds["gitlab-oidc-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"] else ""
