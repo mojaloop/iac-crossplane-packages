@@ -85,7 +85,7 @@ _clientSecret = base64.decode(ocds["gitlab-oidc-secret-observe"]?.Resource?.stat
 _part1 = "client_id=" + _clientId
 _part2 = "client_secret=" + _clientSecret
 _part3 = "grant_type=client_credentials"
-_part4 = "scope=openid%20email%20profile%20urn:iam:org:project:roles%20urn:zitadel:iam:org:projects:roles%20urn:zitadel:iam:org:project:id:" + _zitadelProjectId + ":aud" + "%20urn:zitadel:iam:org:id:" + _zitadelOrgId
+_part4 = "scope=openid%20email%20profile%20urn:iam:org:project:roles%20urn:zitadel:iam:org:projects:roles%20urn:zitadel:iam:org:project:id:" + _zitadelProjectId + ":aud" + "%20urn:zitadel:iam:org:id:" + _zitadelOrgId + "%20urn:zitadel:iam:org:project:id:zitadel:aud"
 
 _body_content = _part1 + "&" + _part2 + "&" + _part3 + "&" + _part4
 
