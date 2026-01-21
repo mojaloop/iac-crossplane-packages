@@ -76,6 +76,7 @@ _k8sObserveZitadelProjectConfigMap = {
 
 # Extract project ID from ConfigMap
 _zitadelProjectId = ocds["zitadel-project-config-observe"]?.Resource?.status?.atProvider?.manifest?.data?["projectId"] or ""
+_zitadelorgId = ocds["zitadel-project-config-observe"]?.Resource?.status?.atProvider?.manifest?.data?["orgId"] or ""
 
 # Extract OIDC client ID and secret
 _clientId = base64.decode(ocds["gitlab-oidc-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"]) if ocds["gitlab-oidc-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"] else ""
@@ -84,7 +85,7 @@ _clientSecret = base64.decode(ocds["gitlab-oidc-secret-observe"]?.Resource?.stat
 _part1 = "client_id=" + _clientId
 _part2 = "client_secret=" + _clientSecret
 _part3 = "grant_type=client_credentials"
-_part4 = "scope=openid%20email%20profile%20urn:iam:org:project:roles%20urn:zitadel:iam:org:projects:roles%20urn:zitadel:iam:org:project:id:" + _zitadelProjectId + ":aud"
+_part4 = "scope=openid%20email%20profile%20urn:iam:org:project:roles%20urn:zitadel:iam:org:projects:roles%20urn:zitadel:iam:org:project:id:" + _zitadelProjectId + ":aud" + "%20urn:zitadel:iam:org:id:" + _zitadelOrgId
 
 _body_content = _part1 + "&" + _part2 + "&" + _part3 + "&" + _part4
 
@@ -98,6 +99,7 @@ _zitadelTokenRequest = {
         }
     }
     spec = {
+        deletionPolicy = "Orphan"
         forProvider = {
             headers = {
                 "Content-Type" = ["application/x-www-form-urlencoded"]
@@ -111,11 +113,6 @@ _zitadelTokenRequest = {
                     url = ".payload.baseUrl"
                     method = "POST"
                     body = """\n"{}"\n""".format(_body_content)
-                }
-                {
-                    action = "REMOVE"
-                    url = ".payload.baseUrl"
-                    method = "DELETE"
                 }
             ]
             waitTimeout = "5m"
@@ -173,6 +170,7 @@ _gitlabUsersRequest = {
         }
     }
     spec = {
+        deletionPolicy = "Orphan"
         forProvider = {
             headers = {
                 "PRIVATE-TOKEN" = [_gitlabToken]
@@ -187,17 +185,44 @@ _gitlabUsersRequest = {
                     url = ".payload.baseUrl"
                     method = "GET"
                 }
-                {
-                    action = "REMOVE"
-                    url = ".payload.baseUrl"
-                    method = "DELETE"
-                }
             ]
             waitTimeout = "5m"
         }
         providerConfigRef = {
             name = spec.providerConfigsRef.httpProvider
         }
+        managementPolicies = spec.managementPolicies
+    }
+}
+
+_zitadelAccessToken = json.decode(ocds["zitadel-token-request"]?.Resource?.status?.response?.body or "{}")?.access_token or ""
+
+_zitadelGrantsRequest = {
+    apiVersion = "http.crossplane.io/v1alpha2"
+    kind = "Request"
+    metadata = {
+        name = "{}-zitadel-grants".format(oxr.metadata.name)
+        annotations = {"krm.kcl.dev/composition-resource-name" = "zitadel-grants-request"}
+    }
+    spec = {
+        deletionPolicy = "Orphan"
+        forProvider = {
+            headers = {
+                "Authorization" = ["Bearer {}".format(_zitadelAccessToken)]
+                "Content-Type" = ["application/json"]
+            }
+            payload = {
+                baseUrl = "{}/management/v1/users/grants/_search".format(parameters?.zitadelUrl)
+            }
+            mappings = [{
+                action = "OBSERVE"
+                url = ".payload.baseUrl"
+                method = "POST"
+                # Search for grants within this specific project
+                body = json.encode({"queries": [{"projectQuery": {"projectId": _zitadelProjectId}}]})
+            }]
+        }
+        providerConfigRef.name = spec.providerConfigsRef.httpProvider
         managementPolicies = spec.managementPolicies
     }
 }
@@ -209,7 +234,8 @@ _items = [
     _k8sObserveZitadelProjectConfigMap,
     _k8sObserveGitlabRootTokenSecret,
     _gitlabUsersRequest,
-    _zitadelTokenRequest
+    _zitadelTokenRequest,
+    _zitadelGrantsRequest
 ]
 
 dxr = {
