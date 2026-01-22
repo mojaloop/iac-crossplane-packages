@@ -219,7 +219,7 @@ _zitadelGrantsRequest = {
                 url = ".payload.baseUrl"
                 method = "POST"
                 # Search for grants within this specific project
-                body = json.encode({"queries": [{"projectQuery": {"projectId": _zitadelProjectId}}]})
+                body = json.encode({"queries": [{"projectIdQuery": {"projectId": _zitadelProjectId}}]})
             }]
         }
         providerConfigRef.name = spec.providerConfigsRef.httpProvider
