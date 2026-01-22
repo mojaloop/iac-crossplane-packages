@@ -18,6 +18,9 @@ spec:
       name: root-token-secret
       namespace: gitlab
     gitlabUrl: https://gitlab.ccinfra1.drpp-onprem.global
+    adminRbacGroup: "gitlab_administrators"
+    maintainerRbacGroup: "gitlab_maintainers"
+    developerRbacGroup: "gitbab_users"
   providerConfigsRef:
     gitlabProvider: provider-gitlab
     kubernetesProvider: provider-kubernetes

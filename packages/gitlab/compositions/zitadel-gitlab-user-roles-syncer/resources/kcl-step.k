@@ -227,6 +227,70 @@ _zitadelGrantsRequest = {
     }
 }
 
+# Decode the observed response bodies
+_gitlabUsersBody = ocds["gitlab-users"]?.Resource?.status?.response?.body or "[]"
+_zitadelGrantsBody = ocds["zitadel-grants-request"]?.Resource?.status?.response?.body or "{}"
+
+_gitlabUsers = json.decode(_gitlabUsersBody)
+_zitadelGrantsResponse = json.decode(_zitadelGrantsBody)
+_userGrantData = _zitadelGrantsResponse?.result or []
+
+# Map GitLab emails to their User IDs (e.g., "janedoe@infitx.com" -> 7)
+_emailToGitlabId = {u.email: u.id for u in _gitlabUsers if u?.email}
+
+# Define Priority Mapping
+# If a user has "gitlab_administrators", they get "owner".
+# Add other roles here in order of increasing power.
+_rolePriority = [
+    {"zitadel": parameters.developerRbacGroup, "gitlab": "developer"},
+    {"zitadel": parameters.maintainerRbacGroup, "gitlab": "maintainer"},
+    {"zitadel": parameters.adminRbacGroup, "gitlab": "owner"}
+]
+
+# Process memberships
+_finalMemberships = {}
+
+for _grant in _userGrantData:
+    _email = _grant?.email
+    _roles = _grant?.roleKeys or []
+
+    # Only process if the user exists in GitLab
+    if _email and _email in _emailToGitlabId:
+        _highestLevel = ""
+        for _p in _rolePriority:
+            if _p.zitadel in _roles:
+                _highestLevel = _p.gitlab
+
+        # If we found a matching role, record the membership
+        if _highestLevel:
+            _finalMemberships[_email] = {
+                "gitlab_user_id": _emailToGitlabId[_email],
+                "access_level": _highestLevel
+            }
+
+_debugData = {
+    _email: {
+        gitlab_user_id = str(_data.gitlab_user_id)
+        access_level = _data.access_level
+    } for _email, _data in _finalMemberships
+}
+
+_debugConfigMap = {
+    apiVersion = "v1"
+    kind = "ConfigMap"
+    metadata = {
+        name = "{}-membership-debug".format(projectName)
+        namespace = parameters.zitadelProjectConfigMap.namespace
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "membership-debug-log"
+        }
+    }
+    data = {
+        "calculated_memberships": json.encode(_debugData)
+        "raw_zitadel_grant_count": str(len(_userGrantData))
+        "matched_user_count": str(len(_finalMemberships))
+    }
+}
 
 # Add the resources to the items list
 _items = [
@@ -235,7 +299,8 @@ _items = [
     _k8sObserveGitlabRootTokenSecret,
     _gitlabUsersRequest,
     _zitadelTokenRequest,
-    _zitadelGrantsRequest
+    _zitadelGrantsRequest,
+    _debugConfigMap
 ]
 
 dxr = {
