@@ -248,25 +248,20 @@ _rolePriority = [
 ]
 
 # Process memberships
-_finalMemberships = {}
-
-for _grant in _userGrantData:
-    _email = _grant?.email
-    _roles = _grant?.roleKeys or []
-
-    # Only process if the user exists in GitLab
-    if _email and _email in _emailToGitlabId:
-        _highestLevel = ""
-        for _p in _rolePriority:
-            if _p.zitadel in _roles:
-                _highestLevel = _p.gitlab
-
-        # If we found a matching role, record the membership
-        if _highestLevel:
-            _finalMemberships[_email] = {
-                "gitlab_user_id": _emailToGitlabId[_email],
-                "access_level": _highestLevel
-            }
+_finalMemberships = {
+    _grant.email: {
+        "gitlab_user_id": _emailToGitlabId[_grant.email],
+        # Determine the highest level by checking roles against the priority list
+        "access_level": [
+            _p.gitlab for _p in _rolePriority if _p.zitadel in (_grant.roleKeys or [])
+        ][-1] # Select the last match (highest priority)
+    }
+    for _grant in _userGrantData
+    # Filter: Only if the grant has an email and that email exists in GitLab
+    if _grant?.email and _grant.email in _emailToGitlabId and [
+        _p.gitlab for _p in _rolePriority if _p.zitadel in (_grant.roleKeys or [])
+    ]
+}
 
 _debugData = {
     _email: {
@@ -276,22 +271,37 @@ _debugData = {
 }
 
 _debugConfigMap = {
-    apiVersion = "v1"
-    kind = "ConfigMap"
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
     metadata = {
         name = "{}-membership-debug".format(projectName)
-        namespace = parameters.zitadelProjectConfigMap.namespace
         annotations = {
             "krm.kcl.dev/composition-resource-name" = "membership-debug-log"
         }
     }
-    data = {
-        "calculated_memberships": json.encode(_debugData)
-        "raw_zitadel_grant_count": str(len(_userGrantData))
-        "matched_user_count": str(len(_finalMemberships))
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "ConfigMap"
+                metadata = {
+                    name = "{}-membership-debug".format(projectName)
+                    namespace = parameters.zitadelProjectConfigMap.namespace
+                }
+                data = {
+                    "calculated_memberships": json.encode(_debugData)
+                    "raw_zitadel_grant_count": str(len(_userGrantData))
+                    "matched_user_count": str(len(_finalMemberships))
+                }
+            }
+        }
+        # Using default management policies so Crossplane creates/updates it
+        managementPolicies = ["*"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProvider
+        }
     }
 }
-
 # Add the resources to the items list
 _items = [
     _k8sObserveGitlabOidcSecret,
