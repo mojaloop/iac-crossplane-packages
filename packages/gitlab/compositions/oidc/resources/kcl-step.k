@@ -422,8 +422,30 @@ _machineUserGrant = {
     }
 }
 
+_machineUserOrgMember = {
+    apiVersion = "org.zitadel.crossplane.io/v1alpha1"
+    kind = "Member"
+    metadata = {
+        name = "{}-sync-machine-org-member".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "zitadel-sync-machine-org-member"
+        }
+    }
+    spec = {
+        forProvider = {
+            orgId = _orgId
+            userId = _zitadelMachineUserId
+            roles = ["ORG_USER_MANAGER"]
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.zitadelProviderName
+        }
+    }
+}
+
 # Add all objects to _items in one line
-_items = [_observe_org_id_secret, _project, _zitadelProjectIdConfigMap, _zitadelAdminHumanUserIdObserveSecret, _oidcAppConnObserve, _oidcApp, _techopsAdminRole, _techopsMaintainerRole, _techopsUserRole, _userGrant, _oidcSecret, _zitadelMachineUser, _machineUserGrant]
+_items = [_observe_org_id_secret, _project, _zitadelProjectIdConfigMap, _zitadelAdminHumanUserIdObserveSecret, _oidcAppConnObserve, _oidcApp, _techopsAdminRole, _techopsMaintainerRole, _techopsUserRole, _userGrant, _oidcSecret, _zitadelMachineUser, _machineUserGrant, _machineUserOrgMember]
 
 dxr = {
     **oxr
