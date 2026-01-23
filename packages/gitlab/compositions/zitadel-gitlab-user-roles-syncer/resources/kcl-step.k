@@ -349,7 +349,7 @@ _groupMembershipResources = [
         }
         spec = {
             forProvider = {
-                groupId = parameters.gitlabGroupPath
+                groupId = _gitlabGroupIacId
                 userId = _data.gitlab_user_id
                 accessLevel = _data.access_level
             }
