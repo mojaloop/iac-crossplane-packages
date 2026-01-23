@@ -47,6 +47,41 @@ _groupIAC = {
     }
 }
 
+_groupIACIdConfigMap = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-group-iac-id-configmap".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "group-iac-id-configmap"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "ConfigMap"
+                metadata = {
+                    name = "gitlab-group-iac-config"
+                    namespace = "gitlab"
+                    labels = {
+                        "gitlab.mojaloop.io/group-iac-config" = "true"
+                        "app.kubernetes.io/part-of" = "gitlab-post-config"
+                    }
+                }
+                data = {
+                    groupId = ocds[p?.iacGroupName]?.Resource?.status?.atProvider?.id or ""
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProvider
+        }
+    }
+}
+
+
 _statusExpireAt = status?.tokenExpireAt
 _expireAt = None
 
@@ -432,6 +467,7 @@ _vaultJwtAuthRole = {
 
 _items += [
     _groupIAC
+    _groupIACIdConfigMap
     _groupAccessToken
     _pushSecret
     _projBootstrap

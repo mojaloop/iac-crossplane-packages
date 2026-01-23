@@ -303,6 +303,39 @@ _debugConfigMap = {
     }
 }
 
+# ============================================
+# OBSERVE GITLAB IAC GROUP ID CONFIGMAP
+# ============================================
+_k8sObserveGroupIACIdConfigMap = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "gitlab-group-iac-config-observe-{}".format(projectName)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "gitlab-group-iac-config-observe"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "ConfigMap"
+                metadata = {
+                    name = "gitlab-group-iac-config"
+                    namespace = "gitlab"
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProvider
+        }
+    }
+}
+
+_gitlabGroupIacId = ocds["gitlab-group-iac-config-observe"]?.Resource?.status?.atProvider?.manifest?.data?["groupId"] or ""
+
+
 _groupMembershipResources = [
     {
         apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
@@ -337,7 +370,8 @@ _items = [
     _gitlabUsersRequest,
     _zitadelTokenRequest,
     _zitadelGrantsRequest,
-    _debugConfigMap
+    _debugConfigMap,
+    _k8sObserveGroupIACIdConfigMap
 ] + _groupMembershipResources
 
 dxr = {
