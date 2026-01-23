@@ -242,9 +242,9 @@ _emailToGitlabId = {u.email: u.id for u in _gitlabUsers if u?.email}
 # If a user has "gitlab_administrators", they get "owner".
 # Add other roles here in order of increasing power.
 _rolePriority = [
-    {"zitadel": parameters.developerRbacGroup, "gitlab": "developer"},
-    {"zitadel": parameters.maintainerRbacGroup, "gitlab": "maintainer"},
-    {"zitadel": parameters.adminRbacGroup, "gitlab": "owner"}
+    {"zitadel": parameters.developerRbacGroup, "gitlab": 30},
+    {"zitadel": parameters.maintainerRbacGroup, "gitlab": 40},
+    {"zitadel": parameters.adminRbacGroup, "gitlab": 50}
 ]
 
 # Process memberships
@@ -349,9 +349,9 @@ _groupMembershipResources = [
         }
         spec = {
             forProvider = {
-                groupId = _gitlabGroupIacId
-                userId = _data.gitlab_user_id
-                accessLevel = _data.access_level
+                groupId = int(_gitlabGroupIacId)
+                userID = int(_data.gitlab_user_id)
+                accessLevel = int(_data.access_level)
             }
 
             providerConfigRef = {
