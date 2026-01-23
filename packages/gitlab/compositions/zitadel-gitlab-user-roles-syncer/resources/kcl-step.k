@@ -305,7 +305,7 @@ _debugConfigMap = {
 
 _groupMembershipResources = [
     {
-        apiVersion = "group.gitlab.crossplane.io/v1alpha1"
+        apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
         kind = "Member"
         metadata = {
             # Sanitize email for K8s name: david@infitx.com -> david-infitx-com
