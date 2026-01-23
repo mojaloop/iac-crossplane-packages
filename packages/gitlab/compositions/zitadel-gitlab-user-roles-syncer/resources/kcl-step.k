@@ -296,12 +296,39 @@ _debugConfigMap = {
             }
         }
         # Using default management policies so Crossplane creates/updates it
-        managementPolicies = ["*"]
+        managementPolicies = spec.managementPolicies
         providerConfigRef = {
             name = spec.providerConfigsRef.kubernetesProvider
         }
     }
 }
+
+_groupMembershipResources = [
+    {
+        apiVersion = "group.gitlab.crossplane.io/v1alpha1"
+        kind = "Member"
+        metadata = {
+            # Sanitize email for K8s name: david@infitx.com -> david-infitx-com
+            name = "{}-member-{}".format(projectName, _email.replace("@", "-").replace(".", "-"))
+            annotations = {
+                "krm.kcl.dev/composition-resource-name" = "gitlab-member-{}".format(_email)
+            }
+        }
+        spec = {
+            forProvider = {
+                groupId = parameters.gitlabGroupPath
+                userId = _data.gitlab_user_id
+                accessLevel = _data.access_level
+            }
+
+            providerConfigRef = {
+                name = spec.providerConfigsRef.gitlabProvider
+            }
+            managementPolicies = spec.managementPolicies
+        }
+    } for _email, _data in _finalMemberships
+]
+
 # Add the resources to the items list
 _items = [
     _k8sObserveGitlabOidcSecret,
@@ -311,7 +338,7 @@ _items = [
     _zitadelTokenRequest,
     _zitadelGrantsRequest,
     _debugConfigMap
-]
+] + _groupMembershipResources
 
 dxr = {
     **oxr
