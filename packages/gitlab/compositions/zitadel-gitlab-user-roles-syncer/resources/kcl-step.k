@@ -120,7 +120,7 @@ _zitadelTokenRequest = {
         providerConfigRef = {
             name = spec.providerConfigsRef.httpProvider
         }
-        managementPolicies = spec.managementPolicies
+        managementPolicies = ["*"]
     }
 }
 
@@ -191,7 +191,7 @@ _gitlabUsersRequest = {
         providerConfigRef = {
             name = spec.providerConfigsRef.httpProvider
         }
-        managementPolicies = spec.managementPolicies
+        managementPolicies = ["*"]
     }
 }
 
@@ -223,7 +223,7 @@ _zitadelGrantsRequest = {
             }]
         }
         providerConfigRef.name = spec.providerConfigsRef.httpProvider
-        managementPolicies = spec.managementPolicies
+        managementPolicies = ["*"]
     }
 }
 
