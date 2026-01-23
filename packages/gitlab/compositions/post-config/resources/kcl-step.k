@@ -70,7 +70,7 @@ _groupIACIdConfigMap = {
                     }
                 }
                 data = {
-                    groupId = ocds[p?.iacGroupName]?.Resource?.status?.atProvider?.id or ""
+                    groupId = str(ocds[p?.iacGroupName]?.Resource?.status?.atProvider?.id or "")
                 }
             }
         }
