@@ -1,0 +1,196 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xzitadelgitlabuserrolesyncer.gitlab.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: gitlab.mojaloop.io
+  names:
+    kind: XZitadelGitlabUserRoleSyncer
+    plural: xzitadelgitlabuserrolesyncer
+  claimNames:
+    kind: ZitadelGitlabUserRoleSyncer
+    plural: zitadelgitlabuserrolesyncer
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              providerConfigsRef:
+                type: object
+                description: |-
+                  The name of the provider config to use for the gitlab providers.
+                properties:
+                  gitlabProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the gitlab provider.
+                    default: gitlab-provider
+                  kubernetesProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the kubernetes provider.
+                    default: kubernetes-provider
+                  httpProvider:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the http provider.
+                    default: http-provider
+              parameters:
+                type: object
+                properties:
+                  projectName:
+                    type: string
+                    description: "Name of the project for resource naming"
+
+                  zitadelProjectConfigMap:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        default: "gitlab-zitadel-project-config"
+                      namespace:
+                        type: string
+                        default: "crossplane-system"
+
+                  # GitLab OIDC Secret (contains Zitadel credentials)
+                  gitlabOidcSecret:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        default: "gitlab-oidc-secret"
+                      namespace:
+                        type: string
+                        default: "gitlab"
+                    required:
+                    - name
+                    - namespace
+
+                  # GitLab OIDC Secret (contains Zitadel credentials)
+                  gitlabRootTokenSecret:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        default: "root-token-secret"
+                      namespace:
+                        type: string
+                        default: "gitlab"
+                    required:
+                    - name
+                    - namespace
+
+                  # Zitadel Configuration
+                  zitadelUrl:
+                    type: string
+                    description: "Zitadel base URL"
+                    example: "https://zitadel.example.com"
+
+
+                  zitadelProjectName:
+                    type: string
+                    description: "Zitadel project name for querying user grants"
+
+                  # GitLab Configuration
+                  gitlabUrl:
+                    type: string
+                    description: "GitLab instance URL"
+                    example: "https://gitlab.example.com"
+
+
+                  gitlabGroupPath:
+                    type: string
+                    description: "GitLab group path to manage memberships"
+                    default: "iac"
+
+                  gitlabProviderConfig:
+                    type: string
+                    description: "Name of GitLab provider config"
+                    default: "gitlab-provider"
+
+                  # RBAC Role Mapping
+                  adminRbacGroup:
+                    type: string
+                    description: "Zitadel role key for admin/owner access"
+                    default: "gitlab_administrators"
+
+                  maintainerRbacGroup:
+                    type: string
+                    description: "Zitadel role key for maintainer access"
+                    default: "gitlab_maintainers"
+
+                  developerRbacGroup:
+                    type: string
+                    description: "Zitadel role key for developer access"
+                    default: "gitlab_users"
+
+                required:
+                - zitadelProjectName
+                - gitlabOidcSecret
+                - zitadelProjectName
+                - gitlabUrl
+
+            required:
+            - parameters
+            - providerConfigsRef
+
+          status:
+            type: object
+            properties:
+              syncStatus:
+                type: object
+                properties:
+                  zitadelAuthenticated:
+                    type: boolean
+                  zitadelUserGrantsCount:
+                    type: integer
+                  gitlabUsersCount:
+                    type: integer
+                  gitlabGroupId:
+                    type: string
+                  membershipsToSync:
+                    type: integer
+                  adminUsers:
+                    type: integer
+                  maintainerUsers:
+                    type: integer
+                  developerUsers:
+                    type: integer
+
+              userMappings:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                    gitlabUserId:
+                      type: string
+                    accessLevel:
+                      type: string
