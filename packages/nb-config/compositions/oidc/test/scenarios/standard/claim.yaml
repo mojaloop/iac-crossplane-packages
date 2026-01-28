@@ -2,7 +2,7 @@ apiVersion: netbird.mojaloop.io/v1alpha1
 kind: XNetbirdOIDC
 metadata:
   name: netbird-oidc-claim
-  namespace: crossplane-system # Or the namespace where you manage your infra claims
+  namespace: netbird
 spec:
   parameters:
     # Required FQDNs and Namespace

@@ -280,6 +280,14 @@ _adminHumanGrant = {
     }
 }
 
+# Extract the observed role keys
+_admin_key = ocds["zitadel-nb-techops-admin-role"]?.Resource?.status?.atProvider?.roleKey
+_user_key = ocds["zitadel-nb-techops-user-role"]?.Resource?.status?.atProvider?.roleKey
+
+# 2. Define the conditional list logic
+# We check if both are not None and have a length > 0
+_role_keys_list = [_admin_key, _user_key] if _admin_key and _user_key else [""]
+
 _apiAdminGrant = {
     apiVersion = "user.zitadel.crossplane.io/v1alpha1"
     kind = "Grant"
@@ -291,10 +299,7 @@ _apiAdminGrant = {
             projectId = _project_id
             orgId = _orgId
             userId = ocds["zitadel-netbird-api-admin"]?.Resource?.status?.atProvider?.id or ""
-            roleKeys = [
-                ocds["zitadel-nb-techops-admin-role"]?.Resource?.status?.atProvider?.roleKey or ""
-                ocds["zitadel-nb-techops-user-role"]?.Resource?.status?.atProvider?.roleKey or ""
-            ]
+            roleKeys = _role_keys_list
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef.name = spec.providerConfigsRef.zitadelProviderName
