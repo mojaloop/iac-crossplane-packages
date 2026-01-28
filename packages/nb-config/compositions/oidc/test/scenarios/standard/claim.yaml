@@ -6,8 +6,8 @@ metadata:
 spec:
   parameters:
     # Required FQDNs and Namespace
-    netbirdFqdn: "netbird.example.com"
-    zitadelFqdn: "zitadel.example.com"
+    netbirdFqdn: "netbird-dashboard.ccinfra1.drpp-onprem.global"
+    zitadelFqdn: "zitadel.ccinfra1.drpp-onprem.global"
     netbirdNamespace: "netbird"
 
     # Reference to the Secret containing the Admin Human User GUID
@@ -17,17 +17,12 @@ spec:
       key: "zitadel_admin_human_user_id"
 
     # RBAC Group mapping (matched to your Zitadel Project Roles)
-    adminRbacGroup: "netbird_administrators"
-    maintainerRbacGroup: "netbird_maintainers"
-    userRbacGroup: "netbird_users"
-
-    # OIDC Configuration
-    oidcSecretName: "netbird-oidc-secret"
-    oidcProviderGroupClaimPrefix: "zitadel:grants"
+    adminRbacGroup: "techops-admin"
+    userRbacGroup: "techops-users"
 
     # Reference to the Secret containing the Zitadel Org ID
     organizationIdSecretRef:
-      name: "zitadel-org-id"
+      name: "zitadel-post-config-init-output"
       namespace: "zitadel"
       key: "zitadel_org_id"
 

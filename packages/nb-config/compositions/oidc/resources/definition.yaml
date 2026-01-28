@@ -45,7 +45,6 @@ spec:
                   - zitadelFqdn
                   - netbirdNamespace
                   - adminRbacGroup
-                  - maintainerRbacGroup
                   - userRbacGroup
                   - zitadelAdminHumanUserIdRef
                 properties:
@@ -61,18 +60,9 @@ spec:
                   adminRbacGroup:
                     type: string
                     description: Role key for Techops Admins
-                  maintainerRbacGroup:
-                    type: string
-                    description: Role key for Techops Maintainers
                   userRbacGroup:
                     type: string
                     description: Role key for Techops Users
-                  oidcSecretName:
-                    type: string
-                    default: "netbird-oidc-secret"
-                  oidcProviderGroupClaimPrefix:
-                    type: string
-                    default: "zitadel:grants"
                   # Added key property to match KCL base64.decode logic
                   zitadelAdminHumanUserIdRef:
                     type: object
