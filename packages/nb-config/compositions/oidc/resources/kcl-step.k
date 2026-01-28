@@ -321,7 +321,7 @@ _outputSecret = {
             apiVersion = "v1"
             kind = "Secret"
             metadata = {
-                name = "{}-zitadel-outputs".format(oxr.metadata.name)
+                name = parameters.netbirdPreConfigOutputSecret
                 namespace = parameters.netbirdNamespace
             }
             type = "Opaque"

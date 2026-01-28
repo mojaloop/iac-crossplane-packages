@@ -47,6 +47,7 @@ spec:
                   - adminRbacGroup
                   - userRbacGroup
                   - zitadelAdminHumanUserIdRef
+                  - netbirdPreConfigOutputSecret
                 properties:
                   netbirdFqdn:
                     type: string
@@ -63,6 +64,10 @@ spec:
                   userRbacGroup:
                     type: string
                     description: Role key for Techops Users
+                  netbirdPreConfigOutputSecret:
+                    type: string
+                    description: Name of the Secret containing pre-config output values
+                    default: "netbird-management"
                   # Added key property to match KCL base64.decode logic
                   zitadelAdminHumanUserIdRef:
                     type: object

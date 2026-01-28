@@ -9,6 +9,7 @@ spec:
     netbirdFqdn: "netbird-dashboard.ccinfra1.drpp-onprem.global"
     zitadelFqdn: "zitadel.ccinfra1.drpp-onprem.global"
     netbirdNamespace: "netbird"
+    netbirdPreConfigOutputSecret: "netbird-management"
 
     # Reference to the Secret containing the Admin Human User GUID
     zitadelAdminHumanUserIdRef:
