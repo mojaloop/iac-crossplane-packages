@@ -1,0 +1,41 @@
+apiVersion: netbird.mojaloop.io/v1alpha1
+kind: XNetbirdOIDC
+metadata:
+  name: netbird-oidc-claim
+  namespace: crossplane-system # Or the namespace where you manage your infra claims
+spec:
+  parameters:
+    # Required FQDNs and Namespace
+    netbirdFqdn: "netbird.example.com"
+    zitadelFqdn: "zitadel.example.com"
+    netbirdNamespace: "netbird"
+
+    # Reference to the Secret containing the Admin Human User GUID
+    zitadelAdminHumanUserIdRef:
+      name: "post-config-output"
+      namespace: "zitadel"
+      key: "zitadel_admin_human_user_id"
+
+    # RBAC Group mapping (matched to your Zitadel Project Roles)
+    adminRbacGroup: "netbird_administrators"
+    maintainerRbacGroup: "netbird_maintainers"
+    userRbacGroup: "netbird_users"
+
+    # OIDC Configuration
+    oidcSecretName: "netbird-oidc-secret"
+    oidcProviderGroupClaimPrefix: "zitadel:grants"
+
+    # Reference to the Secret containing the Zitadel Org ID
+    organizationIdSecretRef:
+      name: "zitadel-org-id"
+      namespace: "zitadel"
+      key: "zitadel_org_id"
+
+  # References to the ProviderConfigs configured in your cluster
+  providerConfigsRef:
+    zitadelProviderName: "zitadel-provider"
+    kubernetesProviderName: "kubernetes-provider"
+
+  # Policy allowing Crossplane to manage all lifecycle actions
+  managementPolicies:
+    - "*"
