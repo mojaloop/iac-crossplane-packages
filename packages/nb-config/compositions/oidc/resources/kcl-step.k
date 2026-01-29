@@ -176,6 +176,7 @@ _zitadelMachineUser = {
         forProvider = {
             userName = "netbird"
             name = "netbird"
+            description = "Netbird Service Account for IDP management"
             orgId = _orgId
             accessTokenType = "ACCESS_TOKEN_TYPE_JWT"
             withSecret = True
@@ -202,6 +203,7 @@ _netbirdApiAdmin = {
         forProvider = {
             userName = "netbird-api-admin"
             name = "netbird-api-admin"
+            description = "Netbird API admin user"
             orgId = _orgId
             accessTokenType = "ACCESS_TOKEN_TYPE_JWT"
             withSecret = True
@@ -331,6 +333,8 @@ _outputSecret = {
                 netbird_cli_client_id = ocds["zitadel-nb-cli-oidc-app-conn-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"] or ""
                 netbird_service_user_client_id = ocds["zitadel-nb-service-user-creds-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"] or ""
                 netbird_service_user_client_secret = ocds["zitadel-nb-service-user-creds-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_secret"] or ""
+                netbird_api_admin_user_client_id = ocds["zitadel-api-admin-creds-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"] or ""
+                netbird_api_admin_user_client_secret = ocds["zitadel-api-admin-creds-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_secret"] or ""
             }
         }
         managementPolicies = spec.managementPolicies
