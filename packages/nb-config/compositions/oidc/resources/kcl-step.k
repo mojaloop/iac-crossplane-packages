@@ -190,6 +190,30 @@ _zitadelMachineUser = {
     }
 }
 
+_zitadelMachineUserId = ocds["zitadel-nb-service-user"]?.Resource?.status?.atProvider?.id or ""
+
+_machineUserOrgMember = {
+    apiVersion = "org.zitadel.crossplane.io/v1alpha1"
+    kind = "Member"
+    metadata = {
+        name = "{}-service-user-org-member".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "zitadel-nb-service-user-org-member"
+        }
+    }
+    spec = {
+        forProvider = {
+            orgId = _orgId
+            userId = _zitadelMachineUserId
+            roles = ["ORG_USER_MANAGER"]
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.zitadelProviderName
+        }
+    }
+}
+
 _netbirdApiAdmin = {
     apiVersion = "machine.zitadel.crossplane.io/v1alpha1"
     kind = "User"
@@ -395,6 +419,7 @@ _items = [
     _oidcApp
     _cliOidcApp
     _zitadelMachineUser
+    _machineUserOrgMember
     _netbirdApiAdmin
     _techopsAdminRole
     _techopsUserRole
