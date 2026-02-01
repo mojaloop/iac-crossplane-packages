@@ -350,7 +350,7 @@ _outputSecret = {
                 name = parameters.netbirdPreConfigOutputSecret
                 namespace = parameters.netbirdNamespace
             }
-            type = "Opaque"
+            type = "connection.crossplane.io/v1alpha1"
             data = {
                 netbird_project_id = base64.encode(_project_id or "")
                 netbird_client_id = ocds["zitadel-nb-oidc-app-conn-observe"]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_id"] or ""
