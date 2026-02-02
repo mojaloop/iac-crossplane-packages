@@ -1,0 +1,101 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xnetbirdoidc.netbird.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: netbird.mojaloop.io
+  names:
+    kind: XNetbirdOIDC
+    plural: xnetbirdoidc
+  claimNames:
+    kind: NetbirdOIDC
+    plural: netbirdoidc
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                type: array
+                default: ["*"]
+                items:
+                  type: string
+                  enum: ["Observe", "Create", "Update", "Delete", "LateInitialize", "*"]
+              providerConfigsRef:
+                type: object
+                required:
+                  - zitadelProviderName
+                  - kubernetesProviderName
+                properties:
+                  zitadelProviderName:
+                    type: string
+                  kubernetesProviderName:
+                    type: string
+              parameters:
+                type: object
+                required:
+                  - netbirdFqdn
+                  - zitadelFqdn
+                  - netbirdNamespace
+                  - adminRbacGroup
+                  - userRbacGroup
+                  - zitadelAdminHumanUserIdRef
+                  - netbirdPreConfigOutputSecret
+                properties:
+                  netbirdFqdn:
+                    type: string
+                    description: FQDN for the Netbird dashboard
+                  zitadelFqdn:
+                    type: string
+                    description: FQDN for the Zitadel instance
+                  netbirdNamespace:
+                    type: string
+                    description: Namespace where Netbird and related secrets are managed
+                  adminRbacGroup:
+                    type: string
+                    description: Role key for Techops Admins
+                  userRbacGroup:
+                    type: string
+                    description: Role key for Techops Users
+                  netbirdPreConfigOutputSecret:
+                    type: string
+                    description: Name of the Secret containing pre-config output values
+                    default: "netbird-management"
+                  # Added key property to match KCL base64.decode logic
+                  zitadelAdminHumanUserIdRef:
+                    type: object
+                    required:
+                      - name
+                      - namespace
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                      key:
+                        type: string
+                        default: "zitadel_admin_human_user_id"
+                  # Logic for the Organization ID Observation
+                  organizationIdSecretRef:
+                    type: object
+                    default:
+                      name: "zitadel-post-config-init-output"
+                      namespace: "zitadel"
+                      key: "zitadel_org_id"
+                    properties:
+                      name:
+                        type: string
+                        default: "zitadel-post-config-init-output"
+                      namespace:
+                        type: string
+                        default: "zitadel"
+                      key:
+                        type: string
+                        default: "zitadel_org_id"
