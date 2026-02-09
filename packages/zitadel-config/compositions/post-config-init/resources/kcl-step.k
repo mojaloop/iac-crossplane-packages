@@ -1,5 +1,6 @@
 import json
 import base64
+import crypto
 
 # Read the XR and the OCDs
 oxr = option("params").oxr
@@ -65,7 +66,6 @@ for i in $(seq 1 20); do
     -d "scope=openid urn:zitadel:iam:org:project:id:zitadel:aud" \\
     -d "assertion=$HEADER.$PAYLOAD.$SIG")
 
-  # BusyBox fix: Use sed instead of grep -oP
   TOKEN=$(echo "$RESPONSE" | sed -n 's/.*"access_token":"\\([^"]*\\)".*/\\1/p')
 
   if [ -n "$TOKEN" ]; then
@@ -87,34 +87,40 @@ exit 1
     PRIV_KEY = private_key
 )
 
-# 4. ConfigMap to store the script
+# 2. Generate a hash of the script to handle Job immutability
+# This ensures that if the script changes, a new Job and ConfigMap are created
+_script_hash = crypto.sha256(_script_content)[:8]
+_cm_name = "{}-getter-script-{}".format(metadata.name, _script_hash)
+_job_name = "{}-getter-{}".format(metadata.name, _script_hash)
+
+# 3. ConfigMap with unique hash-based name
 _script_cm = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "{}-script-cm".format(metadata.name)
+        name = _cm_name
         annotations = {"krm.kcl.dev/composition-resource-name": "script-cm"}
     }
     spec = {
         forProvider.manifest = {
             apiVersion = "v1"
-            kind = "ConfigMap"
+            kind = "Secret" # Using a Secret for the script is safer due to the Private Key content
             metadata = {
-                name = "{}-getter-script".format(metadata.name)
+                name = _cm_name
                 namespace = namespace
             }
-            data = {"fetch-org.sh" = _script_content}
+            stringData = {"fetch-org.sh" = _script_content}
         }
         providerConfigRef.name = spec.providerConfigsRef.kubernetesProviderName
     }
 }
 
-# 5. Post-Config Init Job (Mounted ConfigMap)
+# 4. Job with unique hash-based name
 _zitadelPostConfigInit = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "{}-post-config-job".format(metadata.name)
+        name = _job_name
         annotations = {"krm.kcl.dev/composition-resource-name": "post-config-job"}
     }
     spec = {
@@ -122,14 +128,13 @@ _zitadelPostConfigInit = {
             apiVersion = "batch/v1"
             kind = "Job"
             metadata = {
-                name = "{}-getter".format(metadata.name)
+                name = _job_name
                 namespace = namespace
             }
             spec.template.spec = {
                 containers = [{
                     name = "zitadel-helper"
                     image = "alpine:latest"
-                    # Add apk dependencies then run the mounted script
                     command = ["/bin/sh", "-c", "apk add --no-cache curl openssl && sh /scripts/fetch-org.sh"]
                     volumeMounts = [{
                         name = "script-vol"
@@ -139,8 +144,8 @@ _zitadelPostConfigInit = {
                 restartPolicy = "Never"
                 volumes = [{
                     name = "script-vol"
-                    configMap = {
-                        name = "{}-getter-script".format(metadata.name)
+                    secret = {
+                        secretName = _cm_name
                         defaultMode = 0o755
                     }
                 }]
