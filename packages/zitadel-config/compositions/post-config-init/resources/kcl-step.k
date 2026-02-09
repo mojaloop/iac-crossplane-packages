@@ -142,6 +142,9 @@ _script_cm = {
     }
 }
 
+_sa_name = params.serviceAccountName
+
+
 # 5. Job Definition
 _zitadelPostConfigInit = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -185,85 +188,6 @@ _zitadelPostConfigInit = {
     }
 }
 
-_sa_name = "{}-getter-sa".format(metadata.name)
 
-# 1. ServiceAccount for the Job
-_job_sa = {
-    apiVersion = "kubernetes.crossplane.io/v1alpha2"
-    kind = "Object"
-    metadata = {
-        name = "{}-sa".format(metadata.name)
-        annotations = {"krm.kcl.dev/composition-resource-name": "job-sa"}
-    }
-    spec = {
-        forProvider.manifest = {
-            apiVersion = "v1"
-            kind = "ServiceAccount"
-            metadata = {
-                name = _sa_name
-                namespace = namespace
-            }
-        }
-        providerConfigRef.name = spec.providerConfigsRef.kubernetesProviderName
-    }
-}
-
-# 2. Role to allow Secret creation
-_job_role = {
-    apiVersion = "kubernetes.crossplane.io/v1alpha2"
-    kind = "Object"
-    metadata = {
-        name = "{}-role".format(metadata.name)
-        annotations = {"krm.kcl.dev/composition-resource-name": "job-role"}
-    }
-    spec = {
-        forProvider.manifest = {
-            apiVersion = "rbac.authorization.k8s.io/v1"
-            kind = "Role"
-            metadata = {
-                name = "{}-secret-creator".format(metadata.name)
-                namespace = namespace
-            }
-            rules = [{
-                apiGroups = [""]
-                resources = ["secrets"]
-                verbs = ["create", "get", "patch", "update"]
-            }]
-        }
-        providerConfigRef.name = spec.providerConfigsRef.kubernetesProviderName
-    }
-}
-
-# 3. RoleBinding to link SA and Role
-_job_rb = {
-    apiVersion = "kubernetes.crossplane.io/v1alpha2"
-    kind = "Object"
-    metadata = {
-        name = "{}-rb".format(metadata.name)
-        annotations = {"krm.kcl.dev/composition-resource-name": "job-rb"}
-    }
-    spec = {
-        forProvider.manifest = {
-            apiVersion = "rbac.authorization.k8s.io/v1"
-            kind = "RoleBinding"
-            metadata = {
-                name = "{}-secret-creator-binding".format(metadata.name)
-                namespace = namespace
-            }
-            roleRef = {
-                apiGroup = "rbac.authorization.k8s.io"
-                kind = "Role"
-                name = "{}-secret-creator".format(metadata.name)
-            }
-            subjects = [{
-                kind = "ServiceAccount"
-                name = _sa_name
-                namespace = namespace
-            }]
-        }
-        providerConfigRef.name = spec.providerConfigsRef.kubernetesProviderName
-    }
-}
-
-_items = [_observe_zitadel_admin_sa, _script_cm, _job_sa, _job_role,_job_rb, _zitadelPostConfigInit]
+_items = [_observe_zitadel_admin_sa, _script_cm, _zitadelPostConfigInit]
 items = _items + [oxr]
