@@ -59,7 +59,7 @@ private_key = (_zitadelAdminSa.key or "").replace("\\n", "\n")
 _script = """
 set -e
 echo "Waiting for {DOMAIN}..."
-until curl -skf "{DOMAIN}/debug/healthz"; do sleep 5; done
+until curl -skf "https://{DOMAIN}/debug/healthz"; do sleep 5; done
 
 cat <<EOF > /tmp/privkey.pem
 {PRIV_KEY}
@@ -75,13 +75,13 @@ for i in $(seq 1 20); do
   PAYLOAD=$(echo -n '{{"iss":"{UID}","sub":"{UID}","aud":"{DOMAIN}","iat":'$IAT',"exp":'$EXP'}}' | b64url)
   SIG=$(echo -n "$HEADER.$PAYLOAD" | openssl dgst -sha256 -sign /tmp/privkey.pem -binary | b64url)
 
-  TOKEN=$(curl -s -X POST "{DOMAIN}/oauth/v2/token" \
+  TOKEN=$(curl -s -X POST "https://{DOMAIN}/oauth/v2/token" \
     -d "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer" \
     -d "scope=openid urn:zitadel:iam:org:project:id:zitadel:aud" \
     -d "assertion=$HEADER.$PAYLOAD.$SIG" | grep -oP '(?<="access_token":")[^"]*')
 
   if [ -n "$TOKEN" ]; then
-    ORG_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "{DOMAIN}/admin/v1/orgs/default" | grep -oP '(?<="id":")[^"]*')
+    ORG_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "https://{DOMAIN}/admin/v1/orgs/default" | grep -oP '(?<="id":")[^"]*')
     if [ -n "$ORG_ID" ]; then
       echo "FOUND_ORG_ID=$ORG_ID"
       # We output this so Crossplane can capture it or we write to a secret
