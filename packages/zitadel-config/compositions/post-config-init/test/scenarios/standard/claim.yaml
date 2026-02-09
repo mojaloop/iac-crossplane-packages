@@ -1,0 +1,22 @@
+apiVersion: zitadel.mojaloop.io/v1alpha1
+kind: XZitadelPostConfigInit
+metadata:
+  name: zitadel-provider-config-claim
+spec:
+  parameters:
+    # Required parameters
+    domain: "zitadel.example.com"
+    zitadelAdminSecret:
+      name: "zitadel-admin-sa"
+      key: "zitadel-admin-sa.json"
+    zitadelInitOutputSecret:
+      name: "zitadel-post-config-init-output"
+      key: "zitadel_org_id"
+
+
+
+  providerConfigsRef:
+    kubernetesProviderName: "kubernetes-provider"
+
+  managementPolicies:
+    - "*"
