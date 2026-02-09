@@ -41,7 +41,7 @@ user_id = _sa_json.userId or ""
 key_id = _sa_json.keyId or ""
 private_key = (_sa_json.key or "").replace("\\n", "\n")
 
-# 3. Define the Script (Fixed for BusyBox/Alpine using sed)
+# 3. Define the Script with K8s Secret Creation Logic
 _script_content = """
 set -e
 echo "Waiting for {DOMAIN}..."
@@ -71,8 +71,35 @@ for i in $(seq 1 20); do
   if [ -n "$TOKEN" ]; then
     ORG_ID_RAW=$(curl -s -H "Authorization: Bearer $TOKEN" "https://{DOMAIN}/admin/v1/orgs/default")
     ORG_ID=$(echo "$ORG_ID_RAW" | sed -n 's/.*"id":"\\([^"]*\\)".*/\\1/p')
+
     if [ -n "$ORG_ID" ]; then
       echo "FOUND_ORG_ID=$ORG_ID"
+
+      # --- K8S SECRET CREATION ---
+      K8S_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+      NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+
+      echo "Creating Secret {OUT_SECRET}..."
+
+      # Encode the Org ID to Base64 for the Secret
+      ORG_B64=$(echo -n "$ORG_ID" | base64)
+
+      curl -s -X POST "https://kubernetes.default.svc/api/v1/namespaces/$NAMESPACE/secrets" \\
+        --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \\
+        -H "Authorization: Bearer $K8S_TOKEN" \\
+        -H "Content-Type: application/json" \\
+        -d @- <<EOF
+{{
+  "apiVersion": "v1",
+  "kind": "Secret",
+  "metadata": {{
+    "name": "{OUT_SECRET}"
+  }},
+  "data": {{
+    "{OUT_KEY}": "$ORG_B64"
+  }}
+}}
+EOF
       exit 0
     fi
   fi
@@ -84,16 +111,16 @@ exit 1
     DOMAIN = params.domain,
     UID = user_id,
     KID = key_id,
-    PRIV_KEY = private_key
+    PRIV_KEY = private_key,
+    OUT_SECRET = params.zitadelInitOutputSecret.name,
+    OUT_KEY = params.zitadelInitOutputSecret.key
 )
 
-# 2. Generate a hash of the script to handle Job immutability
-# This ensures that if the script changes, a new Job and ConfigMap are created
 _script_hash = crypto.sha256(_script_content)[:8]
 _cm_name = "{}-getter-script-{}".format(metadata.name, _script_hash)
 _job_name = "{}-getter-{}".format(metadata.name, _script_hash)
 
-# 3. ConfigMap with unique hash-based name
+# 4. Storage for the Script (Secret)
 _script_cm = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
@@ -104,7 +131,7 @@ _script_cm = {
     spec = {
         forProvider.manifest = {
             apiVersion = "v1"
-            kind = "Secret" # Using a Secret for the script is safer due to the Private Key content
+            kind = "Secret"
             metadata = {
                 name = _cm_name
                 namespace = namespace
@@ -115,7 +142,7 @@ _script_cm = {
     }
 }
 
-# 4. Job with unique hash-based name
+# 5. Job Definition
 _zitadelPostConfigInit = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
@@ -132,6 +159,9 @@ _zitadelPostConfigInit = {
                 namespace = namespace
             }
             spec.template.spec = {
+                # Ensure the Job has permission to create secrets
+                # You may need to bind a Role to this default ServiceAccount
+                serviceAccountName = _sa_name
                 containers = [{
                     name = "zitadel-helper"
                     image = "alpine:latest"
@@ -155,6 +185,85 @@ _zitadelPostConfigInit = {
     }
 }
 
-_items = [_observe_zitadel_admin_sa, _script_cm, _zitadelPostConfigInit]
-dxr = {**oxr}
-items = _items + [dxr]
+_sa_name = "{}-getter-sa".format(metadata.name)
+
+# 1. ServiceAccount for the Job
+_job_sa = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-sa".format(metadata.name)
+        annotations = {"krm.kcl.dev/composition-resource-name": "job-sa"}
+    }
+    spec = {
+        forProvider.manifest = {
+            apiVersion = "v1"
+            kind = "ServiceAccount"
+            metadata = {
+                name = _sa_name
+                namespace = namespace
+            }
+        }
+        providerConfigRef.name = spec.providerConfigsRef.kubernetesProviderName
+    }
+}
+
+# 2. Role to allow Secret creation
+_job_role = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-role".format(metadata.name)
+        annotations = {"krm.kcl.dev/composition-resource-name": "job-role"}
+    }
+    spec = {
+        forProvider.manifest = {
+            apiVersion = "rbac.authorization.k8s.io/v1"
+            kind = "Role"
+            metadata = {
+                name = "{}-secret-creator".format(metadata.name)
+                namespace = namespace
+            }
+            rules = [{
+                apiGroups = [""]
+                resources = ["secrets"]
+                verbs = ["create", "get", "patch", "update"]
+            }]
+        }
+        providerConfigRef.name = spec.providerConfigsRef.kubernetesProviderName
+    }
+}
+
+# 3. RoleBinding to link SA and Role
+_job_rb = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-rb".format(metadata.name)
+        annotations = {"krm.kcl.dev/composition-resource-name": "job-rb"}
+    }
+    spec = {
+        forProvider.manifest = {
+            apiVersion = "rbac.authorization.k8s.io/v1"
+            kind = "RoleBinding"
+            metadata = {
+                name = "{}-secret-creator-binding".format(metadata.name)
+                namespace = namespace
+            }
+            roleRef = {
+                apiGroup = "rbac.authorization.k8s.io"
+                kind = "Role"
+                name = "{}-secret-creator".format(metadata.name)
+            }
+            subjects = [{
+                kind = "ServiceAccount"
+                name = _sa_name
+                namespace = namespace
+            }]
+        }
+        providerConfigRef.name = spec.providerConfigsRef.kubernetesProviderName
+    }
+}
+
+_items = [_observe_zitadel_admin_sa, _script_cm, _job_sa, _job_role,_job_rb, _zitadelPostConfigInit]
+items = _items + [oxr]
