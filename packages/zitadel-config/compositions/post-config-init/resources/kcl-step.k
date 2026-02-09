@@ -58,7 +58,7 @@ for i in $(seq 1 20); do
   IAT=$(($(date +%s) - 60))
   EXP=$((IAT + 3600))
   HEADER=$(echo -n '{{"alg":"RS256","typ":"JWT","kid":"{KID}"}}' | b64url)
-  PAYLOAD=$(echo -n '{{"iss":"{UID}","sub":"{UID}","aud":"{DOMAIN}","iat":'$IAT',"exp":'$EXP'}}' | b64url)
+  PAYLOAD=$(echo -n '{{"iss":"{UID}","sub":"{UID}","aud":"https://{DOMAIN}","iat":'$IAT',"exp":'$EXP'}}' | b64url)
   SIG=$(echo -n "$HEADER.$PAYLOAD" | openssl dgst -sha256 -sign /tmp/privkey.pem -binary | b64url)
 
   RESPONSE=$(curl -s -X POST "https://{DOMAIN}/oauth/v2/token" \\

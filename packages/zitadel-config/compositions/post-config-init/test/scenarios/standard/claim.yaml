@@ -1,7 +1,7 @@
 apiVersion: zitadel.mojaloop.io/v1alpha1
 kind: XZitadelPostConfigInit
 metadata:
-  name: zitadel-provider-config-claim
+  name: zitadel-post-config-init
 spec:
   parameters:
     # Required parameters
