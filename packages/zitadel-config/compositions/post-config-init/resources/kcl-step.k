@@ -55,8 +55,10 @@ b64url() {{ openssl base64 -e -A | tr -d '=' | tr '+/' '-_'; }}
 
 echo "Starting retry loop for Org ID..."
 for i in $(seq 1 20); do
-  IAT=$(($(date +%s) - 60))
+  # Offset IAT by 5 mins to handle clock skew
+  IAT=$(($(date +%s) - 300))
   EXP=$((IAT + 3600))
+
   HEADER=$(echo -n '{{"alg":"RS256","typ":"JWT","kid":"{KID}"}}' | b64url)
   PAYLOAD=$(echo -n '{{"iss":"{UID}","sub":"{UID}","aud":"https://{DOMAIN}","iat":'$IAT',"exp":'$EXP'}}' | b64url)
   SIG=$(echo -n "$HEADER.$PAYLOAD" | openssl dgst -sha256 -sign /tmp/privkey.pem -binary | b64url)
@@ -75,31 +77,27 @@ for i in $(seq 1 20); do
     if [ -n "$ORG_ID" ]; then
       echo "FOUND_ORG_ID=$ORG_ID"
 
-      # --- K8S SECRET CREATION ---
       K8S_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
       NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
-
-      echo "Creating Secret {OUT_SECRET}..."
-
-      # Encode the Org ID to Base64 for the Secret
       ORG_B64=$(echo -n "$ORG_ID" | base64)
 
-      curl -s -X POST "https://kubernetes.default.svc/api/v1/namespaces/$NAMESPACE/secrets" \\
+      echo "Upserting Secret {OUT_SECRET}..."
+      # Use Server-Side Apply (PATCH) to handle existing secrets gracefully
+      curl -s -X PATCH "https://kubernetes.default.svc/api/v1/namespaces/$NAMESPACE/secrets/{OUT_SECRET}?fieldManager=zitadel-init&force=true" \\
         --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \\
         -H "Authorization: Bearer $K8S_TOKEN" \\
-        -H "Content-Type: application/json" \\
+        -H "Content-Type: application/apply-patch+yaml" \\
         -d @- <<EOF
-{{
-  "apiVersion": "v1",
-  "kind": "Secret",
-  "metadata": {{
-    "name": "{OUT_SECRET}"
-  }},
-  "data": {{
-    "{OUT_KEY}": "$ORG_B64"
-  }}
-}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {OUT_SECRET}
+  namespace: $NAMESPACE
+data:
+  {OUT_KEY}: $ORG_B64
+type: connection.crossplane.io/v1alpha1
 EOF
+      echo "Secret {OUT_SECRET} processed successfully."
       exit 0
     fi
   fi
