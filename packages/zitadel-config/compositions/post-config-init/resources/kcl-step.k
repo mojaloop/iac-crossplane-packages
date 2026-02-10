@@ -82,23 +82,31 @@ for i in $(seq 1 20); do
       ORG_B64=$(echo -n "$ORG_ID" | base64)
 
       echo "Upserting Secret {OUT_SECRET}..."
-      # Use Server-Side Apply (PATCH) to handle existing secrets gracefully
-      curl -s -X PATCH "https://kubernetes.default.svc/api/v1/namespaces/$NAMESPACE/secrets/{OUT_SECRET}?fieldManager=zitadel-init&force=true" \\
-        --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \\
-        -H "Authorization: Bearer $K8S_TOKEN" \\
-        -H "Content-Type: application/apply-patch+yaml" \\
-        -d @- <<EOF
+      cat <<EOF > /tmp/secret-patch.yaml
 apiVersion: v1
 kind: Secret
 metadata:
   name: {OUT_SECRET}
   namespace: $NAMESPACE
+type: Opaque
 data:
   {OUT_KEY}: $ORG_B64
-type: connection.crossplane.io/v1alpha1
 EOF
-      echo "Secret {OUT_SECRET} processed successfully."
-      exit 0
+      HTTP_STATUS=$(curl -s -o /tmp/k8s_resp.json -w "%{{http_code}}" -X PATCH \\
+        "https://kubernetes.default.svc/api/v1/namespaces/$NAMESPACE/secrets/{OUT_SECRET}?fieldManager=zitadel-init&force=true" \\
+        --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \\
+        -H "Authorization: Bearer $K8S_TOKEN" \\
+        -H "Content-Type: application/apply-patch+yaml" \\
+        --data-binary @/tmp/secret-patch.yaml)
+
+      if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 201 ]; then
+        echo "Secret {OUT_SECRET} processed successfully (HTTP $HTTP_STATUS)."
+        exit 0
+      else
+        echo "CRITICAL ERROR: Failed to upsert secret. HTTP Status: $HTTP_STATUS"
+        cat /tmp/k8s_resp.json
+        exit 1
+      fi
     fi
   fi
   echo "Attempt $i failed, retrying..."
