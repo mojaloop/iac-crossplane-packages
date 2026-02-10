@@ -93,6 +93,17 @@ spec:
                         type: string
                         description: |-
                           Key in the secret where the output of the post config init will be stored.
+                  zitadelPostConfigOutputSecret:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: |-
+                          Name of the secret where the output of the post config init will be stored.
+                      key:
+                        type: string
+                        description: |-
+                          Key in the secret where the output of the post config init will be stored.
                   oidcProviderGroupClaimPrefix:
                     type: string
                     description: |-

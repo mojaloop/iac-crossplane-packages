@@ -13,6 +13,9 @@ spec:
     zitadelInitOutputSecret:
       name: "zitadel-org-id-secret"
       key: "zitadel_org_id"
+    zitadelPostConfigOutputSecret:
+      name: "post-config-output"
+      key: "zitadel_admin_human_user_id"
     oidcProviderGroupClaimPrefix: "zitadel:grants"
 
 

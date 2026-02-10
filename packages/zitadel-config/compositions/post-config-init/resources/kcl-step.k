@@ -362,6 +362,30 @@ _zitadelAdminHumanUser = {
 
 _adminUserId = ocds["zitadel-adm-human-user"]?.Resource?.status?.atProvider?.id or ""
 
+_adminUserIdOutputSecret = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-human-admin-id-secret".format(metadata.name)
+        annotations = {"krm.kcl.dev/composition-resource-name": "human-admin-id-secret"}
+    }
+    spec = {
+        forProvider.manifest = {
+            apiVersion = "v1"
+            kind = "Secret"
+            metadata = {
+                name = params.zitadelPostConfigOutputSecret.name
+                namespace = namespace
+            }
+            data = {
+                params.zitadelPostConfigOutputSecret.key = base64.encode(_adminUserId)
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef.name = spec.providerConfigsRef.kubernetesProviderName
+    }
+}
+
 _zitadelInstanceMember = {
     apiVersion = "instance.zitadel.crossplane.io/v1alpha1"
     kind = "Member"
@@ -490,5 +514,5 @@ _zitadelTriggerPreAccessToken = {
     }
 }
 
-_items = [_observe_zitadel_admin_sa, _script_cm, _zitadelPostConfigInit, _job_sa, _job_role, _job_rb, _observe_zitadel_org_secret, _human_admin_password_secret, _zitadelAdminHumanUser, _zitadelInstanceMember, _zitadelOrgMember, _zitadelActionFlatRoles, _zitadelTriggerPreUserInfo, _zitadelTriggerPreAccessToken]
+_items = [_observe_zitadel_admin_sa, _script_cm, _zitadelPostConfigInit, _job_sa, _job_role, _job_rb, _observe_zitadel_org_secret, _human_admin_password_secret, _zitadelAdminHumanUser, _zitadelInstanceMember, _zitadelOrgMember, _zitadelActionFlatRoles, _zitadelTriggerPreUserInfo, _zitadelTriggerPreAccessToken, _adminUserIdOutputSecret]
 items = _items + [oxr]
