@@ -274,6 +274,221 @@ _zitadelPostConfigInit = {
     }
 }
 
+# secret to observe org id
 
-_items = [_observe_zitadel_admin_sa, _script_cm, _zitadelPostConfigInit, _job_sa, _job_role, _job_rb]
+_observe_zitadel_org_secret = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-org-secret-observe".format(metadata.name)
+        annotations = {"krm.kcl.dev/composition-resource-name": "zitadel-org-secret-observe"}
+    }
+    spec = {
+        forProvider.manifest = {
+            apiVersion = "v1"
+            kind = "Secret"
+            metadata = {
+                name = params.zitadelInitOutputSecret.name
+                namespace = namespace
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef.name = spec.providerConfigsRef.kubernetesProviderName
+    }
+}
+
+_orgId = ocds["zitadel-org-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?[params.zitadelInitOutputSecret.key] or ""
+
+# secret to store initial password
+
+_password_raw = "#Password1!"
+
+_human_admin_password_secret = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-human-admin-initial-pass".format(metadata.name)
+        annotations = {"krm.kcl.dev/composition-resource-name": "human-admin-initial-pass"}
+    }
+    spec = {
+        forProvider.manifest = {
+            apiVersion = "v1"
+            kind = "Secret"
+            metadata = {
+                name = "{}-human-admin-initial-pass".format(metadata.name)
+                namespace = namespace
+            }
+            data = {
+                password = base64.encode(_password_raw)
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef.name = spec.providerConfigsRef.kubernetesProviderName
+    }
+}
+
+_zitadelAdminHumanUser = {
+    apiVersion = "human.zitadel.crossplane.io/v1alpha1"
+    kind = "User"
+    metadata = {
+        name = "{}-adm-human-user".format(metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "zitadel-adm-human-user"
+        }
+    }
+    spec = {
+        forProvider = {
+            orgId = _orgId
+            userName = "rootauto@zitadel.{}".format(params.domain)
+            firstName = "root"
+            lastName = "admin"
+            nickName = "admin"
+            displayName = "Zitadel Admin"
+            preferredLanguage = "en"
+            gender = "GENDER_MALE"
+            email = "admin@{}.format(params.domain)"
+            isEmailVerified = True
+            # Human users require a reference to a secret for the initial password
+            initialPasswordSecretRef = {
+                name = "{}-human-admin-initial-pass".format(oxr.metadata.name)
+                key = "password"
+                namespace = namespace
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef.name = spec.providerConfigsRef.zitadelProviderName
+    }
+}
+
+_adminUserId = ocds["zitadel-adm-human-user"]?.Resource?.status?.atProvider?.id or ""
+
+_zitadelInstanceMember = {
+    apiVersion = "instance.zitadel.crossplane.io/v1alpha1"
+    kind = "Member"
+    metadata = {
+        name = "{}-instance-admin-member".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "zitadel-instance-admin-member"
+        }
+    }
+    spec = {
+        forProvider = {
+            userId = _adminUserId
+            roles = ["IAM_OWNER"]
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.zitadelProviderName
+        }
+    }
+}
+
+_zitadelOrgMember = {
+    apiVersion = "org.zitadel.crossplane.io/v1alpha1"
+    kind = "Member"
+    metadata = {
+        name = "{}-admin-user-org-memeber".format(metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "admin-user-org-memeber"
+        }
+    }
+    spec = {
+        forProvider = {
+            orgId = _orgId
+            userId = _adminUserId
+            roles = ["ORG_OWNER"]
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.zitadelProviderName
+        }
+    }
+}
+
+_flatRoleScript = """
+function flatRoles(ctx, api) {{
+    if (ctx.v1.user.grants == undefined || ctx.v1.user.grants.count == 0) {{
+        return;
+    }}
+
+    let grants = [];
+    ctx.v1.user.grants.grants.forEach(claim => {{
+        claim.roles.forEach(role => {{
+            grants.push(claim.projectId + ':' + role)
+        }})
+    }})
+    api.v1.claims.setClaim('{GROUP_CLAIM_REFIX}', grants)
+}}""".format(
+    GROUP_CLAIM_REFIX = params.oidcProviderGroupClaimPrefix
+)
+
+_zitadelActionFlatRoles = {
+    apiVersion = "zitadel.zitadel.crossplane.io/v1alpha1"
+    kind = "Action"
+    metadata = {
+        name = "{}-flat-roles-action".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "flat-roles-action"
+        }
+    }
+    spec = {
+        forProvider = {
+            orgId = _orgId
+            name = "flatRoles"
+            allowedToFail = True
+            timeout = "10s"
+            # Using a multi-line string for the JS script
+            script = _flatRoleScript
+
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef.name = spec.providerConfigsRef.zitadelProviderName
+    }
+}
+
+_actionId = ocds["flat-roles-action"]?.Resource?.status?.atProvider?.id or ""
+
+_zitadelTriggerPreUserInfo = {
+    apiVersion = "trigger.zitadel.crossplane.io/v1alpha1"
+    kind = "Actions"
+    metadata = {
+        name = "{}-pre-userinfo-trigger".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "pre-userinfo-trigger"
+        }
+    }
+    spec = {
+        forProvider = {
+            orgId = _orgId
+            flowType = "FLOW_TYPE_CUSTOMISE_TOKEN"
+            triggerType = "TRIGGER_TYPE_PRE_USERINFO_CREATION"
+            actionIds = [_actionId]
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef.name = spec.providerConfigsRef.zitadelProviderName
+    }
+}
+
+_zitadelTriggerPreAccessToken = {
+    apiVersion = "trigger.zitadel.crossplane.io/v1alpha1"
+    kind = "Actions"
+    metadata = {
+        name = "{}-pre-access-token-trigger".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name" = "pre-access-token-trigger"
+        }
+    }
+    spec = {
+        forProvider = {
+            orgId = _orgId
+            flowType = "FLOW_TYPE_CUSTOMISE_TOKEN"
+            triggerType = "TRIGGER_TYPE_PRE_ACCESS_TOKEN_CREATION"
+            actionIds = [_actionId]
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef.name = spec.providerConfigsRef.zitadelProviderName
+    }
+}
+
+_items = [_observe_zitadel_admin_sa, _script_cm, _zitadelPostConfigInit, _job_sa, _job_role, _job_rb, _observe_zitadel_org_secret, _human_admin_password_secret, _zitadelAdminHumanUser, _zitadelInstanceMember, _zitadelOrgMember, _zitadelActionFlatRoles, _zitadelTriggerPreUserInfo, _zitadelTriggerPreAccessToken]
 items = _items + [oxr]

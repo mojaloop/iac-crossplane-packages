@@ -52,6 +52,10 @@ spec:
                     type: string
                     description: |-
                       The name of the provider config to use for the kubernetes provider.
+                  zitadelProviderName:
+                    type: string
+                    description: |-
+                      The name of the provider config to use for the zitadel provider.
               parameters:
                 type: object
                 properties:
@@ -89,3 +93,8 @@ spec:
                         type: string
                         description: |-
                           Key in the secret where the output of the post config init will be stored.
+                  oidcProviderGroupClaimPrefix:
+                    type: string
+                    description: |-
+                      The prefix to use for the OIDC provider group claims in the generated config.
+                    default: "zitadel:grants"

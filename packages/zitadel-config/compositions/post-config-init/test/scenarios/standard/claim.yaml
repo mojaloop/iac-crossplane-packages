@@ -13,11 +13,12 @@ spec:
     zitadelInitOutputSecret:
       name: "zitadel-org-id-secret"
       key: "zitadel_org_id"
-
+    oidcProviderGroupClaimPrefix: "zitadel:grants"
 
 
   providerConfigsRef:
     kubernetesProviderName: "kubernetes-provider"
+    zitadelProviderName: "zitadel-provider"
 
   managementPolicies:
     - "*"
