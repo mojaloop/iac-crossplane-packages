@@ -162,8 +162,8 @@ _zitadelPostConfigInit = {
                 namespace = namespace
             }
             spec.template.spec = {
-                # Ensure the Job has permission to create secrets
-                # You may need to bind a Role to this default ServiceAccount
+                backoffLimit = "5"
+                ttlSecondsAfterFinished = "300"
                 serviceAccountName = _sa_name
                 containers = [{
                     name = "zitadel-helper"
