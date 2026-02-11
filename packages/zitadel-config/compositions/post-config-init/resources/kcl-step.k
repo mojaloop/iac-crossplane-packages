@@ -297,7 +297,7 @@ _observe_zitadel_org_secret = {
     }
 }
 
-_orgId = ocds["zitadel-org-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?[params.zitadelInitOutputSecret.key] or ""
+_orgId = base64.decode(ocds["zitadel-org-secret-observe"]?.Resource?.status?.atProvider?.manifest?.data?[params.zitadelInitOutputSecret.key]) or ""
 
 # secret to store initial password
 
