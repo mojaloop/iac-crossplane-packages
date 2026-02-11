@@ -322,7 +322,6 @@ _human_admin_password_secret = {
                 password = base64.encode(_password_raw)
             }
         }
-        managementPolicies = spec.managementPolicies
         providerConfigRef.name = spec.providerConfigsRef.kubernetesProviderName
     }
 }
