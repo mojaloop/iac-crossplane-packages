@@ -5,7 +5,6 @@ metadata:
 spec:
   parameters:
     domain: "zitadel.ccinfra05.drpp-onprem.global"
-    serviceAccountName: "zitadel-secret-creator"
     namespace: "zitadel"
     zitadelAdminSecret:
       name: "zitadel-admin-sa"
