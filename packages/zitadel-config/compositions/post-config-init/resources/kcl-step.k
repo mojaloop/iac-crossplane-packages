@@ -338,6 +338,7 @@ _zitadelAdminHumanUser = {
         name = "{}-adm-human-user".format(metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name" = "zitadel-adm-human-user"
+            "upjet.crossplane.io/terraform-ignore-changes" = "initial_password"
         }
     }
     spec = {
