@@ -358,6 +358,8 @@ _zitadelAdminHumanUser = {
                 key = "password"
                 namespace = namespace
             }
+            isPhoneVerified = False
+            phone = ""
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef.name = spec.providerConfigsRef.zitadelProviderName
