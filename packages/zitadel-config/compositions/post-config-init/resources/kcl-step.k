@@ -88,7 +88,7 @@ kind: Secret
 metadata:
   name: {OUT_SECRET}
   namespace: $NAMESPACE
-type: Opaque
+type: "connection.crossplane.io/v1alpha1"
 data:
   {OUT_KEY}: $ORG_B64
 EOF
