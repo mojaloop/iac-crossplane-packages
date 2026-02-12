@@ -271,6 +271,10 @@ _zitadelPostConfigInit = {
             }
         }
         providerConfigRef.name = spec.providerConfigsRef.kubernetesProviderName
+        readiness = {
+            policy = "DeriveFromCelQuery"
+            celQuery = "object.status.conditions.exists(c, c.type == 'Complete' && c.status == 'True')"
+        }
     }
 }
 
