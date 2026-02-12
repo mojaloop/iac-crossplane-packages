@@ -346,7 +346,7 @@ _zitadelAdminHumanUser = {
             displayName = "Zitadel Admin"
             preferredLanguage = "en"
             gender = "GENDER_MALE"
-            email = "admin@{}.format(params.domain)"
+            email = "admin@{}".format(params.domain)
             isEmailVerified = True
             # Human users require a reference to a secret for the initial password
             initialPasswordSecretRef = {
