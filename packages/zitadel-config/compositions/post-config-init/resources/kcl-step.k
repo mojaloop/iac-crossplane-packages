@@ -361,7 +361,7 @@ _zitadelAdminHumanUser = {
                 namespace = namespace
             }
         }
-        managementPolicies = spec.managementPolicies
+        managementPolicies = spec.humanUserManagementPolicies
         providerConfigRef.name = spec.providerConfigsRef.zitadelProviderName
     }
 }

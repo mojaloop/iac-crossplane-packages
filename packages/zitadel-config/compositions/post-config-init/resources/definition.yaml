@@ -41,6 +41,22 @@ spec:
                     - "*"
                   type: string
                 type: array
+              humanUserManagementPolicies:
+                default:
+                  - Observe
+                  - Create
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                  type: string
+                type: array
               providerConfigsRef:
                 type: object
                 description: |-
