@@ -352,7 +352,8 @@ _zitadelAdminHumanUser = {
             gender = "GENDER_MALE"
             email = "admin@{}".format(params.domain)
             isEmailVerified = True
-            # Human users require a reference to a secret for the initial password
+        }
+        initProvider = {
             initialPasswordSecretRef = {
                 name = _secret_name
                 key = "password"
