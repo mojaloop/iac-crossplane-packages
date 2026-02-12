@@ -353,11 +353,6 @@ _zitadelAdminHumanUser = {
             gender = "GENDER_MALE"
             email = "admin@{}".format(params.domain)
             isEmailVerified = True
-            initialPasswordSecretRef = {
-                name = _secret_name
-                key = "password"
-                namespace = namespace
-            }
             isPhoneVerified = False
             phone = ""
         }
