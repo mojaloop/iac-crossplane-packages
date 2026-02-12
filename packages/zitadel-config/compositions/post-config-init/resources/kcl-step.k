@@ -302,6 +302,7 @@ _orgId = base64.decode(ocds["zitadel-org-secret-observe"]?.Resource?.status?.atP
 # secret to store initial password
 
 _password_raw = "#Password1!"
+_secret_name = "zitadel-human-admin-initial-password"
 
 _human_admin_password_secret = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -315,7 +316,7 @@ _human_admin_password_secret = {
             apiVersion = "v1"
             kind = "Secret"
             metadata = {
-                name = "{}-human-admin-initial-pass".format(metadata.name)
+                name = _secret_name
                 namespace = namespace
             }
             data = {
@@ -349,7 +350,7 @@ _zitadelAdminHumanUser = {
             isEmailVerified = True
             # Human users require a reference to a secret for the initial password
             initialPasswordSecretRef = {
-                name = "{}-human-admin-initial-pass".format(oxr.metadata.name)
+                name = _secret_name
                 key = "password"
                 namespace = namespace
             }
