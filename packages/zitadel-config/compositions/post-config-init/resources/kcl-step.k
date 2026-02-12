@@ -378,7 +378,7 @@ _adminUserIdOutputSecret = {
                 namespace = namespace
             }
             data = {
-                params.zitadelPostConfigOutputSecret.key = base64.encode(_adminUserId)
+                (params.zitadelPostConfigOutputSecret.key) = base64.encode(_adminUserId)
             }
         }
         managementPolicies = spec.managementPolicies
