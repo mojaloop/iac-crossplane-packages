@@ -338,7 +338,6 @@ _zitadelAdminHumanUser = {
         name = "{}-adm-human-user".format(metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name" = "zitadel-adm-human-user"
-            "upjet.crossplane.io/terraform-ignore-changes" = '{ "paths": ["spec.forProvider.initialPasswordSecretRef"] }'
         }
     }
     spec = {
@@ -353,6 +352,11 @@ _zitadelAdminHumanUser = {
             gender = "GENDER_MALE"
             email = "admin@{}".format(params.domain)
             isEmailVerified = True
+            if not params.isExistingUser: initialPasswordSecretRef = {
+                name = _secret_name
+                key = "password"
+                namespace = namespace
+            }
             isPhoneVerified = False
             phone = ""
         }
@@ -360,6 +364,7 @@ _zitadelAdminHumanUser = {
         providerConfigRef.name = spec.providerConfigsRef.zitadelProviderName
     }
 }
+
 
 _adminUserId = ocds["zitadel-adm-human-user"]?.Resource?.status?.atProvider?.id or ""
 

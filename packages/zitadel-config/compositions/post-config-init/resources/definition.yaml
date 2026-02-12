@@ -67,6 +67,11 @@ spec:
                     type: string
                     description: |-
                       The namespace of zitadel instance.
+                  isExistingUser:
+                    type: boolean
+                    description: |-
+                      Whether the post config init should use an existing human user or create a new one.
+                    default: false
                   zitadelAdminSecret:
                     type: object
                     properties:
