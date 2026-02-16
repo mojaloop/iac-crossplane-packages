@@ -84,6 +84,7 @@ _MysqlCluster = {
                                             storage = parameters?.pxc?.storageSize
                                         }
                                     }
+                                    storageClassName = parameters?.pxc?.volumeSpec?.persistentVolumeClaim?.storageClassName
                                 }
                             }
 
