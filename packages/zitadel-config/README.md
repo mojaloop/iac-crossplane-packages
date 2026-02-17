@@ -20,6 +20,7 @@ spec:
 This package includes the following compositions:
 
 1. [ZitadelProviderConfig](compositions/zitadel-provider-config/README.md)
+2. [PostConfigInit](compositions/post-config-init/README.md)
 
 ## Usage
 
