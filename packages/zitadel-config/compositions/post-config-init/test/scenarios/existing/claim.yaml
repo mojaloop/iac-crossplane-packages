@@ -1,0 +1,27 @@
+apiVersion: zitadel.mojaloop.io/v1alpha1
+kind: XZitadelPostConfigInit
+metadata:
+  name: postconfig-init
+spec:
+  parameters:
+    domain: "zitadel.ccinfra05.drpp-onprem.global"
+    namespace: "zitadel"
+    isExistingUser: True
+    zitadelAdminSecret:
+      name: "zitadel-admin-sa"
+      key: "zitadel-admin-sa.json"
+    zitadelInitOutputSecret:
+      name: "zitadel-org-id-secret"
+      key: "zitadel_org_id"
+    zitadelPostConfigOutputSecret:
+      name: "post-config-output"
+      key: "zitadel_admin_human_user_id"
+    oidcProviderGroupClaimPrefix: "zitadel:grants"
+
+
+  providerConfigsRef:
+    kubernetesProviderName: "kubernetes-provider"
+    zitadelProviderName: "zitadel-provider"
+
+  managementPolicies:
+    - "*"

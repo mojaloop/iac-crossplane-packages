@@ -1,0 +1,26 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: zitadelpostconfiginit
+  labels:
+    crossplane.io/xrd: xzitadelpostconfiginit.zitadel.mojaloop.io
+spec:
+  compositeTypeRef:
+    apiVersion: zitadel.mojaloop.io/v1alpha1
+    kind: XZitadelPostConfigInit
+  mode: Pipeline
+  pipeline:
+
+    - step: kcl
+      functionRef:
+        name: function-kcl
+      input:
+        apiVersion: krm.kcl.dev/v1alpha1
+        kind: KCLInput
+        spec:
+          source: |
+            $KCL_FUNCTION_CODE
+
+    - step: automatically-detect-ready-composed-resources
+      functionRef:
+        name: function-auto-ready
