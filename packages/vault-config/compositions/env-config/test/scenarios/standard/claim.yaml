@@ -7,6 +7,7 @@ spec:
     environments: "dev,staging,prod"
     kvPath: "secret"
     envTokenTTL: "14d"
+    namespace: "vault"
   providerConfigsRef:
     vaultProvider: provider-vault
     kubernetesProvider: provider-kubernetes
