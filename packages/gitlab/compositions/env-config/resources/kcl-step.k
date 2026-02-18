@@ -79,7 +79,7 @@ _projectAccessTokens = [{
             name = spec?.providerConfigsRef?.gitlabProvider
         }
         writeConnectionSecretToRef = {
-            name = "{}-repo-secret".format(projectName)
+            name = "{}-project-access-token".format(projectName)
             namespace = parameters?.namespace
         }
     }
@@ -121,9 +121,9 @@ _observe_repo_secret = [{
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "{}-repo-secret-observe".format(projectName)
+        name = "{}-project-access-token-observe".format(projectName)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "repo-secret-observe-{}".format(projectName)
+            "krm.kcl.dev/composition-resource-name": "project-access-token-observe-{}".format(projectName)
         }
     }
     spec = {
@@ -132,7 +132,7 @@ _observe_repo_secret = [{
                 apiVersion = "v1"
                 kind = "Secret"
                 metadata = {
-                    name = "{}-repo-secret".format(projectName)
+                    name = "{}-project-access-token".format(projectName)
                     namespace = parameters?.namespace
                 }
             }
@@ -146,7 +146,7 @@ _observe_repo_secret = [{
 ]
 
 _repo_tokens = {
-  projectName: base64.decode(ocds["repo-secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["token"]) or ""
+  projectName: base64.decode(ocds["project-access-token-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["token"]) or ""
   for projectName in _environments or []
 }
 
@@ -172,7 +172,7 @@ _repoSecrets = [{
                     "argocd.argoproj.io/secret-type" = "repo-creds"
                 }
                 data = {
-                    "password"  = ocds["repo-secret-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["token"]
+                    "password"  = ocds["project-access-token-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["token"]
                     "url"       = base64.encode(ocds["project-{}".format(projectName)]?.Resource?.status?.atProvider?.httpUrlToRepo)
                     "type"      = base64.encode("git")
                     "project"   = base64.encode("default")
