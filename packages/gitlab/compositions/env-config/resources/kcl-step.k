@@ -204,7 +204,7 @@ _k8sObserveSecret = [{
                 kind = "Secret"
                 metadata = {
                     name = "env-token-secret-{}".format(projectName)
-                    namespace = projectName
+                    namespace = parameters.vaultNamespace
                 }
             }
         }
