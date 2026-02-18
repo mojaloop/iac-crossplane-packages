@@ -340,7 +340,7 @@ _vaultTokenUpdateJobs = [{
                             ""
                             )
                     )
-                    namespace = projectName
+                    namespace = parameters.namespace
                 }
                 spec = {
                     backoffLimit = 1
