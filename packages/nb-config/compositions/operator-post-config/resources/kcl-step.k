@@ -123,13 +123,27 @@ _nb_network_resource = {
 
 # Add the resources to the items list
 _items += [
-    _hostport_class,
-    _nb_network_resource
+    _hostport_class
 ]
+if readyBasedOnConditions(ocds["hostport-class"]):
+    _items += [_hostport_claims]
 
-# Add the routing peers and hostport claims
-_items += _nb_routing_peers
-_items += _hostport_claims
+_all_hostport_claims_ready = all_true([
+    readyBasedOnConditions(ocds.get("hostport-claim-{}".format(i), {})) 
+    for i in _hostport_claims
+])
+
+if _all_hostport_claims_ready:
+    _items += [_nb_routing_peers]
+
+# Check if all nb-routing-peers are ready
+_all_nb_routing_peers_ready = all_true([
+    readyBasedOnConditions(ocds.get("nb-routing-peer-{}".format(i), {})) 
+    for i in _router_indices
+])
+
+if _all_nb_routing_peers_ready:
+    _items += [_nb_network_resource]
 
 dxr = {
   **oxr
