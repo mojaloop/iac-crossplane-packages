@@ -261,7 +261,7 @@ if parameters.accessToken.destinationType == "sc":
         metadata = {
             name = "{}-sc-nb-operator-kyverno-policy-install".format(oxr.metadata.name)
             annotations = {
-                "krm.kcl.dev/composition-resource-name": "sc-nb-operator-policy-kyverno-install"
+                "krm.kcl.dev/composition-resource-name" = "sc-nb-operator-policy-kyverno-install"
             }
         }
         spec = {
@@ -272,8 +272,8 @@ if parameters.accessToken.destinationType == "sc":
                     metadata = {
                         name = "nbrouter-add-security-context"
                         annotations = {
-                            "policies.kyverno.io/title": "Add security context to nbrouter deployment"
-                            "policies.kyverno.io/description": "This policy updates pod security context of nbrouter deployment"
+                            "policies.kyverno.io/title" = "Add security context to nbrouter deployment"
+                            "policies.kyverno.io/description" = "This policy updates pod security context of nbrouter deployment"
                         }
                     }
                     spec = {
@@ -288,7 +288,7 @@ if parameters.accessToken.destinationType == "sc":
                                                 namespaces = [parameters.operatorNamespace]
                                                 selector = {
                                                     matchLabels = {
-                                                        "app.kubernetes.io/name": "netbird-router"
+                                                        "app.kubernetes.io/name" = "netbird-router"
                                                     }
                                                 }
                                             }
@@ -312,29 +312,45 @@ if parameters.accessToken.destinationType == "sc":
                                     }
                                 ]
                                 mutate = {
-                                    patchesJson6902 = """
-        - op: add
-        path: /metadata/annotations/claim.hostport.rmb938.com~1router
-        value: "netbird-{{ request.object.metadata.ownerReferences[0].name | split(@, '-') | [0:-1] | join('-', @) }}"
-        # Inject the ACTUAL port into the spec immediately
-        - op: add
-        path: "/spec/containers/0/ports"
-        value: 
-        - name: router
-            containerPort: 51820
-            hostPort: {{ hostport }}
-            protocol: UDP
-        - op: add
-        path: "/spec/containers/0/env/-"
-        value: {"name": "NB_EXTERNAL_IP", "valueFrom": {"fieldRef": {"fieldPath": "status.hostIP"}}}
-        # Static injection of the port into the ENV (more reliable than fieldRef for annotations)
-        - op: add
-        path: "/spec/containers/0/env/-"
-        value: {"name": "NB_LISTEN_PORT", "value": "{{ hostport }}"}
-        - op: add
-        path: "/spec/securityContext"
-        value: {"sysctls": [{"name": "net.ipv4.ip_forward", "value": "1"}]}
-        """
+                                    patchStrategicMerge = {
+                                        spec = {
+                                            containers = [
+                                                {
+                                                    name = "*"
+                                                    ports = [
+                                                        {
+                                                            name = "router"
+                                                            containerPort = 51820
+                                                            hostPort = "{{ hostport }}"
+                                                            protocol = "UDP"
+                                                        }
+                                                    ]
+                                                    env = [
+                                                        {
+                                                            name = "NB_EXTERNAL_IP"
+                                                            valueFrom = {
+                                                                fieldRef = {
+                                                                    fieldPath = "status.hostIP"
+                                                                }
+                                                            }
+                                                        }
+                                                        {
+                                                            name = "NB_LISTEN_PORT"
+                                                            value = "{{ hostport }}"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                            securityContext = {
+                                                sysctls = [
+                                                    {
+                                                        name = "net.ipv4.ip_forward"
+                                                        value = "1"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
                                 }
                                 preconditions = {
                                     "all" = [
