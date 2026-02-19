@@ -305,6 +305,10 @@ _vaultTokenUpdateJobs = [{
         providerConfigRef = {
             name = spec?.providerConfigsRef?.kubernetesProvider
         }
+        readiness = {
+            policy = "DeriveFromCelQuery"
+            celQuery = "object.status.conditions.exists(c, c.type == 'Complete' && c.status == 'True')"
+        }
     }
 } for projectName in _environments or []
 ]
