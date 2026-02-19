@@ -276,7 +276,7 @@ _vaultTokenUpdateJobs = [{
                         projectName,
                         crypto.sha256(_envVaulttokens[projectName])[:10]
                     )
-                    namespace = parameters.namespace
+                    namespace = projectName
                 }
                 spec = {
                     backoffLimit = 1
