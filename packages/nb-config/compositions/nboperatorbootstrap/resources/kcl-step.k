@@ -214,7 +214,7 @@ if parameters.accessToken.destinationType == "sc":
                     metadata = {
                         name = parameters.operatorNamespace
                         labels = {
-                            "hostport.rmb938.com": True
+                            "hostport.rmb938.com": "true"
                         }
                     }
                 }
