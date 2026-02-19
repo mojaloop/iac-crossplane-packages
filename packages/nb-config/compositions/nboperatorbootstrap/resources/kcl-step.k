@@ -213,6 +213,9 @@ if parameters.accessToken.destinationType == "sc":
                     kind = "Namespace"
                     metadata = {
                         name = parameters.operatorNamespace
+                        labels = {
+                            "hostport.rmb938.com": True
+                        }
                     }
                 }
             }
@@ -268,7 +271,6 @@ if parameters.accessToken.destinationType == "sc":
                     kind = "ClusterPolicy"
                     metadata = {
                         name = "nbrouter-add-security-context"
-                        namespace = parameters.operatorNamespace
                         annotations = {
                             "policies.kyverno.io/title": "Add security context to nbrouter deployment"
                             "policies.kyverno.io/description": "This policy updates pod security context of nbrouter deployment"
@@ -282,12 +284,8 @@ if parameters.accessToken.destinationType == "sc":
                                     "any" = [
                                         {
                                             resources = {
-                                                kinds = [
-                                                    "Pod"
-                                                ]
-                                                namespaces = [
-                                                    parameters.operatorNamespace
-                                                ]
+                                                kinds = ["Pod"]
+                                                namespaces = [parameters.operatorNamespace]
                                                 selector = {
                                                     matchLabels = {
                                                         "app.kubernetes.io/name": "netbird-router"
@@ -297,24 +295,51 @@ if parameters.accessToken.destinationType == "sc":
                                         }
                                     ]
                                 }
-                                mutate = {
-                                    patchStrategicMerge = {
-                                        spec = {
-                                            securityContext = {
-                                                sysctls = [
-                                                    {
-                                                        name = "net.ipv4.ip_forward"
-                                                        value = "1"
-                                                    }
-                                                ]
-                                            }
+                                context = [
+                                    {
+                                        name = "hostportclaim"
+                                        apiCall = {
+                                            urlPath = "/apis/hostport.rmb938.com/v1alpha1/namespaces/{{ request.namespace }}/hostportclaims/netbird-{{ request.object.metadata.ownerReferences[0].name | split(@, '-') | [0:-1] | join('-', @) }}"
+                                            jmesPath = "spec.hostPortName"
                                         }
                                     }
+                                    {
+                                        name = "hostport"
+                                        apiCall = {
+                                            urlPath = "/apis/hostport.rmb938.com/v1alpha1/hostports/{{ hostportclaim }}"
+                                            jmesPath = "status.port"
+                                        }
+                                    }
+                                ]
+                                mutate = {
+                                    patchesJson6902 = """
+        - op: add
+        path: /metadata/annotations/claim.hostport.rmb938.com~1router
+        value: "netbird-{{ request.object.metadata.ownerReferences[0].name | split(@, '-') | [0:-1] | join('-', @) }}"
+        # Inject the ACTUAL port into the spec immediately
+        - op: add
+        path: "/spec/containers/0/ports"
+        value: 
+        - name: router
+            containerPort: 51820
+            hostPort: {{ hostport }}
+            protocol: UDP
+        - op: add
+        path: "/spec/containers/0/env/-"
+        value: {"name": "NB_EXTERNAL_IP", "valueFrom": {"fieldRef": {"fieldPath": "status.hostIP"}}}
+        # Static injection of the port into the ENV (more reliable than fieldRef for annotations)
+        - op: add
+        path: "/spec/containers/0/env/-"
+        value: {"name": "NB_LISTEN_PORT", "value": "{{ hostport }}"}
+        - op: add
+        path: "/spec/securityContext"
+        value: {"sysctls": [{"name": "net.ipv4.ip_forward", "value": "1"}]}
+        """
                                 }
                                 preconditions = {
-                                    "any" = [
+                                    "all" = [
                                         {
-                                            key = "{{request.operation}}"
+                                            key = "{{ request.operation }}"
                                             operator = "In"
                                             value = ["CREATE", "UPDATE"]
                                         }
