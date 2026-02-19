@@ -156,8 +156,36 @@ _repoSecrets = [{
 } for projectName in _environments or []
 ]
 
+_VaultEnvTokenObserveSecret = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "vault-env-token-observe-{}".format(projectName)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "vault-env-token-observe-{}".format(projectName)
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = "env-token-secret-{}".format(projectName)
+                    namespace = projectName
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProvider
+        }
+    }
+}for projectName in _environments or []
+]
+
 _envVaulttokens = {
-  projectName: base64.decode(ocds["env-token-secret-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"]) or ""
+  projectName: base64.decode(ocds["vault-env-token-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["attribute.client_token"]) or ""
   for projectName in _environments or []
 }
 

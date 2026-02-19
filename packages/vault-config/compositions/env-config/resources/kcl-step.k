@@ -143,7 +143,7 @@ _envTokens = [{
         }
         writeConnectionSecretToRef = {
             name = "env-token-secret-{}".format(env)
-            namespace = parameters.namespace
+            namespace = env
         }
     }
 
@@ -166,7 +166,7 @@ _k8sObserveSecret = [{
                 kind = "Secret"
                 metadata = {
                     name = "env-token-secret-{}".format(env)
-                    namespace = parameters.namespace
+                    namespace = env
                 }
             }
         }
@@ -201,7 +201,7 @@ _k8sSecrets = [{
                 kind = "Secret"
                 metadata = {
                     name = "env-token-k8secret-{}".format(env)
-                    namespace = parameters.namespace
+                    namespace = env
                 }
                 data = {
                     "credentials" = base64.encode(json.encode(_jsonPayload[env]))
@@ -231,7 +231,7 @@ _envTokenSecrets = [{
             dataJsonSecretRef = {
                 key = "credentials"
                 name = "env-token-k8secret-{}".format(env)
-                namespace = parameters.namespace
+                namespace = env
             }
             deleteAllVersions = True
             path = "{}/{}/env_token".format(parameters.kvPath, env)

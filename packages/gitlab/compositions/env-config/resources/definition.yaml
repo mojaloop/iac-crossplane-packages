@@ -87,11 +87,6 @@ spec:
                     description: |-
                       The namespace where argocd is installed, to create the repo creds for argocd repository sync
                     default: argocd
-                  vaultNamespace:
-                    type: string
-                    description: |-
-                      The namespace of vault instance to create the secrets in.
-                    default: vault
                   environments:
                     type: string
                     description: |-
