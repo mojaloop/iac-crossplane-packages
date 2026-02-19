@@ -81,7 +81,7 @@ _projectAccessTokens = [{
         }
         writeConnectionSecretToRef = {
             name = "{}-project-access-token".format(projectName)
-            namespace = parameters?.namespace
+            namespace = projectName
         }
     }
 
@@ -164,7 +164,7 @@ _projectTokenObserveSecrets = [{
                 kind = "Secret"
                 metadata = {
                     name = "{}-project-access-token".format(projectName)
-                    namespace = parameters?.namespace # Ensure this matches where AccessToken wrote the secret
+                    namespace = projectName
                 }
             }
         }
