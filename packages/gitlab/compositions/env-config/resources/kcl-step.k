@@ -148,13 +148,13 @@ _envNamespaces = [{
 } for projectName in _environments or []
 ]
 
-_repoSecrets = [{
+_projectTokenObserveSecrets = [{
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "{}-repo-creds".format(projectName)
+        name = "project-token-observe-{}".format(projectName)
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "repo-creds-{}".format(projectName)
+            "krm.kcl.dev/composition-resource-name": "project-token-observe-{}".format(projectName)
         }
     }
     spec = {
@@ -163,14 +163,46 @@ _repoSecrets = [{
                 apiVersion = "v1"
                 kind = "Secret"
                 metadata = {
-                    name = "{}-repo-creds".format(projectName)
+                    name = "{}-project-access-token".format(projectName)
+                    namespace = parameters?.namespace # Ensure this matches where AccessToken wrote the secret
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.kubernetesProvider
+        }
+    }
+} for projectName in _environments or []]
+
+_projectTokens = {
+    projectName: ocds["project-token-observe-{}".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?.token or ""
+    for projectName in _environments or []
+}
+
+_repoSecrets = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-repo-secret".format(projectName)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "repo-secret-{}".format(projectName)
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = "{}-repo-secret".format(projectName)
                     namespace = parameters?.argocdNamespace
                 }
                 labels = {
                     "argocd.argoproj.io/secret-type" = "repo-creds"
                 }
                 data = {
-                    "password"  = ocds["{}-project-access-token".format(projectName)]?.Resource?.status?.atProvider?.manifest?.data?["token"]
+                    "password"  = _projectTokens[projectName]
                     "url"       = base64.encode(ocds["project-{}".format(projectName)]?.Resource?.status?.atProvider?.httpUrlToRepo)
                     "type"      = base64.encode("git")
                     "project"   = base64.encode("default")
@@ -372,7 +404,7 @@ _vaultTokenUpdateJobs = [{
 ]
 
 
-_items += _envNamespaces + _environmentProjects + _projectAccessTokens + _groupVariables + _repoSecrets + _vaultTokenUpdateJobs
+_items += _envNamespaces + _environmentProjects + _projectAccessTokens + _projectTokenObserveSecrets + _groupVariables + _repoSecrets + _vaultTokenUpdateJobs
 
 dxr = {
     **oxr
