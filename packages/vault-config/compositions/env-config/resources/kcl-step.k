@@ -1,5 +1,6 @@
 import base64
 import json
+import crypto
 # Read the XR and the OCDs
 oxr = option("params").oxr
 ocds = option("params").ocds
@@ -185,13 +186,19 @@ _jsonPayload = {
     for env in _environments or []
 }
 
+_payloadHash = {
+    env: crypto.sha256(json.encode(_jsonPayload[env]))[:8] # First 8 chars of hash
+    for env in _environments or []
+}
+
+
 _k8sSecrets = [{
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "env-token-k8secret-{}".format(env)
+        name = "env-token-k8secret-{}-{}".format(env, _payloadHash[env])
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "env-token-k8secret-{}".format(env)
+            "krm.kcl.dev/composition-resource-name": "env-token-k8secret-{}-{}".format(env, _payloadHash[env])
         }
     }
     spec = {
@@ -200,7 +207,7 @@ _k8sSecrets = [{
                 apiVersion = "v1"
                 kind = "Secret"
                 metadata = {
-                    name = "env-token-k8secret-{}".format(env)
+                    name = "env-token-k8secret-{}-{}".format(env, _payloadHash[env])
                     namespace = env
                 }
                 data = {
@@ -230,7 +237,7 @@ _envTokenSecrets = [{
         forProvider = {
             dataJsonSecretRef = {
                 key = "credentials"
-                name = "env-token-k8secret-{}".format(env)
+                name = "env-token-k8secret-{}-{}".format(env, _payloadHash[env])
                 namespace = env
             }
             deleteAllVersions = True

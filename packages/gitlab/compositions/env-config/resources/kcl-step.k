@@ -397,7 +397,7 @@ _vaultTokenUpdateJobs = [{
         }
         readiness = {
             policy = "DeriveFromCelQuery"
-            celQuery = "object.status.conditions.exists(c, c.type == 'Complete' && c.status == 'True')"
+            celQuery = "has(object.status.conditions) && object.status.conditions.exists(c, c.type == 'Complete' && c.status == 'True')"
         }
     }
 } for projectName in _environments or []
