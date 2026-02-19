@@ -118,6 +118,36 @@ _groupVariables = [ {
 } for variable in parameters?.groupVariables or []
 ]
 
+_envNamespaces = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-namespace".format(projectName)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "namespace-{}".format(projectName)
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Namespace"
+                metadata = {
+                    name = projectName
+                }
+                annotations = {
+                    "name" = projectName
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.kubernetesProvider
+        }
+    }
+} for projectName in _environments or []
+]
+
 _repoSecrets = [{
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
@@ -342,7 +372,7 @@ _vaultTokenUpdateJobs = [{
 ]
 
 
-_items += _environmentProjects + _projectAccessTokens + _groupVariables + _repoSecrets + _vaultTokenUpdateJobs
+_items += _envNamespaces + _environmentProjects + _projectAccessTokens + _groupVariables + _repoSecrets + _vaultTokenUpdateJobs
 
 dxr = {
     **oxr
