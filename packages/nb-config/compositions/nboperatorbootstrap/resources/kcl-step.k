@@ -314,7 +314,7 @@ if parameters.accessToken.destinationType == "sc":
                                     }
                                 ]
                                 mutate = {
-                                    patchesJson6902 = "- op: add\n  path: \"/spec/containers/0/ports\"\n  value: \n   - name: router\n     containerPort: 51820\n     hostPort: {{ hostport }}\n     protocol: UDP\n- op: add\n  path: \"/spec/containers/0/env/-\"\n  value: {\"name\": \"NB_EXTERNAL_IP\", \"valueFrom\": {\"fieldRef\": {\"fieldPath\": \"status.hostIP\"}}}\n- op: add\n  path: \"/spec/containers/0/env/-\"\n  value: {\"name\": \"NB_LISTEN_PORT\", \"value\": \"{{ hostport }}\"}\n- op: add\n  path: \"/spec/securityContext\"\n  value: {\"sysctls\": [{\"name\": \"net.ipv4.ip_forward\", \"value\": \"1\"}]}"
+                                    patchesJson6902 = "- op: add\n  path: \"/spec/containers/0/ports\"\n  value: \n   - name: router\n     containerPort: 51820\n     hostPort: {{ hostport }}\n     protocol: UDP\n- op: add\n  path: \"/spec/containers/0/env/-\"\n  value: {\"name\": \"NB_EXTERNAL_IP\", \"valueFrom\": {\"fieldRef\": {\"fieldPath\": \"status.hostIP\"}}}\n- op: add\n  path: \"/spec/containers/0/env/-\"\n  value: {\"name\": \"NB_LISTEN_PORT\", \"value\": \"{{ hostport }}\"}\n- op: add\n  path: \"/spec/containers/0/securityContext\"\n  value: {\"privileged\": true}\n- op: add\n  path: \"/spec/securityContext\"\n  value: {\"sysctls\": [{\"name\": \"net.ipv4.ip_forward\", \"value\": \"1\"}]}"
                                 }
                                 preconditions = {
                                     "all" = [
