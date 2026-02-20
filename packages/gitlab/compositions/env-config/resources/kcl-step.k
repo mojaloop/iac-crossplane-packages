@@ -64,6 +64,7 @@ _projectAccessTokens = [{
 
     }
     spec = {
+        deletionPolicy = "Orphan"
         forProvider = {
             projectIdSelector = {
                 matchLabels = {
