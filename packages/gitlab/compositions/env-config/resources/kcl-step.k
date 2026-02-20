@@ -335,14 +335,14 @@ _vaultTokenUpdateJobs = [{
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "{}-envtoken-renew-job-{}".format(
+        name = "{}-envtokenrenew-{}".format(
             projectName,
-            crypto.sha256(_envVaulttokens[projectName] + _scriptContent(_projectIds[projectName]))[:10]
+            crypto.sha256(_envVaulttokens[projectName] + _scriptContent(_projectIds[projectName]))[:15]
         )
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "{}-envtoken-renew-job-{}".format(
+            "krm.kcl.dev/composition-resource-name": "{}-envtokenrenew-{}".format(
                 projectName,
-                crypto.sha256(_envVaulttokens[projectName] + _scriptContent(_projectIds[projectName]))[:10]
+                crypto.sha256(_envVaulttokens[projectName] + _scriptContent(_projectIds[projectName]))[:15]
             )
         }
     }
@@ -352,9 +352,9 @@ _vaultTokenUpdateJobs = [{
                 apiVersion = "batch/v1"
                 kind = "Job"
                 metadata = {
-                    name = "{}-envtoken-renew-job-{}".format(
+                    name = "{}-envtokenrenew-{}".format(
                         projectName,
-                        crypto.sha256(_envVaulttokens[projectName] + _scriptContent(_projectIds[projectName]))[:10]
+                        crypto.sha256(_envVaulttokens[projectName] + _scriptContent(_projectIds[projectName]))[:15]
                     )
                     namespace = projectName
                 }
