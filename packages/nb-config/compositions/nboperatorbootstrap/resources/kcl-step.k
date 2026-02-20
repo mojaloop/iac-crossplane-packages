@@ -14,6 +14,8 @@ readyBasedOnConditions = lambda o: any -> bool {
     # Simply check if all conditions are True
     len(conditions) > 0 and all_true([c.status == "True" for c in conditions])
 }
+# Define router indices
+_router_indices = [1, 2, 3]
 
 _zitadel_project_id_secret = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -213,6 +215,9 @@ if parameters.accessToken.destinationType == "sc":
                     kind = "Namespace"
                     metadata = {
                         name = parameters.operatorNamespace
+                        labels = {
+                            "hostport.rmb938.com": "true"
+                        }
                     }
                 }
             }
@@ -258,7 +263,7 @@ if parameters.accessToken.destinationType == "sc":
         metadata = {
             name = "{}-sc-nb-operator-kyverno-policy-install".format(oxr.metadata.name)
             annotations = {
-                "krm.kcl.dev/composition-resource-name": "sc-nb-operator-policy-kyverno-install"
+                "krm.kcl.dev/composition-resource-name" = "sc-nb-operator-policy-kyverno-install"
             }
         }
         spec = {
@@ -268,10 +273,9 @@ if parameters.accessToken.destinationType == "sc":
                     kind = "ClusterPolicy"
                     metadata = {
                         name = "nbrouter-add-security-context"
-                        namespace = parameters.operatorNamespace
                         annotations = {
-                            "policies.kyverno.io/title": "Add security context to nbrouter deployment"
-                            "policies.kyverno.io/description": "This policy updates pod security context of nbrouter deployment"
+                            "policies.kyverno.io/title" = "Add security context to nbrouter deployment"
+                            "policies.kyverno.io/description" = "This policy updates pod security context of nbrouter deployment"
                         }
                     }
                     spec = {
@@ -282,39 +286,40 @@ if parameters.accessToken.destinationType == "sc":
                                     "any" = [
                                         {
                                             resources = {
-                                                kinds = [
-                                                    "Pod"
-                                                ]
-                                                namespaces = [
-                                                    parameters.operatorNamespace
-                                                ]
+                                                kinds = ["Pod"]
+                                                namespaces = [parameters.operatorNamespace]
                                                 selector = {
                                                     matchLabels = {
-                                                        "app.kubernetes.io/name": "netbird-router"
+                                                        "app.kubernetes.io/name" = "netbird-router"
                                                     }
                                                 }
                                             }
                                         }
                                     ]
                                 }
-                                mutate = {
-                                    patchStrategicMerge = {
-                                        spec = {
-                                            securityContext = {
-                                                sysctls = [
-                                                    {
-                                                        name = "net.ipv4.ip_forward"
-                                                        value = "1"
-                                                    }
-                                                ]
-                                            }
+                                context = [
+                                    {
+                                        name = "hostportclaim"
+                                        apiCall = {
+                                            urlPath = "/apis/hostport.rmb938.com/v1alpha1/namespaces/{{ request.namespace }}/hostportclaims/netbird-{{ request.object.metadata.ownerReferences[0].name | split(@, '-') | [0:-1] | join('-', @) }}"
+                                            jmesPath = "spec.hostPortName"
                                         }
                                     }
+                                    {
+                                        name = "hostport"
+                                        apiCall = {
+                                            urlPath = "/apis/hostport.rmb938.com/v1alpha1/hostports/{{ hostportclaim }}"
+                                            jmesPath = "status.port"
+                                        }
+                                    }
+                                ]
+                                mutate = {
+                                    patchesJson6902 = "- op: add\n  path: \"/spec/containers/0/ports\"\n  value: \n   - name: router\n     containerPort: 51820\n     hostPort: {{ hostport }}\n     protocol: UDP\n- op: add\n  path: \"/spec/containers/0/env/-\"\n  value: {\"name\": \"NB_EXTERNAL_IP\", \"valueFrom\": {\"fieldRef\": {\"fieldPath\": \"status.hostIP\"}}}\n- op: add\n  path: \"/spec/containers/0/env/-\"\n  value: {\"name\": \"NB_LISTEN_PORT\", \"value\": \"{{ hostport }}\"}\n- op: add\n  path: \"/spec/containers/0/securityContext\"\n  value: {\"privileged\": true}\n- op: add\n  path: \"/spec/securityContext\"\n  value: {\"sysctls\": [{\"name\": \"net.ipv4.ip_forward\", \"value\": \"1\"}]}"
                                 }
                                 preconditions = {
-                                    "any" = [
+                                    "all" = [
                                         {
-                                            key = "{{request.operation}}"
+                                            key = "{{ request.operation }}"
                                             operator = "In"
                                             value = ["CREATE", "UPDATE"]
                                         }
@@ -424,6 +429,108 @@ if parameters.accessToken.destinationType == "sc":
             }
         }
     }
+
+    _nb_router_peers = [{
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "nb-router-peer-{}".format(i)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "nb-router-peer-{}".format(i)
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "netbird.io/v1"
+                    kind = "NBRoutingPeer"
+                    metadata = {
+                        name = "router-{}".format(i)
+                        namespace = parameters.operatorNamespace
+                        finalizers = ["netbird.io/cleanup"]
+                        labels = {
+                            "app.kubernetes.io/component": "operator"
+                            "app.kubernetes.io/instance": "netbird-operator"
+                            "app.kubernetes.io/name": "kubernetes-operator"
+                        }
+                    }
+                    spec = {
+                        replicas = 1
+                    }
+                }
+            }
+            managementPolicies = spec?.managementPolicies
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.scK8sProviderName
+            }
+        }
+    } for i in _router_indices]
+
+    # Create HostPortClaim resources for each router
+
+    _hostport_claims = [{
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "sc-hostport-claim-{}".format(i)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "sc-hostport-claim-{}".format(i)
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "hostport.rmb938.com/v1alpha1"
+                    kind = "HostPortClaim"
+                    metadata = {
+                        name = "netbird-router-{}".format(i)
+                        namespace = parameters.operatorNamespace
+                    }
+                    spec = {
+                        hostPortClassName = "netbird-hostports"
+                    }
+                }
+            }
+            managementPolicies = spec?.managementPolicies
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.scK8sProviderName
+            }
+        }
+    } for i in _router_indices]
+
+    _hostport_class = {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-sc-hostport-class".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "sc-hostport-class"
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "hostport.rmb938.com/v1alpha1"
+                    kind = "HostPortClass"
+                    metadata = {
+                        name = "netbird-hostports"
+                    }
+                    spec = {
+                        pools = [
+                            {
+                                start = 51820
+                                end = 51830
+                            }
+                        ]
+                    }
+                }
+            }
+            managementPolicies = spec?.managementPolicies
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.scK8sProviderName
+            }
+        }
+    }
 # elif parameters.accessToken.destinationType == "tenantVault":
 #     # TODO: Implement tenant vault stuff
 _internal_network_policy = {
@@ -474,13 +581,17 @@ _items += [
 
 if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
     _items += [
-        _external_access_group
-        _network_resource_group
-        _service_user
+        _external_access_group,
+        _network_resource_group,
+        _service_user,
         _access_token
     ]
     if parameters.accessToken.destinationType == "sc":
-        _items += [_sc_netbird_namespace, _sc_access_token_secret_copy, _sc_nb_operator_kyverno_policy, _sc_nb_op_secret_update_kyverno_policy]
+        _items += [_sc_netbird_namespace, _sc_access_token_secret_copy, _sc_nb_operator_kyverno_policy, _sc_nb_op_secret_update_kyverno_policy, _hostport_class]
+        _items += _hostport_claims
+        _items += _nb_router_peers
+            
+
     if parameters.accessToken.destinationType == "tenantVault":
         _items += [_push_secret_access_token]
 
