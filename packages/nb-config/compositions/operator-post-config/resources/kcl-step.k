@@ -16,32 +16,9 @@ readyBasedOnConditions = lambda o: any -> bool {
 
 # Get provider config references from the XR spec
 _netbird_provider_config = oxr_spec?.providerConfigsRef?.netbirdProviderConfigName
-_k8s_provider_config = oxr_spec?.providerConfigsRef?.scK8sProviderName
 _management_policies = oxr_spec?.managementPolicies
 
-# HostPortClass for netbird hostports
-_hostport_class = {
-    apiVersion = "hostport.rmb938.com/v1alpha1"
-    kind = "HostPortClass"
-    metadata = {
-        name = "netbird-hostports"
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "hostport-class"
-        }
-    }
-    spec = {
-        pools = [
-            {
-                start = 51820
-                end = 51830
-            }
-        ]
-    }
-    providerConfigRef = {
-        name = _k8s_provider_config
-    }
-    managementPolicies = _management_policies
-}
+
 
 # Define router indices
 _router_indices = [1, 2, 3]
@@ -72,25 +49,6 @@ _nb_routing_peers = [{
     managementPolicies = _management_policies
 } for i in _router_indices]
 
-# Create HostPortClaim resources for each router
-_hostport_claims = [{
-    apiVersion = "hostport.rmb938.com/v1alpha1"
-    kind = "HostPortClaim"
-    metadata = {
-        name = "netbird-router-{}".format(i)
-        namespace = parameters.operatorNamespace
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "hostport-claim-{}".format(i)
-        }
-    }
-    spec = {
-        hostPortClassName = "netbird-hostports"
-    }
-    providerConfigRef = {
-        name = _k8s_provider_config
-    }
-    managementPolicies = _management_policies
-} for i in _router_indices]
 
 _nb_network_resource = {
   apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
@@ -121,29 +79,8 @@ _nb_network_resource = {
   }
 }
 
-# Add the resources to the items list
-_items += [
-    _hostport_class
-]
-if readyBasedOnConditions(ocds["hostport-class"]):
-    _items += [_hostport_claims]
 
-_all_hostport_claims_ready = all_true([
-    readyBasedOnConditions(ocds.get("hostport-claim-{}".format(i), {})) 
-    for i in _hostport_claims
-])
-
-if _all_hostport_claims_ready:
-    _items += [_nb_routing_peers]
-
-# Check if all nb-routing-peers are ready
-_all_nb_routing_peers_ready = all_true([
-    readyBasedOnConditions(ocds.get("nb-routing-peer-{}".format(i), {})) 
-    for i in _router_indices
-])
-
-if _all_nb_routing_peers_ready:
-    _items += [_nb_network_resource]
+_items += [_nb_routing_peers, _nb_network_resource]
 
 dxr = {
   **oxr
