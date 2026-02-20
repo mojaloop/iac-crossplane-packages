@@ -581,13 +581,14 @@ _items += [
 
 if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
     _items += [
-        _external_access_group
-        _network_resource_group
-        _service_user
+        _external_access_group,
+        _network_resource_group,
+        _service_user,
         _access_token
     ]
     if parameters.accessToken.destinationType == "sc":
-        _items += [_sc_netbird_namespace, _sc_access_token_secret_copy, _sc_nb_operator_kyverno_policy, _sc_nb_op_secret_update_kyverno_policy, _hostport_class, _hostport_claims]
+        _items += [_sc_netbird_namespace, _sc_access_token_secret_copy, _sc_nb_operator_kyverno_policy, _sc_nb_op_secret_update_kyverno_policy, _hostport_class]
+        _items += _hostport_claims
     if parameters.accessToken.destinationType == "tenantVault":
         _items += [_push_secret_access_token]
 
