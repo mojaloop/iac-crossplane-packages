@@ -627,13 +627,8 @@ if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
     if parameters.accessToken.destinationType == "sc":
         _items += [_sc_netbird_namespace, _sc_access_token_secret_copy, _sc_nb_operator_kyverno_policy, _sc_nb_op_secret_update_kyverno_policy, _hostport_class]
         _items += _hostport_claims
-        # Check if all hostport claims are ready
-        _all_hostport_claims_ready = all_true([
-            readyBasedOnConditions(ocds.get("sc-hostport-claim-{}".format(i), {})) 
-            for i in _router_indices
-        ])
-        if _all_hostport_claims_ready:
-            _items += _nb_router_peers
+        _items += _nb_router_peers
+            
 
     if parameters.accessToken.destinationType == "tenantVault":
         _items += [_push_secret_access_token]
