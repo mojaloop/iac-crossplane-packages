@@ -314,46 +314,53 @@ if parameters.accessToken.destinationType == "sc":
                                     }
                                 ]
                                 mutate = {
-                                    patchStrategicMerge = {
-                                        spec = {
-                                            containers = [
+                                    patchesJson6902 = [
+                                        {
+                                            "op": "add",
+                                            "path": "/spec/containers/0/ports",
+                                            "value": [
+                                            {
+                                                "name": "router",
+                                                "containerPort": 51820,
+                                                "hostPort": "{{ hostport }}",
+                                                "protocol": "UDP"
+                                            }
+                                            ]
+                                        },
+                                        {
+                                            "op": "add",
+                                            "path": "/spec/containers/0/env/-",
+                                            "value": {
+                                            "name": "NB_EXTERNAL_IP",
+                                            "valueFrom": {
+                                                "fieldRef": {
+                                                "fieldPath": "status.hostIP"
+                                                }
+                                            }
+                                            }
+                                        },
+                                        {
+                                            "op": "add",
+                                            "path": "/spec/containers/0/env/-",
+                                            "value": {
+                                            "name": "NB_LISTEN_PORT",
+                                            "value": "{{ hostport }}"
+                                            }
+                                        },
+                                        {
+                                            "op": "add",
+                                            "path": "/spec/securityContext",
+                                            "value": {
+                                            "sysctls": [
                                                 {
-                                                    name = "*"
-                                                    ports = [
-                                                        {
-                                                            name = "router"
-                                                            containerPort = 51820
-                                                            hostPort = "{{ hostport }}"
-                                                            protocol = "UDP"
-                                                        }
-                                                    ]
-                                                    env = [
-                                                        {
-                                                            name = "NB_EXTERNAL_IP"
-                                                            valueFrom = {
-                                                                fieldRef = {
-                                                                    fieldPath = "status.hostIP"
-                                                                }
-                                                            }
-                                                        }
-                                                        {
-                                                            name = "NB_LISTEN_PORT"
-                                                            value = "{{ hostport }}"
-                                                        }
-                                                    ]
+                                                "name": "net.ipv4.ip_forward",
+                                                "value": "1"
                                                 }
                                             ]
-                                            securityContext = {
-                                                sysctls = [
-                                                    {
-                                                        name = "net.ipv4.ip_forward"
-                                                        value = "1"
-                                                    }
-                                                ]
                                             }
                                         }
+                                    ] 
                                     }
-                                }
                                 preconditions = {
                                     "all" = [
                                         {
