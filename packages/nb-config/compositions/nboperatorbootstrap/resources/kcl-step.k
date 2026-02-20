@@ -526,10 +526,10 @@ if parameters.accessToken.destinationType == "sc":
                     }
                 }
             }
-        }
-        managementPolicies = spec?.managementPolicies
-        providerConfigRef = {
-            name = spec?.providerConfigsRef?.scK8sProviderName
+            managementPolicies = spec?.managementPolicies
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.scK8sProviderName
+            }
         }
     }
 # elif parameters.accessToken.destinationType == "tenantVault":
