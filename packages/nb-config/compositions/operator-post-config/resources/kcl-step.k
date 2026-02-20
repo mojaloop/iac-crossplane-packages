@@ -80,7 +80,8 @@ _nb_network_resource = {
 }
 
 
-_items += [_nb_routing_peers, _nb_network_resource]
+_items += _nb_routing_peers
+_items += [_nb_network_resource]
 
 dxr = {
   **oxr
