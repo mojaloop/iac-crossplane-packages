@@ -316,45 +316,45 @@ if parameters.accessToken.destinationType == "sc":
                                 mutate = {
                                     patchesJson6902 = [
                                         {
-                                            "op": "add",
-                                            "path": "/spec/containers/0/ports",
-                                            "value": [
+                                            op = "add",
+                                            path = "/spec/containers/0/ports",
+                                            value = [
                                             {
-                                                "name": "router",
-                                                "containerPort": 51820,
-                                                "hostPort": "{{ hostport }}",
-                                                "protocol": "UDP"
+                                                name = "router",
+                                                containerPort = 51820,
+                                                hostPort = "{{ hostport }}",
+                                                protocol = "UDP"
                                             }
                                             ]
                                         },
                                         {
-                                            "op": "add",
-                                            "path": "/spec/containers/0/env/-",
-                                            "value": {
-                                            "name": "NB_EXTERNAL_IP",
-                                            "valueFrom": {
-                                                "fieldRef": {
-                                                "fieldPath": "status.hostIP"
+                                            op = "add",
+                                            path = "/spec/containers/0/env/-",
+                                            value = {
+                                            name = "NB_EXTERNAL_IP",
+                                            valueFrom = {
+                                                fieldRef = {
+                                                fieldPath = "status.hostIP"
                                                 }
                                             }
                                             }
                                         },
                                         {
-                                            "op": "add",
-                                            "path": "/spec/containers/0/env/-",
-                                            "value": {
-                                            "name": "NB_LISTEN_PORT",
-                                            "value": "{{ hostport }}"
+                                            op = "add",
+                                            path = "/spec/containers/0/env/-",
+                                            value = {
+                                            name = "NB_LISTEN_PORT",
+                                            value = "{{ hostport }}"
                                             }
                                         },
                                         {
-                                            "op": "add",
-                                            "path": "/spec/securityContext",
-                                            "value": {
-                                            "sysctls": [
+                                            op = "add",
+                                            path = "/spec/securityContext",
+                                            value = {
+                                            sysctls = [
                                                 {
-                                                "name": "net.ipv4.ip_forward",
-                                                "value": "1"
+                                                name = "net.ipv4.ip_forward",
+                                                value =  "1"
                                                 }
                                             ]
                                             }
