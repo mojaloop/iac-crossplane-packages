@@ -327,7 +327,7 @@ else
 fi
 """.format(
     gitlabFqdn=parameters?.gitlabFqdn,
-    projectId=projectId
+    projectId=str(projectId)
 )
 }
 
@@ -337,12 +337,12 @@ _vaultTokenUpdateJobs = [{
     metadata = {
         name = "{}-envtokenrenew-{}".format(
             projectName,
-            crypto.sha256(_envVaulttokens[projectName] + _scriptContent(_projectIds[projectName]))[:15]
+            crypto.sha256(_envVaulttokens[projectName] + _scriptContent(str(_projectIds[projectName])))[:15]
         )
         annotations = {
             "krm.kcl.dev/composition-resource-name": "{}-envtokenrenew-{}".format(
                 projectName,
-                crypto.sha256(_envVaulttokens[projectName] + _scriptContent(_projectIds[projectName]))[:15]
+                crypto.sha256(_envVaulttokens[projectName] + _scriptContent(str(_projectIds[projectName])))[:15]
             )
         }
     }
@@ -354,7 +354,7 @@ _vaultTokenUpdateJobs = [{
                 metadata = {
                     name = "{}-envtokenrenew-{}".format(
                         projectName,
-                        crypto.sha256(_envVaulttokens[projectName] + _scriptContent(_projectIds[projectName]))[:15]
+                        crypto.sha256(_envVaulttokens[projectName] + _scriptContent(str(_projectIds[projectName])))[:15]
                     )
                     namespace = projectName
                 }
@@ -387,7 +387,7 @@ _vaultTokenUpdateJobs = [{
                                         }
                                     }
                                 ]
-                                args = [_scriptContent(_projectIds[projectName])]
+                                args = [_scriptContent(str(_projectIds[projectName]))]
                                     }]
                         }
                     }
