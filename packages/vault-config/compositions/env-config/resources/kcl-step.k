@@ -228,9 +228,9 @@ _envTokenSecrets = [{
     apiVersion = "generic.vault.upbound.io/v1alpha1"
     kind = "Secret"
     metadata = {
-        name = "env-token-vault-secret-{}".format(env)
+        name = "env-token-vault-secret-{}-{}".format(env, _payloadHash[env])
         annotations = {
-            "krm.kcl.dev/composition-resource-name": "env-token-vault-secret-{}".format(env)
+            "krm.kcl.dev/composition-resource-name": "env-token-vault-secret-{}-{}".format(env, _payloadHash[env])
         }
     }
     spec = {
