@@ -14,6 +14,8 @@ readyBasedOnConditions = lambda o: any -> bool {
     # Simply check if all conditions are True
     len(conditions) > 0 and all_true([c.status == "True" for c in conditions])
 }
+# Define router indices
+_router_indices = [1, 2, 3]
 
 _zitadel_project_id_secret = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -465,6 +467,70 @@ if parameters.accessToken.destinationType == "sc":
             }
         }
     }
+    # Create HostPortClaim resources for each router
+
+    _hostport_claims = [{
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "sc-hostport-claim-{}".format(i)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "sc-hostport-claim-{}".format(i)
+            }
+        }
+        spec = {
+            forProvider = {
+               metadata = {
+                    name = "netbird-router-{}".format(i)
+                    namespace = parameters.operatorNamespace
+                    annotations = {
+                        "krm.kcl.dev/composition-resource-name": "hostport-claim-{}".format(i)
+                    }
+                }
+                spec = {
+                    hostPortClassName = "netbird-hostports"
+                }
+            }
+            managementPolicies = spec?.managementPolicies
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.scK8sProviderName
+            }
+        }
+    } for i in _router_indices]
+
+    _hostport_class = {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-sc-hostport-class".format(oxr.metadata.name)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "sc-hostport-class"
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "hostport.rmb938.com/v1alpha1"
+                    kind = "HostPortClass"
+                    metadata = {
+                        name = "netbird-hostports"
+                    }
+                    spec = {
+                        pools = [
+                            {
+                                start = 51820
+                                end = 51830
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        managementPolicies = spec?.managementPolicies
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.scK8sProviderName
+        }
+    }
 # elif parameters.accessToken.destinationType == "tenantVault":
 #     # TODO: Implement tenant vault stuff
 _internal_network_policy = {
@@ -521,7 +587,7 @@ if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
         _access_token
     ]
     if parameters.accessToken.destinationType == "sc":
-        _items += [_sc_netbird_namespace, _sc_access_token_secret_copy, _sc_nb_operator_kyverno_policy, _sc_nb_op_secret_update_kyverno_policy]
+        _items += [_sc_netbird_namespace, _sc_access_token_secret_copy, _sc_nb_operator_kyverno_policy, _sc_nb_op_secret_update_kyverno_policy, _hostport_class, _hostport_claims]
     if parameters.accessToken.destinationType == "tenantVault":
         _items += [_push_secret_access_token]
 
