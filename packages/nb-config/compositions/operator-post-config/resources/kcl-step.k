@@ -18,38 +18,6 @@ readyBasedOnConditions = lambda o: any -> bool {
 _netbird_provider_config = oxr_spec?.providerConfigsRef?.netbirdProviderConfigName
 _management_policies = oxr_spec?.managementPolicies
 
-
-
-# Define router indices
-_router_indices = [1, 2, 3]
-
-# Create NBRoutingPeer resources for each router
-_nb_routing_peers = [{
-    apiVersion = "netbird.io/v1"
-    kind = "NBRoutingPeer"
-    metadata = {
-        name = "router-{}".format(i)
-        namespace = parameters.operatorNamespace
-        finalizers = ["netbird.io/cleanup"]
-        labels = {
-            "app.kubernetes.io/component": "operator"
-            "app.kubernetes.io/instance": "netbird-operator"
-            "app.kubernetes.io/name": "kubernetes-operator"
-        }
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "nb-routing-peer-{}".format(i)
-        }
-    }
-    spec = {
-        replicas = 1
-    }
-    providerConfigRef = {
-        name = _netbird_provider_config
-    }
-    managementPolicies = _management_policies
-} for i in _router_indices]
-
-
 _nb_network_resource = {
   apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
   kind = "NbNetworkResource"
@@ -79,8 +47,6 @@ _nb_network_resource = {
   }
 }
 
-
-_items += _nb_routing_peers
 _items += [_nb_network_resource]
 
 dxr = {

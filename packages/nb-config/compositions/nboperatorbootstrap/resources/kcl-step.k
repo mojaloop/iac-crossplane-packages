@@ -467,6 +467,43 @@ if parameters.accessToken.destinationType == "sc":
             }
         }
     }
+
+    _nb_router_peers = [{
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "nb-router-peer-{}".format(i)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "nb-router-peer-{}".format(i)
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "netbird.io/v1"
+                    kind = "NBRoutingPeer"
+                    metadata = {
+                        name = "router-{}".format(i)
+                        namespace = parameters.operatorNamespace
+                        finalizers = ["netbird.io/cleanup"]
+                        labels = {
+                            "app.kubernetes.io/component": "operator"
+                            "app.kubernetes.io/instance": "netbird-operator"
+                            "app.kubernetes.io/name": "kubernetes-operator"
+                        }
+                    }
+                    spec = {
+                        replicas = 1
+                    }
+                }
+            }
+            managementPolicies = spec?.managementPolicies
+            providerConfigRef = {
+                name = spec?.providerConfigsRef?.scK8sProviderName
+            }
+        }
+    } for i in _router_indices]
+
     # Create HostPortClaim resources for each router
 
     _hostport_claims = [{
@@ -590,6 +627,14 @@ if readyBasedOnConditions(ocds["zitadel-project-id-secret"]):
     if parameters.accessToken.destinationType == "sc":
         _items += [_sc_netbird_namespace, _sc_access_token_secret_copy, _sc_nb_operator_kyverno_policy, _sc_nb_op_secret_update_kyverno_policy, _hostport_class]
         _items += _hostport_claims
+        # Check if all hostport claims are ready
+        _all_hostport_claims_ready = all_true([
+            readyBasedOnConditions(ocds.get("sc-hostport-claim-{}".format(i), {})) 
+            for i in _router_indices
+        ])
+        if _all_hostport_claims_ready:
+            _items += _nb_router_peers
+
     if parameters.accessToken.destinationType == "tenantVault":
         _items += [_push_secret_access_token]
 
