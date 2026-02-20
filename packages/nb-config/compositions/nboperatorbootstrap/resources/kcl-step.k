@@ -480,15 +480,16 @@ if parameters.accessToken.destinationType == "sc":
         }
         spec = {
             forProvider = {
-               metadata = {
-                    name = "netbird-router-{}".format(i)
-                    namespace = parameters.operatorNamespace
-                    annotations = {
-                        "krm.kcl.dev/composition-resource-name": "hostport-claim-{}".format(i)
+                manifest = {
+                    apiVersion = "hostport.rmb938.com/v1alpha1"
+                    kind = "HostPortClaim"
+                    metadata = {
+                        name = "netbird-router-{}".format(i)
+                        namespace = parameters.operatorNamespace
                     }
-                }
-                spec = {
-                    hostPortClassName = "netbird-hostports"
+                    spec = {
+                        hostPortClassName = "netbird-hostports"
+                    }
                 }
             }
             managementPolicies = spec?.managementPolicies
