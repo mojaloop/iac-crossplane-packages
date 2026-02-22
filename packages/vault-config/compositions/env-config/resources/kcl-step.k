@@ -296,7 +296,7 @@ ENCODED_TOKEN=$(echo -n "$TOKEN" | base64 | tr -d '\n')
 DOUBLE_ENCODED_TOKEN=$(echo -n "$ENCODED_TOKEN" | base64 | tr -d '\n')
 
 # Fetch file (GET) - Capture status code
-http_code=$(curl -s -o resp.json -w "%{{http_code}}" -H "PRIVATE-TOKEN: $PRIVATE_TOKEN" "$GITLAB_URL?ref=main")
+http_code=$(curl -s -o resp.json -w "%{http_code}" -H "PRIVATE-TOKEN: $PRIVATE_TOKEN" "$GITLAB_URL?ref=main")
 curl_exit=$?
 
 if [ $curl_exit -ne 0 ]; then
@@ -314,16 +314,16 @@ if [ "$http_code" -eq 200 ]; then
         exit 0
     else
         echo "Updating file with new token..."
-        update_code=$(curl -s -o /dev/null -w "%{{http_code}}" -X PUT "$GITLAB_URL" \
+        update_code=$(curl -s -o /dev/null -w "%{http_code}" -X PUT "$GITLAB_URL" \
         -H "PRIVATE-TOKEN: $PRIVATE_TOKEN" \
         -H "Content-Type: application/json" \
-        -d "{{
-            \\"branch\\": \\"main\\",
-            \\"commit_message\\": \\"tf_trigger: vault_token_update\\",
-            \\"content\\": \\"$DOUBLE_ENCODED_TOKEN\\",
-            \\"encoding\\": \\"base64\\",
-            \\"author_name\\": \\"Crossplane\\"
-        }}")
+        -d "{
+            \"branch\": \"main\",
+            \"commit_message\": \"tf_trigger: vault_token_update\",
+            \"content\": \"$DOUBLE_ENCODED_TOKEN\",
+            \"encoding\": \"base64\",
+            \"author_name\": \"Crossplane\"
+        }")
 
         if [ "$update_code" -lt 200 ] || [ "$update_code" -ge 300 ]; then
             echo "Error: Failed to update file. HTTP Status: $update_code"
@@ -333,16 +333,16 @@ if [ "$http_code" -eq 200 ]; then
     fi
 elif [ "$http_code" -eq 404 ]; then
     echo "File not found, creating new file..."
-    create_code=$(curl -s -o /dev/null -w "%{{http_code}}" -X POST "$GITLAB_URL" \
+    create_code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$GITLAB_URL" \
         -H "PRIVATE-TOKEN: $PRIVATE_TOKEN" \
         -H "Content-Type: application/json" \
-        -d "{{
-        \\"branch\\": \\"main\\",
-        \\"commit_message\\": \\"tf_trigger: vault_token_create\\",
-        \\"content\\": \\"$DOUBLE_ENCODED_TOKEN\\",
-        \\"encoding\\": \\"base64\\",
-        \\"author_name\\": \\"Crossplane\\"
-        }}")
+        -d "{
+        \"branch\": \"main\",
+        \"commit_message\": \"tf_trigger: vault_token_create\",
+        \"content\": \"$DOUBLE_ENCODED_TOKEN\",
+        \"encoding\": \"base64\",
+        \"author_name\": \"Crossplane\"
+        }")
 
     if [ "$create_code" -lt 200 ] || [ "$create_code" -ge 300 ]; then
         echo "Error: Failed to create file. HTTP Status: $create_code"
