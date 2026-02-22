@@ -383,7 +383,7 @@ _vaultTokenUpdateJobs = [{
                                 name = "vault-token-renewer"
                                 image = "alpine:3.20"
                                 command = ["/bin/sh", "-c"]
-                                env = [
+                                "env" = [
                                     {
                                         name = "VAULT_TOKEN"
                                         valueFrom = {
