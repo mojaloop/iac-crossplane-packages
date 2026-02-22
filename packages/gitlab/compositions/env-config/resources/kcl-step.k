@@ -74,7 +74,7 @@ _projectIdSecrets = [{
                 # Using stringData to handle the ID (which might be int or string) safely
                 data = {
                     "project_id" = base64.encode(str(_projectIds[projectName]))
-                    "gitlab_fqdn" = base64.encode(strparameters?.gitlabFqdn)
+                    "gitlab_fqdn" = base64.encode(str(parameters?.gitlabFqdn))
                 }
             }
         }
