@@ -53,6 +53,40 @@ _projectIds = {
 }
 
 
+_projectIdSecrets = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "project-id-secret-{}".format(projectName)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "project-id-secret-{}".format(projectName)
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = "project-id-secret-{}".format(projectName)
+                    namespace = projectName
+                }
+                # Using stringData to handle the ID (which might be int or string) safely
+                data = {
+                    "project_id" = str(_projectIds[projectName])
+                    "gitlab_fqdn" = parameters?.gitlabFqdn
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec?.providerConfigsRef?.kubernetesProvider
+        }
+    }
+} for projectName in _environments or []
+]
+
+
 _projectAccessTokens = [{
     apiVersion = "projects.gitlab.crossplane.io/v1alpha1"
     kind = "AccessToken"
@@ -252,163 +286,8 @@ _envVaulttokens = {
   for projectName in _environments or []
 }
 
-_scriptContent = lambda projectId: str {"""set -e
 
-apk add --no-cache curl jq
-GITLAB_URL="https://{gitlabFqdn}/api/v4/projects/{projectId}/repository/files/%2Evault_token_trigger"
-
-TOKEN="$VAULT_TOKEN"
-
-if [ -z "$TOKEN" ] || [ -z "$PRIVATE_TOKEN" ]; then
-    echo "Error: Tokens not found in environment variables"
-    exit 1
-fi
-
-ENCODED_TOKEN=$(echo -n "$TOKEN" | base64 | tr -d '\n')
-DOUBLE_ENCODED_TOKEN=$(echo -n "$ENCODED_TOKEN" | base64 | tr -d '\n')
-
-# Fetch file (GET) - Capture status code
-http_code=$(curl -s -o resp.json -w "%{{http_code}}" -H "PRIVATE-TOKEN: $PRIVATE_TOKEN" "$GITLAB_URL?ref=main")
-curl_exit=$?
-
-if [ $curl_exit -ne 0 ]; then
-    echo "Error: Curl failed to fetch file (exit code $curl_exit)"
-    exit 1
-fi
-
-if [ "$http_code" -eq 200 ]; then
-    current=$(jq -r .content resp.json)
-    # Decode current content to compare with raw token
-    current_decoded=$(echo "$current" | base64 -d)
-
-    if [ "$current_decoded" = "$TOKEN" ]; then
-        echo "Token already up to date. Nothing to do."
-        exit 0
-    else
-        echo "Updating file with new token..."
-        update_code=$(curl -s -o /dev/null -w "%{{http_code}}" -X PUT "$GITLAB_URL" \
-        -H "PRIVATE-TOKEN: $PRIVATE_TOKEN" \
-        -H "Content-Type: application/json" \
-        -d "{{
-            \\"branch\\": \\"main\\",
-            \\"commit_message\\": \\"tf_trigger: vault_token_update\\",
-            \\"content\\": \\"$DOUBLE_ENCODED_TOKEN\\",
-            \\"encoding\\": \\"base64\\",
-            \\"author_name\\": \\"Crossplane\\"
-        }}")
-
-        if [ "$update_code" -lt 200 ] || [ "$update_code" -ge 300 ]; then
-            echo "Error: Failed to update file. HTTP Status: $update_code"
-            exit 1
-        fi
-        echo "Successfully updated file."
-    fi
-elif [ "$http_code" -eq 404 ]; then
-    echo "File not found, creating new file..."
-    create_code=$(curl -s -o /dev/null -w "%{{http_code}}" -X POST "$GITLAB_URL" \
-        -H "PRIVATE-TOKEN: $PRIVATE_TOKEN" \
-        -H "Content-Type: application/json" \
-        -d "{{
-        \\"branch\\": \\"main\\",
-        \\"commit_message\\": \\"tf_trigger: vault_token_create\\",
-        \\"content\\": \\"$DOUBLE_ENCODED_TOKEN\\",
-        \\"encoding\\": \\"base64\\",
-        \\"author_name\\": \\"Crossplane\\"
-        }}")
-
-    if [ "$create_code" -lt 200 ] || [ "$create_code" -ge 300 ]; then
-        echo "Error: Failed to create file. HTTP Status: $create_code"
-        exit 1
-    fi
-    echo "Successfully created file."
-else
-    echo "Unexpected status code fetching file: $http_code"
-    cat resp.json || true
-    exit 1
-fi
-""".format(
-    gitlabFqdn=parameters?.gitlabFqdn,
-    projectId=str(projectId)
-)
-}
-
-_vaultTokenUpdateJobs = [{
-    apiVersion = "kubernetes.crossplane.io/v1alpha2"
-    kind = "Object"
-    metadata = {
-        name = "{}-envtokenrenew-{}".format(
-            projectName,
-            crypto.sha256(_envVaulttokens[projectName] + _scriptContent(str(_projectIds[projectName])))[:15]
-        )
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "{}-envtokenrenew-{}".format(
-                projectName,
-                crypto.sha256(_envVaulttokens[projectName] + _scriptContent(str(_projectIds[projectName])))[:15]
-            )
-        }
-    }
-    spec = {
-        forProvider = {
-            manifest = {
-                apiVersion = "batch/v1"
-                kind = "Job"
-                metadata = {
-                    name = "{}-envtokenrenew-{}".format(
-                        projectName,
-                        crypto.sha256(_envVaulttokens[projectName] + _scriptContent(str(_projectIds[projectName])))[:15]
-                    )
-                    namespace = projectName
-                }
-                spec = {
-                    backoffLimit = 1
-                    template = {
-                        spec = {
-                            restartPolicy = "Never"
-                            containers = [{
-                                name = "vault-token-renewer"
-                                image = "alpine:3.20"
-                                command = ["/bin/sh", "-c"]
-                                env = [
-                                    {
-                                        name = "VAULT_TOKEN"
-                                        valueFrom = {
-                                            secretKeyRef = {
-                                                name = "env-token-secret-{}".format(projectName)
-                                                key = "attribute.client_token"
-                                            }
-                                        }
-                                    },
-                                    {
-                                        name = "PRIVATE_TOKEN"
-                                        valueFrom = {
-                                            secretKeyRef = {
-                                                name = "{}-project-access-token".format(projectName)
-                                                key = "token"
-                                            }
-                                        }
-                                    }
-                                ]
-                                args = [_scriptContent(str(_projectIds[projectName]))]
-                                    }]
-                        }
-                    }
-                }
-            }
-        }
-        managementPolicies = spec.managementPolicies
-        providerConfigRef = {
-            name = spec?.providerConfigsRef?.kubernetesProvider
-        }
-        readiness = {
-            policy = "DeriveFromCelQuery"
-            celQuery = "has(object.status.conditions) && object.status.conditions.exists(c, c.type == 'Complete' && c.status == 'True')"
-        }
-    }
-} for projectName in _environments or []
-]
-
-
-_items += _envNamespaces + _environmentProjects + _projectAccessTokens + _projectTokenObserveSecrets + _groupVariables + _repoSecrets + _vaultTokenUpdateJobs
+_items += _envNamespaces + _environmentProjects + _projectIdSecrets + _projectAccessTokens + _projectTokenObserveSecrets + _groupVariables + _repoSecrets
 
 dxr = {
     **oxr
