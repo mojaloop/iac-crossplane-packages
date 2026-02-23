@@ -10,7 +10,6 @@ spec:
     argocdNamespace: argocd
     environments: "test-repo1,test-repo2,test-repo3"
     groupName: "iac"
-    expiresAt: "2025-12-31T23:59:59Z"
     groupVariables:
       - environmentScope: '*'
         key: NEXUS_FQDN

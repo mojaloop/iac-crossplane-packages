@@ -72,7 +72,6 @@ spec:
                   - gitlabFqdn
                   - namespace
                   - environments
-                  - expiresAt
                 properties:
                   gitlabFqdn:
                     type: string

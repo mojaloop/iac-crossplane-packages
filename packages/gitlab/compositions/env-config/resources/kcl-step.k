@@ -8,8 +8,23 @@ oxr = option("params").oxr
 ocds = option("params").ocds
 
 spec = oxr.spec
+status = oxr.status
 parameters = spec.parameters
 
+
+calculateExpireAt = lambda -> str {
+    now = datetime.today()
+    date = regex.split(now, " ")[0]
+
+    _y = regex.split(date, "-")[0]
+    _m = regex.split(date, "-")[1]
+    _d = regex.split(date, "-")[2]
+
+    y = int(_y) + 1
+    m = int(_m) - 1 if int(_m) > 1 else 1
+
+    "{}-{:02d}-01T00:00:00Z".format(y, m)
+}
 
 _items = []
 
@@ -87,6 +102,12 @@ _projectIdSecrets = [{
 ]
 
 
+_statusExpireAt = status?.tokenExpireAt
+_expireAt = None
+
+if _statusExpireAt == None:
+    _expireAt = calculateExpireAt()
+
 _projectAccessTokens = [{
     apiVersion = "projects.gitlab.crossplane.io/v1alpha1"
     kind = "AccessToken"
@@ -107,6 +128,7 @@ _projectAccessTokens = [{
             }
             name = "accesstoken-{}".format(projectName)
             accessLevel = 40
+            expiresAt = _statusExpireAt if _statusExpireAt != None else _expireAt
             scopes = ["api", "read_api", "read_registry", "read_repository", "write_repository"]
         }
         managementPolicies = spec.managementPolicies
@@ -314,4 +336,9 @@ dxr = {
     **oxr
 }
 
-items = _items + [dxr]
+finalDxr = {
+    **dxr
+    status.tokenExpireAt = _expireAt
+} if _statusExpireAt == None else dxr
+
+items = _items + [finalDxr]
