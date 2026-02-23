@@ -102,12 +102,12 @@ _projectIdSecrets = [{
 ]
 
 
-_statusExpireAt = status?.tokenExpireAt
-_expireAt = None
+_existingExpirations = status?.tokenExpirations or {}
 
-if _statusExpireAt == None:
-    _expireAt = calculateExpireAt()
-
+_projectExpirations = {
+    projectName: _existingExpirations[projectName] if projectName in _existingExpirations else calculateExpireAt()
+    for projectName in _environments or []
+}
 _projectAccessTokens = [{
     apiVersion = "projects.gitlab.crossplane.io/v1alpha1"
     kind = "AccessToken"
@@ -128,7 +128,7 @@ _projectAccessTokens = [{
             }
             name = "accesstoken-{}".format(projectName)
             accessLevel = 40
-            expiresAt = _statusExpireAt if _statusExpireAt != None else _expireAt
+            expiresAt = _projectExpirations[projectName]
             scopes = ["api", "read_api", "read_registry", "read_repository", "write_repository"]
         }
         managementPolicies = spec.managementPolicies
@@ -336,9 +336,7 @@ dxr = {
     **oxr
 }
 
-finalDxr = {
-    **dxr
-    status.tokenExpireAt = _expireAt
-} if _statusExpireAt == None else dxr
-
-items = _items + [finalDxr]
+items = _items + [{
+    **oxr
+    status.tokenExpirations = _projectExpirations
+}]

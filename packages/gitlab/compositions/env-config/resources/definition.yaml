@@ -127,5 +127,8 @@ spec:
           status:
             type: object
             properties:
-              tokenExpireAt:
-                type: string
+              tokenExpirations:
+                type: object
+                description: "Map of project names to their token expiration dates."
+                additionalProperties:
+                  type: string
