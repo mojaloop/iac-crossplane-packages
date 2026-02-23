@@ -108,7 +108,6 @@ _projectAccessTokens = [{
             name = "accesstoken-{}".format(projectName)
             accessLevel = 40
             scopes = ["api", "read_api", "read_registry", "read_repository", "write_repository"]
-            expiresAt = parameters?.expiresAt
         }
         managementPolicies = spec.managementPolicies
         providerConfigRef = {

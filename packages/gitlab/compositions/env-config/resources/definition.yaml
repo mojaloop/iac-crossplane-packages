@@ -91,10 +91,6 @@ spec:
                     type: string
                     description: |-
                       A comma separated list of environments to create.
-                  expiresAt:
-                    type: string
-                    description: |-
-                      The date at which project's access token will expire. (e.g. 2024-12-31)
                   groupName:
                     type: string
                     description: |-
