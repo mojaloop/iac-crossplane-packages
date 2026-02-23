@@ -123,6 +123,26 @@ _projectAccessTokens = [{
 } for projectName in _environments or []
 ]
 
+# Helper function to transform HELM_CLASSIC_PROXY_REPOS
+_transformClassicRepos = lambda val, baseUrl: str {
+    items = (val or "").split(",")
+    result = [
+        "{}={}/{}".format(item.split("=")[1], baseUrl, item.split("=")[0])
+        for item in items if item and "=" in item
+    ]
+    ",".join(result)
+}
+
+# Helper function to transform HELM_OCI_PROXY_REPOS
+_transformOciRepos = lambda val, baseUrl: str {
+    items = (val or "").split(",")
+    result = [
+        "{}={}".format(item.split("=")[1], baseUrl)
+        for item in items if item and "=" in item
+    ]
+    ",".join(result)
+}
+
 _groupVariables = [ {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "Variable"
@@ -140,7 +160,9 @@ _groupVariables = [ {
                 }
             }
             key = variable.key
-            value = variable.value
+
+            value = _transformClassicRepos(variable.value, parameters?.classicHelmRepoBaseUrl) if variable.key == "HELM_CLASSIC_PROXY_REPOS" else (_transformOciRepos(variable.value, parameters?.ociHelmRepoBaseUrl) if variable.key == "HELM_OCI_PROXY_REPOS" else variable.value)
+
             protected = variable.protected
             masked = variable.masked
             environmentScope = variable.environmentScope

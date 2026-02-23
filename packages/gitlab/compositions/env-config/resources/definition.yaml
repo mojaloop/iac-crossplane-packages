@@ -100,6 +100,14 @@ spec:
                     description: |-
                       The  reference to the gitlab group
                     default: iac
+                  ociHelmRepoBaseUrl:
+                    type: string
+                    description: |-
+                      The base URL for the OCI helm repository to be added to gitlab, e.g. https://nexus.mojaloop.io/repository/helm-oci/
+                  classicHelmRepoBaseUrl:
+                    type: string
+                    description: |-
+                      The base URL for the classic helm repository to be added to gitlab, e.g.
                   groupVariables:
                     type: array
                     description: |-
