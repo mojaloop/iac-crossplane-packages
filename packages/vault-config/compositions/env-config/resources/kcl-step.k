@@ -231,6 +231,7 @@ _envTokenSecrets = [{
         name = "env-token-vault-secret-{}-{}".format(env, _payloadHash[env])
         annotations = {
             "krm.kcl.dev/composition-resource-name": "env-token-vault-secret-{}-{}".format(env, _payloadHash[env])
+            "payload-hash": _payloadHash[env]
         }
     }
     spec = {
