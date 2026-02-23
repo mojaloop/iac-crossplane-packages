@@ -26,6 +26,29 @@ calculateExpireAt = lambda -> str {
     "{}-{:02d}-01T00:00:00Z".format(y, m)
 }
 
+needsRenewal = lambda expiryDateStr: str -> bool {
+    # Prepare current date components
+    now = datetime.today()
+    current_date_str = regex.split(now, " ")[0]
+    now_y = int(regex.split(current_date_str, "-")[0])
+    now_m = int(regex.split(current_date_str, "-")[1])
+    now_d = int(regex.split(current_date_str, "-")[2])
+
+    # Prepare expiry date components (if expiryDateStr exists)
+    expiry_date_part = regex.split(expiryDateStr, "T")[0] if expiryDateStr else ""
+    exp_y = int(regex.split(expiry_date_part, "-")[0]) if expiryDateStr else 0
+    exp_m = int(regex.split(expiry_date_part, "-")[1]) if expiryDateStr else 0
+    exp_d = int(regex.split(expiry_date_part, "-")[2]) if expiryDateStr else 0
+
+    # Simplified Logic: Return True if any expiration condition is met
+    # CHANGED: Explicitly check for empty string instead of (not expiryDateStr)
+    (expiryDateStr == "") or \
+    (exp_y < now_y) or \
+    (exp_y == now_y and exp_m < now_m) or \
+    (exp_y == now_y and exp_m == now_m and (exp_d - now_d) <= 7)
+}
+
+
 _items = []
 
 _environments = (parameters?.environments or "").split(",")
@@ -105,9 +128,10 @@ _projectIdSecrets = [{
 _existingExpirations = status?.tokenExpirations or {}
 
 _projectExpirations = {
-    projectName: _existingExpirations[projectName] if projectName in _existingExpirations else calculateExpireAt()
+    projectName: calculateExpireAt() if needsRenewal(_existingExpirations[projectName]) else _existingExpirations[projectName]
     for projectName in _environments or []
 }
+
 _projectAccessTokens = [{
     apiVersion = "projects.gitlab.crossplane.io/v1alpha1"
     kind = "AccessToken"
