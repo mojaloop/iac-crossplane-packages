@@ -144,7 +144,7 @@ _envTokens = [{
         }
         writeConnectionSecretToRef = {
             name = "env-token-secret-{}".format(env)
-            namespace = env
+            namespace = "gitlab"
         }
     }
 
@@ -167,7 +167,7 @@ _k8sObserveSecret = [{
                 kind = "Secret"
                 metadata = {
                     name = "env-token-secret-{}".format(env)
-                    namespace = env
+                    namespace = "gitlab"
                 }
             }
         }
@@ -208,7 +208,7 @@ _k8sSecrets = [{
                 kind = "Secret"
                 metadata = {
                     name = "env-token-k8secret-{}-{}".format(env, _payloadHash[env])
-                    namespace = env
+                    namespace = "gitlab"
                 }
                 data = {
                     "credentials" = base64.encode(json.encode(_jsonPayload[env]))
@@ -239,7 +239,7 @@ _envTokenSecrets = [{
             dataJsonSecretRef = {
                 key = "credentials"
                 name = "env-token-k8secret-{}-{}".format(env, _payloadHash[env])
-                namespace = env
+                namespace = "gitlab"
             }
             deleteAllVersions = True
             path = "{}/{}/env_token".format(parameters.kvPath, env)
@@ -373,7 +373,7 @@ _vaultTokenUpdateJobs = [{
                 kind = "Job"
                 metadata = {
                     name = "{}-envtokenrenew-{}".format(env, _payloadHash[env])
-                    namespace = env
+                    namespace = "gitlab"
                 }
                 spec = {
                     backoffLimit = 1

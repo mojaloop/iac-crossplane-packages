@@ -107,7 +107,7 @@ _projectIdSecrets = [{
                 kind = "Secret"
                 metadata = {
                     name = "project-id-secret-{}".format(projectName)
-                    namespace = projectName
+                    namespace = "gitlab"
                 }
                 # Using stringData to handle the ID (which might be int or string) safely
                 data = {
@@ -161,7 +161,7 @@ _projectAccessTokens = [{
         }
         writeConnectionSecretToRef = {
             name = "{}-project-access-token".format(projectName)
-            namespace = projectName
+            namespace = "gitlab"
         }
     }
 
@@ -220,35 +220,6 @@ _groupVariables = [ {
 } for variable in parameters?.groupVariables or []
 ]
 
-_envNamespaces = [{
-    apiVersion = "kubernetes.crossplane.io/v1alpha2"
-    kind = "Object"
-    metadata = {
-        name = "{}-namespace".format(projectName)
-        annotations = {
-            "krm.kcl.dev/composition-resource-name": "namespace-{}".format(projectName)
-        }
-    }
-    spec = {
-        forProvider = {
-            manifest = {
-                apiVersion = "v1"
-                kind = "Namespace"
-                metadata = {
-                    name = projectName
-                }
-                annotations = {
-                    "name" = projectName
-                }
-            }
-        }
-        managementPolicies = spec.managementPolicies
-        providerConfigRef = {
-            name = spec?.providerConfigsRef?.kubernetesProvider
-        }
-    }
-} for projectName in _environments or []
-]
 
 _projectTokenObserveSecrets = [{
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -266,7 +237,7 @@ _projectTokenObserveSecrets = [{
                 kind = "Secret"
                 metadata = {
                     name = "{}-project-access-token".format(projectName)
-                    namespace = projectName
+                    namespace = "gitlab"
                 }
             }
         }
@@ -336,7 +307,7 @@ _VaultEnvTokenObserveSecret = [{
                 kind = "Secret"
                 metadata = {
                     name = "env-token-secret-{}".format(projectName)
-                    namespace = projectName
+                    namespace = "gitlab"
                 }
             }
         }
@@ -354,7 +325,7 @@ _envVaulttokens = {
 }
 
 
-_items += _envNamespaces + _environmentProjects + _projectIdSecrets + _projectAccessTokens + _projectTokenObserveSecrets + _groupVariables + _repoSecrets
+_items += _environmentProjects + _projectIdSecrets + _projectAccessTokens + _projectTokenObserveSecrets + _groupVariables + _repoSecrets
 
 dxr = {
     **oxr
