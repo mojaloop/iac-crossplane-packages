@@ -38,8 +38,8 @@ spec:
       name: rs0
       size: 3
       expose:
-        enabled: false
-        type: ClusterIP
+        enabled: true
+        type: LoadBalancer
       resources:
         limits:
           cpu: "300m"

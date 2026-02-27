@@ -326,6 +326,62 @@ _DnsRecord = {
     }
 }
 
+_MongodbServiceObservation = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-rs-service-observation".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "mongodb-rs-service-observation"
+        }
+    }
+    spec = {
+        managementPolicies = ["Observe"]
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Service"
+                metadata = {
+                    name = "{}-rs0-0".format(parameters.clusterName)
+                    namespace = parameters.scAppNamespace
+                }
+            }
+        }
+        providerConfigRef = {
+            name = spec.providerConfigsRef.scK8sProviderName
+        }
+    }
+}] if parameters?.replsets?.expose?.enabled and parameters?.replsets?.expose?.type == "LoadBalancer" else []
+
+_service_observation = ocds["mongodb-rs-service-observation"] if "mongodb-rs-service-observation" in ocds else {}
+_rs0_external_ip = _service_observation?.Resource?.status?.atProvider?.manifest?.status?.loadBalancer?.ingress?[0]?.ip
+
+_Rs0DnsRecord = [{
+    apiVersion = "utils.aws.mojaloop.io/v1alpha1"
+    kind = "XAWSRoute53Record"
+    metadata = {
+        name = "{}-rs0-dnsrecord".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "rs0-dns-record"
+        }
+    }
+
+    spec = {
+        parameters = {
+            name = "rs0.{}".format(parameters?.dns?.name)
+            region = parameters?.dns?.region
+            ttl =  parameters?.dns?.ttl
+            type =  parameters?.dns?.type
+            records = [_rs0_external_ip]
+            zoneId = parameters?.dns?.zoneId
+        }
+        providerConfigsRef = {
+            awsProviderConfigName = spec?.providerConfigsRef?.awsProviderName
+        }
+        managementPolicies = spec.managementPolicies
+    }
+}] if _rs0_external_ip else []
+
 _ns = parameters?.backup?.appNamespace if parameters?.backup?.appNamespace else parameters?.appNamespace
 
 if parameters?.backup?.enabled == True:
@@ -487,7 +543,7 @@ _ConsumerAppExternalServices = [
 ]
 
 
-_items += [_s3Bucket, _s3Secret, _MongodbCluster, _Secret, _clientsourceSecret, _DnsRecord, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+_items += [_s3Bucket, _s3Secret, _MongodbCluster, _Secret, _clientsourceSecret, _DnsRecord, _ExternalService] + _MongodbServiceObservation + _Rs0DnsRecord + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }
