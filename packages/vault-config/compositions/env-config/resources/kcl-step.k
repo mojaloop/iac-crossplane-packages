@@ -376,7 +376,7 @@ _vaultTokenUpdateJobs = [{
                     namespace = "gitlab"
                 }
                 spec = {
-                    backoffLimit = 1
+                    backoffLimit = 10
                     template = {
                         spec = {
                             restartPolicy = "Never"
