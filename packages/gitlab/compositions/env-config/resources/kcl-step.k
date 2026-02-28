@@ -270,9 +270,9 @@ _repoSecrets = [{
                 metadata = {
                     name = "{}-repo-secret".format(projectName)
                     namespace = parameters?.argocdNamespace
-                }
-                labels = {
-                    "argocd.argoproj.io/secret-type" = "repo-creds"
+                    labels = {
+                        "argocd.argoproj.io/secret-type" = "repo-creds"
+                    }
                 }
                 data = {
                     "password"  = _projectTokens[projectName]
