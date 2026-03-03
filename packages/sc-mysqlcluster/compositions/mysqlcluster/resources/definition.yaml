@@ -291,6 +291,31 @@ spec:
                             additionalProperties:
                               type: string
                             description: Labels for the service
+                        exposeReplicas:
+                          type: object
+                          description: Number of HAProxy replicas to expose
+                          default: {}
+                          properties:
+                            type:
+                              type: string
+                              description: Type of service to expose (e.g., LoadBalancer, NodePort)
+                              default: LoadBalancer
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                              description: Annotations for the service
+                              default: {}
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                              description: Labels for the service
+                              default: {}
+                            onlyReaders:
+                              type: boolean
+                              description: Expose only reader replicas
+                              default: true
                       resources:
                         type: object
                         description: The resources for haproxy

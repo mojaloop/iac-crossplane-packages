@@ -31,6 +31,16 @@ ready = lambda o, statusPath="atProvider" -> bool {
     len(objstatus) > 0 and all_true([c.status == "True" for c in objstatus]) and status and statusPath in status
 }
 
+if parameters?.haproxy?.exposeReplicas:
+    _exposeReplicas = {
+        type = parameters?.haproxy?.exposeReplicas?.type
+        annotations = parameters?.haproxy?.exposeReplicas?.annotations
+        labels = parameters?.haproxy?.exposeReplicas?.labels
+        onlyReaders = parameters?.haproxy?.exposeReplicas?.onlyReaders
+    }
+else:
+    _exposeReplicas = {}
+
 _MysqlCluster = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
@@ -122,6 +132,7 @@ _MysqlCluster = {
                             annotations = parameters?.haproxy?.expose?.annotations
                             labels = parameters?.haproxy?.expose?.labels
                         }
+                        exposeReplicas = _exposeReplicas
                         gracePeriod = 30
                         resources = {
                             requests = {
