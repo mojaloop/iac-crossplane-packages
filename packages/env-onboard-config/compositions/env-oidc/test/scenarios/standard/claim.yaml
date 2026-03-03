@@ -1,0 +1,47 @@
+apiVersion: env.mojaloop.io/v1alpha1
+kind: XEnvOidcConfig
+metadata:
+  name: example-env-oidc-config
+  namespace: env-namespace
+spec:
+  parameters:
+    envName: "example-env"
+    organizationIdSecretRef:
+      name: zitadel-admin-creds
+      namespace: crossplane-system
+      key: org_id
+    zitadelAdminHumanUserIdRef:
+      name: zitadel-admin-creds
+      namespace: crossplane-system
+      key: human_user_id
+
+    # App Configurations
+    grafanaFqdn: "grafana.example.com"
+    vaultFqdn: "vault.example.com"
+    argocdFqdn: "argocd.example.com"
+    addonsDomain: "addons.example.com"
+
+    # Vault Config
+    vaultKvPath: "secret"
+
+    # RBAC Groups
+    grafanaAdminRbacGroup: "grafana-admins"
+    grafanaUserRbacGroup: "grafana-users"
+    vaultAdminRbacGroup: "vault-admins"
+    vaultUserRbacGroup: "vault-users"
+    argocdAdminRbacGroup: "argocd-admins"
+    argocdUserRbacGroup: "argocd-users"
+    k8sAdminRbacGroup: "techops-admin"
+    k8sUserRbacGroup: "techops-user"
+
+    # Netbird Config
+    netbirdProjectName: "netbird"
+    netbirdOperatorManagementUrl: "https://netbird-mgmt.example.com"
+    netbirdOperatorApiKeyVaultPath: "netbird/api-key"
+    netbirdSetupKeyVaultPath: "netbird/setup-key"
+
+  providerConfigsRef:
+    zitadelProviderName: zitadel-provider
+    kubernetesProviderName: kubernetes-provider
+    vaultProviderName: vault-provider
+    gitlabProviderName: gitlab-provider
