@@ -33,6 +33,7 @@ ready = lambda o, statusPath="atProvider" -> bool {
 
 if parameters?.haproxy?.exposeReplicas:
     _exposeReplicas = {
+        enabled = True
         type = parameters?.haproxy?.exposeReplicas?.type
         annotations = parameters?.haproxy?.exposeReplicas?.annotations
         labels = parameters?.haproxy?.exposeReplicas?.labels
@@ -128,6 +129,7 @@ _MysqlCluster = {
                         } if parameters?.pxc?.podDisruptionBudget else {}
 
                         exposePrimary = {
+                            enabled = True
                             type = parameters?.haproxy?.expose?.type
                             annotations = parameters?.haproxy?.expose?.annotations
                             labels = parameters?.haproxy?.expose?.labels
