@@ -24,6 +24,10 @@ spec:
       - account-lookup-db-svc
       - central-ledger-db-svc
       - mcm-db-svc
+    consumerAppsReplicaExternalServices:
+      - account-lookup-db-replica-svc
+      - central-ledger-db-replica-svc
+      - mcm-db-replica-svc
     pxc:
       image: "percona/percona-xtradb-cluster:8.4.3-3.1" #example
       imagePullPolicy: IfNotPresent

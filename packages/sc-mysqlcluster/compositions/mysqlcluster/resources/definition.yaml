@@ -92,7 +92,13 @@ spec:
                     type: array
                     items:
                       type: string
-                    description: List of externalservice names for the consumer applications
+                    description: List of externalservice names for addressing the database from consumer applications
+                  consumerAppsReplicaExternalServices:
+                    type: array
+                    items:
+                      type: string
+                    description: List of externalservice names for addressing database replicas from consumer applications
+                    default: []
                   waypointName:
                     type: string
                     description: Name of the waypoint for the consumer applications
@@ -316,6 +322,9 @@ spec:
                             type: boolean
                             description: Expose only reader replicas
                             default: true
+                          externalServiceName:
+                            type: string
+                            description: Name of the external service to create when onlyReaders is true
                       resources:
                         type: object
                         description: The resources for haproxy
