@@ -340,7 +340,7 @@ _replicaServiceObserve = [{
                 apiVersion = "v1"
                 kind = "Service"
                 metadata = {
-                    name = "{}-haproxy-replica".format(parameters.clusterName)
+                    name = "{}-haproxy-replicas".format(parameters.clusterName)
                     namespace = parameters.scAppNamespace
                 }
             }
