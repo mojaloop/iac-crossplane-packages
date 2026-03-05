@@ -507,7 +507,7 @@ _replicaExternalService = [{
                 apiVersion = "networking.istio.io/v1beta1"
                 kind = "ServiceEntry"
                 metadata = {
-                    name = "{}.{}".format("mysql", parameters?.exposeReplicas.externalServiceName)
+                    name = "{}.{}".format("mysql", parameters?.haproxy?.exposeReplicas?.externalServiceName)
                     namespace = parameters?.appNamespace
                     labels = {
                         "istio.io/use-waypoint": parameters?.waypointName
@@ -517,7 +517,7 @@ _replicaExternalService = [{
                 spec = {
                     location = "MESH_EXTERNAL"
                     resolution = "DNS"
-                    hosts = ["{}.{}.svc.cluster.local".format(parameters?.exposeReplicas.externalServiceName, parameters?.appNamespace)]
+                    hosts = ["{}.{}.svc.cluster.local".format(parameters?.haproxy?.exposeReplicas.externalServiceName, parameters?.appNamespace)]
                     endpoints = [
                         {
                             address = _replicaExternalName
