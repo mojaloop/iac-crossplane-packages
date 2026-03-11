@@ -228,7 +228,10 @@ if parameters.backupEnabled == True:
                         namespace = parameters.targetNamespace
                     }
                     spec = {
-                        schedule = parameters.backupSchedule # Ensure this exists in your parameters
+                        schedule = parameters.backupSchedule
+                        successfulJobsHistoryLimit = 3
+                        failedJobsHistoryLimit = 6
+                        startingDeadlineSeconds = 600
                         jobTemplate = {
                             spec = {
                                 template = {
@@ -248,12 +251,18 @@ if parameters.backupEnabled == True:
                                                        echo "[$(date)] INFO: Authenticating with AppRole..."
                                                        export VAULT_TOKEN=$(vault write auth/{}/login role_id=$VAULT_SNAPSHOT_ROLE_ID secret_id=$VAULT_SNAPSHOT_SECRET_ID -format=json | jq -r .auth.client_token);
                                                        echo "[$(date)] INFO: Generating Raft snapshot..."
-                                                       vault operator raft snapshot save /share/vault-raft.snap;
-                                                       if [ $? -eq 0 ]; then
+                                                       if vault operator raft snapshot save /share/vault-raft.snap; then
                                                             echo "[$(date)] SUCCESS: Snapshot saved to /share/vault-raft.snap"
-                                                            touch /share/snapshot_complete
                                                         else
                                                             echo "[$(date)] ERROR: Vault snapshot command failed"
+                                                            exit 1
+                                                        fi
+                                                       echo "[$(date)] INFO: Inspecting snapshot..."
+                                                       if vault operator raft snapshot inspect /share/vault-raft.snap; then
+                                                            echo "[$(date)] SUCCESS: Snapshot inspection passed"
+                                                            touch /share/snapshot_complete
+                                                        else
+                                                            echo "[$(date)] ERROR: Snapshot inspection failed, snapshot may be corrupted"
                                                             exit 1
                                                         fi
                                                     """.format(parameters.snapshotAuthPath)
@@ -270,17 +279,33 @@ if parameters.backupEnabled == True:
                                                 args = [
                                                     "-ec",
                                                     """
-                                                        echo "[$(date)] INFO: Waiting for snapshot file to be ready..."
-                                                        until [ -f /share/vault-raft.snap ]; do sleep 5; done;
+                                                        echo "[$(date)] INFO: Waiting for snapshot to complete..."
+                                                        TIMEOUT=600
+                                                        ELAPSED=0
+                                                        until [ -f /share/snapshot_complete ]; do
+                                                          if [ $ELAPSED -ge $TIMEOUT ]; then
+                                                            echo "[$(date)] ERROR: Timed out waiting for snapshot to complete"
+                                                            exit 1
+                                                          fi
+                                                          sleep 5
+                                                          ELAPSED=$((ELAPSED + 5))
+                                                        done
+                                                        SNAP_NAME=vault_raft_$(date +\"%Y%m%d_%H%M%S\").snap
+                                                        S3_PATH=s3://{}/$SNAP_NAME
                                                         echo "[$(date)] INFO: Uploading to s3";
-                                                        aws s3 cp /share/vault-raft.snap s3://{}/vault_raft_$(date +\"%Y%m%d_%H%M%S\").snap --endpoint-url {};
-                                                        if [ $? -eq 0 ]; then
+                                                        if aws s3 cp /share/vault-raft.snap $S3_PATH --endpoint-url {}; then
                                                             echo "[$(date)] SUCCESS: Upload completed successfully."
                                                         else
                                                             echo "[$(date)] ERROR: AWS S3 upload failed."
                                                             exit 1
                                                         fi
-                                                    """.format(parameters.backupBucket, _s3Endpoint)
+                                                        if aws s3 ls $S3_PATH --endpoint-url {} > /dev/null 2>&1; then
+                                                            echo "[$(date)] SUCCESS: Upload verified: $SNAP_NAME"
+                                                        else
+                                                            echo "[$(date)] ERROR: Upload verification failed for: $SNAP_NAME"
+                                                            exit 1
+                                                        fi
+                                                    """.format(parameters.backupBucket, _s3Endpoint, _s3Endpoint)
                                                 ]
                                                 env = [
                                                     {
