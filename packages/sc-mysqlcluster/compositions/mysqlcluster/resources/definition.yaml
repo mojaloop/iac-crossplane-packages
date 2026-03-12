@@ -165,7 +165,12 @@ spec:
                             properties:
                               storageClassName:
                                 type: string
+                                enum:
+                                  - ceph-block
+                                  - openebs-hostpath
+                                  - openebs-hostpath-retain
                                 description: Storage class name for PVC
+                                default: ceph-block
                               accessModes:
                                 type: array
                                 items:
