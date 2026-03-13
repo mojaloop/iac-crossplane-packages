@@ -92,7 +92,13 @@ spec:
                     type: array
                     items:
                       type: string
-                    description: List of externalservice names for the consumer applications
+                    description: List of externalservice names for addressing the database from consumer applications
+                  consumerAppsReplicaExternalServices:
+                    type: array
+                    items:
+                      type: string
+                    description: List of externalservice names for addressing database replicas from consumer applications
+                    default: []
                   waypointName:
                     type: string
                     description: Name of the waypoint for the consumer applications
@@ -291,6 +297,34 @@ spec:
                             additionalProperties:
                               type: string
                             description: Labels for the service
+                      exposeReplicas:
+                        type: object
+                        description: Number of HAProxy replicas to expose
+                        default: {}
+                        properties:
+                          type:
+                            type: string
+                            description: Type of service to expose (e.g., LoadBalancer, NodePort)
+                            default: LoadBalancer
+                          annotations:
+                            type: object
+                            additionalProperties:
+                              type: string
+                            description: Annotations for the service
+                            default: {}
+                          labels:
+                            type: object
+                            additionalProperties:
+                              type: string
+                            description: Labels for the service
+                            default: {}
+                          onlyReaders:
+                            type: boolean
+                            description: Expose only reader replicas
+                            default: true
+                          externalServiceName:
+                            type: string
+                            description: Name of the external service to create when onlyReaders is true
                       resources:
                         type: object
                         description: The resources for haproxy

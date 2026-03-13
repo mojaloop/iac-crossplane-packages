@@ -31,6 +31,17 @@ ready = lambda o, statusPath="atProvider" -> bool {
     len(objstatus) > 0 and all_true([c.status == "True" for c in objstatus]) and status and statusPath in status
 }
 
+if parameters?.haproxy?.exposeReplicas:
+    _exposeReplicas = {
+        enabled = True
+        type = parameters?.haproxy?.exposeReplicas?.type
+        annotations = parameters?.haproxy?.exposeReplicas?.annotations
+        labels = parameters?.haproxy?.exposeReplicas?.labels
+        onlyReaders = parameters?.haproxy?.exposeReplicas?.onlyReaders
+    }
+else:
+    _exposeReplicas = {}
+
 _MysqlCluster = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
@@ -118,10 +129,12 @@ _MysqlCluster = {
                         } if parameters?.pxc?.podDisruptionBudget else {}
 
                         exposePrimary = {
+                            enabled = True
                             type = parameters?.haproxy?.expose?.type
                             annotations = parameters?.haproxy?.expose?.annotations
                             labels = parameters?.haproxy?.expose?.labels
                         }
+                        exposeReplicas = _exposeReplicas
                         gracePeriod = 30
                         resources = {
                             requests = {
@@ -311,6 +324,62 @@ _DnsRecord = {
     }
 }
 
+_replicaServiceObserve = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-replica-service-observation".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "{}-replica-service-observation".format(oxr.metadata.name)
+        }
+    }
+    spec = {
+        managementPolicies = ["Observe"]
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Service"
+                metadata = {
+                    name = "{}-haproxy-replicas".format(parameters.clusterName)
+                    namespace = parameters.scAppNamespace
+                }
+            }
+        }
+        providerConfigRef = {
+            name = spec.providerConfigsRef.scK8sProviderName
+        }
+    }
+}] if parameters?.haproxy?.exposeReplicas and parameters?.haproxy?.exposeReplicas?.type == "LoadBalancer" else []
+
+_service_observation = ocds["{}-replica-service-observation".format(oxr.metadata.name)] if "{}-replica-service-observation".format(oxr.metadata.name) in ocds else {}
+_replica_service_external_ip = _service_observation?.Resource?.status?.atProvider?.manifest?.status?.loadBalancer?.ingress?[0]?.ip
+
+_ReplicaDnsRecord = [{
+    apiVersion = "utils.aws.mojaloop.io/v1alpha1"
+    kind = "XAWSRoute53Record"
+    metadata = {
+        name = "{}-replica-dnsrecord".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "{}-replica-dnsrecord".format(oxr.metadata.name)
+        }
+    }
+
+    spec = {
+        parameters = {
+            name = "replica.{}".format(parameters?.dns?.name)
+            region = parameters?.dns?.region
+            ttl =  parameters?.dns?.ttl
+            type =  parameters?.dns?.type
+            records = [_replica_service_external_ip]
+            zoneId = parameters?.dns?.zoneId
+        }
+        providerConfigsRef = {
+            awsProviderConfigName = spec?.providerConfigsRef?.awsProviderName
+        }
+        managementPolicies = spec.managementPolicies
+    }
+}] if _replica_service_external_ip else []
+
 _ns = parameters?.backup?.appNamespace if parameters?.backup?.appNamespace else parameters?.appNamespace
 
 if parameters?.backup?.enabled == True:
@@ -420,6 +489,56 @@ _ExternalService = {
         }
     }
 }
+
+_replicaExternalName = ocds["{}-replica-dnsrecord".format(oxr.metadata.name)]?.Resource?.status?.fqdn or ""
+
+_replicaExternalService = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-replica-en-svc".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "{}-replica-en-svc".format(oxr.metadata.name)
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "networking.istio.io/v1beta1"
+                kind = "ServiceEntry"
+                metadata = {
+                    name = "{}.{}".format("mysql", parameters?.haproxy?.exposeReplicas?.externalServiceName)
+                    namespace = parameters?.appNamespace
+                    labels = {
+                        "istio.io/use-waypoint": parameters?.waypointName
+                        "istio.io/use-waypoint-namespace": parameters?.waypointNamespace
+                    }
+                }
+                spec = {
+                    location = "MESH_EXTERNAL"
+                    resolution = "DNS"
+                    hosts = ["{}.{}.svc.cluster.local".format(parameters?.haproxy?.exposeReplicas.externalServiceName, parameters?.appNamespace)]
+                    endpoints = [
+                        {
+                            address = _replicaExternalName
+                        }
+                    ]
+                    ports = [
+                        {
+                            number = 3306
+                            name = "mysql"
+                            protocol = "TCP"
+                        }
+                    ]
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.ccK8sProviderName
+        }
+    }
+}] if _replica_service_external_ip else []
 
 _Policy = {
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
@@ -569,7 +688,57 @@ _ConsumerAppExternalServices = [
     } for serviceName in parameters?.consumerAppsExternalServices or []
 ]
 
-_items += [_s3Bucket, _s3Secret, _Policy, _MysqlCluster, _Secret, _DnsRecord, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+_ConsumerAppReplicaExternalServices = [
+    {
+        apiVersion = "kubernetes.crossplane.io/v1alpha2"
+        kind = "Object"
+        metadata = {
+            name = "{}-rs-en-svc-{}".format(oxr.metadata.name, serviceName)
+            annotations = {
+                "krm.kcl.dev/composition-resource-name": "{}-rs-en-svc-{}".format(oxr.metadata.name, serviceName)
+            }
+        }
+        spec = {
+            forProvider = {
+                manifest = {
+                    apiVersion = "networking.istio.io/v1beta1"
+                    kind = "ServiceEntry"
+                    metadata = {
+                        name = "{}.{}".format("mysql", serviceName)
+                        namespace = parameters?.appNamespace
+                        labels = {
+                            "istio.io/use-waypoint": parameters?.waypointName
+                            "istio.io/use-waypoint-namespace": parameters?.waypointNamespace
+                        }
+                    }
+                    spec = {
+                        location = "MESH_EXTERNAL"
+                        resolution = "DNS"
+                        hosts = ["{}.{}.svc.cluster.local".format(serviceName, parameters?.appNamespace)]
+                        endpoints = [
+                            {
+                                address = _replicaExternalName
+                            }
+                        ]
+                        ports = [
+                            {
+                                number = 3306
+                                name = "mysql"
+                                protocol = "TCP"
+                            }
+                        ]
+                    }
+                }
+            }
+            managementPolicies = spec.managementPolicies
+            providerConfigRef = {
+                name = spec.providerConfigsRef.ccK8sProviderName
+            }
+        }
+    } for serviceName in parameters?.consumerAppsReplicaExternalServices or []
+]
+
+_items += [_s3Bucket, _s3Secret, _Policy, _MysqlCluster, _Secret, _DnsRecord, _clientsourceSecret, _ExternalService] + _ConsumerAppCASecrets + _ConsumerAppExternalServices + _replicaServiceObserve + _ReplicaDnsRecord + _replicaExternalService + _ConsumerAppReplicaExternalServices
 dxr = {
     **oxr
 }

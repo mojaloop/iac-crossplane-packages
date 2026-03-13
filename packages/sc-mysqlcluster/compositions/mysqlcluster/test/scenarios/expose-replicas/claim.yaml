@@ -1,0 +1,132 @@
+apiVersion: sc.mojaloop.io/v1alpha1
+kind: XMysqlCluster
+metadata:
+  name: mysqlpxc
+  namespace: env
+spec:
+  parameters:
+    clusterName: env
+    externalServiceName: my-cluster-service
+    appNamespace: env
+    scAppNamespace: env
+    crVersion: "1.16.0"
+    dbSecret: my-db-secret
+    dbsourceSecret: my-db-secret
+    dbUsername: my-user
+    dbName: my-database
+    consumerAppsSecret:
+      name: my-ca-configmap
+      key: my-ca-bundle.pem
+      namespaces:
+        - env1
+        - env2
+    consumerAppsExternalServices:
+      - account-lookup-db-svc
+      - central-ledger-db-svc
+      - mcm-db-svc
+    consumerAppsReplicaExternalServices:
+      - account-lookup-db-replica-svc
+      - central-ledger-db-replica-svc
+      - mcm-db-replica-svc
+    pxc:
+      image: "percona/percona-xtradb-cluster:8.4.3-3.1" #example
+      imagePullPolicy: IfNotPresent
+      annotations:
+        test: "test-annotation"
+      storageSize: "20Gi"
+      volumeSpec: # optional, overrides the effects of storageSize
+        emptyDir:
+          medium: Memory
+          sizeLimit: 8Gi
+      replicas: 3
+      resources:
+        requests:
+          memory: 2Gi
+          cpu: "1"
+        limits:
+          memory: 4Gi
+          cpu: "2"
+      configuration: |
+        [mysqld]
+        pxc_strict_mode=PERMISSIVE
+        default_authentication_plugin=mysql_native_password
+        max_allowed_packet=16M
+        bind-address="*"
+        character-set-server=UTF8
+        collation-server=utf8_general_ci
+        general_log=0
+        slow_query_log=0
+        long_query_time=10
+        innodb_use_native_aio=0
+        max_connections=2000
+        innodb_buffer_pool_size=2147483648
+        wsrep_auto_increment_control=OFF
+      tolerations: []
+      priorityClassName: ""
+    haproxy:
+      image: "percona/haproxy:2.8.11" #example
+      imagePullPolicy: IfNotPresent
+      expose:
+        type: LoadBalancer
+        annotations: {}
+        labels: {}
+      exposeReplicas:
+        type: LoadBalancer
+        onlyReaders: false
+      replicas: 2
+      resources:
+        requests:
+          memory: 1Gi
+          cpu: 500m
+        limits:
+          memory: 2Gi
+          cpu: "1"
+      tolerations: []
+      priorityClassName: ""
+    logcollector:
+      image: "perconalab/percona-xtradb-cluster-operator:main-logcollector" #example
+      imagePullPolicy: IfNotPresent
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 100m
+        limits:
+          memory: 500Mi
+          cpu: 200m
+    backup:
+      enabled: true
+      backuptype: s3
+      objectStoreProvider: s3
+      forceDestroy: false
+      deletionPolicy: Delete
+      image: "percona/percona-xtradb-cluster-operator:1.17.0-pxc8.4-backup-pxb8.4.0" # example
+      imagePullPolicy: IfNotPresent
+      verifyTLS: true
+      bucket: "s3-bucket-name"
+      endpointUrl: https://s3.eu-west-1.amazonaws.com
+      credentialsSecret: "s3-credentials"
+      bucketRegion: "us-east-1"
+      scheduleName: "daily-backup"
+      cronScheduleExpression: "0 0 * * *"
+      backupRetention: 7
+      pvc: # optional config for enabling backup to PVC
+        type: filesystem
+        volume:
+          persistentVolumeClaim:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 8G
+    dns:
+      name: my-cluster-service
+      region: eu-west-1
+      ttl: 300
+      type: A
+      zoneId: Z0111719400KIQPJMA8G
+  providerConfigsRef:
+    scK8sProviderName: sc-kubernetes-provider
+    ccK8sProviderName: kubernetes-provider
+    awsProviderName: aws-cp-upbound-provider-config
+  managementPolicies:
+    - "*"
