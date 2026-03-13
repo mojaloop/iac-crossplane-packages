@@ -585,6 +585,14 @@ _Policy = {
                                     key = """{{ request.object.spec.template.metadata.annotations."utils.mojaloop.io/restore-pvc-name" || ''}}"""
                                     operator = "NotEquals"
                                     value = ""
+                                }, {
+                                    key = "{{ request.object.spec.template.spec.initContainers[?name == 'restore-backup'] | length(@) }}"
+                                    operator = "Equals"
+                                    value = 0
+                                }, {
+                                    key = "{{ request.object.spec.template.spec.volumes[?name == 'backupdir'] | length(@) }}"
+                                    operator = "Equals"
+                                    value = 0
                                 }]
                             }
                             mutate = {
