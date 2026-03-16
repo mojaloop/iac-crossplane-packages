@@ -323,6 +323,24 @@ echo "[$(date)] INFO: Vault snapshot backup completed successfully"
                                                 env = [
                                                     { name = "VAULT_ADDR", value = "http://vault-active.vault.svc.cluster.local:8200" }
                                                     {
+                                                        name = "VAULT_SNAPSHOT_ROLE_ID"
+                                                        valueFrom = {
+                                                            secretKeyRef = {
+                                                                name = "vault-snapshot-creds"
+                                                                key = "VAULT_SNAPSHOT_ROLE_ID"
+                                                            }
+                                                        }
+                                                    }
+                                                    {
+                                                        name = "VAULT_SNAPSHOT_SECRET_ID"
+                                                        valueFrom = {
+                                                            secretKeyRef = {
+                                                                name = "vault-snapshot-creds"
+                                                                key = "VAULT_SNAPSHOT_SECRET_ID"
+                                                            }
+                                                        }
+                                                    }
+                                                    {
                                                         name = "AWS_ACCESS_KEY_ID"
                                                         valueFrom = {
                                                             secretKeyRef = {
@@ -341,7 +359,6 @@ echo "[$(date)] INFO: Vault snapshot backup completed successfully"
                                                         }
                                                     }
                                                 ]
-                                               envFrom = [{ secretRef = { name = "vault-snapshot-creds" } }]
                                             }
                                         ]
                                         restartPolicy = "OnFailure"
