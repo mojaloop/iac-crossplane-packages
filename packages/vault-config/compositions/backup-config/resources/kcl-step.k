@@ -373,10 +373,6 @@ echo "[$(date)] INFO: Vault snapshot backup completed successfully"
             providerConfigRef = {
                 name = spec.providerConfigsRef.kubernetesProviderName
             }
-            readiness = {
-                policy = "DeriveFromCelQuery"
-                celQuery = "has(object.status.conditions) && object.status.conditions.exists(c, c.type == 'Complete' && c.status == 'True')"
-            }
         }
     }
 
