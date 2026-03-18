@@ -282,58 +282,51 @@ _k8s_id = _get_secret_data("k8s-cli", "attribute.client_id")
 _k8s_secrets = []
 _vault_secrets = []
 
-# Helper to add secret pair (k8s secret + vault secret)
-_add_secrets = lambda name, path, val -> any {
-    _k8s_secret = _create_k8s_secret(name, "{\"value\": \"" + val + "\"}")
-    _vault_secret = _create_vault_kv_secret(name, parameters.vaultKvPath, path, "{}-{}".format(oxr.metadata.name, name))
+# Helper lambdas to create individual secrets
+_make_k8s_secret = lambda name: str, val: str -> any {
+    _create_k8s_secret(name, "{\"value\": \"" + val + "\"}")
+}
 
-    return [_k8s_secret, _vault_secret]
+_make_vault_secret = lambda name: str, path: str -> any {
+    _create_vault_kv_secret(name, parameters.vaultKvPath, path, "{}-{}".format(oxr.metadata.name, name))
 }
 
 if _grafana_id != "":
-    _pair = _add_secrets("grafana-id", "{}/grafana_oidc_client_id".format(parameters.envName), _grafana_id)
-    _k8s_secrets += [_pair[0]]
-    _vault_secrets += [_pair[1]]
+    _k8s_secrets += [_make_k8s_secret("grafana-id", _grafana_id)]
+    _vault_secrets += [_make_vault_secret("grafana-id", "{}/grafana_oidc_client_id".format(parameters.envName))]
 
 if _grafana_secret != "":
-    _pair = _add_secrets("grafana-secret", "{}/grafana_oidc_client_secret".format(parameters.envName), _grafana_secret)
-    _k8s_secrets += [_pair[0]]
-    _vault_secrets += [_pair[1]]
+    _k8s_secrets += [_make_k8s_secret("grafana-secret", _grafana_secret)]
+    _vault_secrets += [_make_vault_secret("grafana-secret", "{}/grafana_oidc_client_secret".format(parameters.envName))]
 
 if _vault_id != "":
-    _pair = _add_secrets("vault-id", "{}/vault_oidc_client_id".format(parameters.envName), _vault_id)
-    _k8s_secrets += [_pair[0]]
-    _vault_secrets += [_pair[1]]
+    _k8s_secrets += [_make_k8s_secret("vault-id", _vault_id)]
+    _vault_secrets += [_make_vault_secret("vault-id", "{}/vault_oidc_client_id".format(parameters.envName))]
 
 if _vault_secret != "":
-    _pair = _add_secrets("vault-secret", "{}/vault_oidc_client_secret".format(parameters.envName), _vault_secret)
-    _k8s_secrets += [_pair[0]]
-    _vault_secrets += [_pair[1]]
+    _k8s_secrets += [_make_k8s_secret("vault-secret", _vault_secret)]
+    _vault_secrets += [_make_vault_secret("vault-secret", "{}/vault_oidc_client_secret".format(parameters.envName))]
 
 if _argocd_id != "":
-    _pair = _add_secrets("argocd-id", "{}/argocd_oidc_client_id".format(parameters.envName), _argocd_id)
-    _k8s_secrets += [_pair[0]]
-    _vault_secrets += [_pair[1]]
+    _k8s_secrets += [_make_k8s_secret("argocd-id", _argocd_id)]
+    _vault_secrets += [_make_vault_secret("argocd-id", "{}/argocd_oidc_client_id".format(parameters.envName))]
 
 if _argocd_secret != "":
-    _pair = _add_secrets("argocd-secret", "{}/argocd_oidc_client_secret".format(parameters.envName), _argocd_secret)
-    _k8s_secrets += [_pair[0]]
-    _vault_secrets += [_pair[1]]
+    _k8s_secrets += [_make_k8s_secret("argocd-secret", _argocd_secret)]
+    _vault_secrets += [_make_vault_secret("argocd-secret", "{}/argocd_oidc_client_secret".format(parameters.envName))]
 
 if _addons_id != "":
-    _pair = _add_secrets("addons-id", "{}/addons_oidc_client_id".format(parameters.envName), _addons_id)
-    _k8s_secrets += [_pair[0]]
-    _vault_secrets += [_pair[1]]
+    _k8s_secrets += [_make_k8s_secret("addons-id", _addons_id)]
+    _vault_secrets += [_make_vault_secret("addons-id", "{}/addons_oidc_client_id".format(parameters.envName))]
 
 if _addons_secret != "":
-    _pair = _add_secrets("addons-secret", "{}/addons_oidc_client_secret".format(parameters.envName), _addons_secret)
-    _k8s_secrets += [_pair[0]]
-    _vault_secrets += [_pair[1]]
+    _k8s_secrets += [_make_k8s_secret("addons-secret", _addons_secret)]
+    _vault_secrets += [_make_vault_secret("addons-secret", "{}/addons_oidc_client_secret".format(parameters.envName))]
 
 if _k8s_id != "":
-    _pair = _add_secrets("k8s-id", "{}/kubernetes_oidc_client_id".format(parameters.envName), _k8s_id)
-    _k8s_secrets += [_pair[0]]
-    _vault_secrets += [_pair[1]]
+    _k8s_secrets += [_make_k8s_secret("k8s-id", _k8s_id)]
+    _vault_secrets += [_make_vault_secret("k8s-id", "{}/kubernetes_oidc_client_id".format(parameters.envName))]
+
 
 
 # Gitlab Project Variables

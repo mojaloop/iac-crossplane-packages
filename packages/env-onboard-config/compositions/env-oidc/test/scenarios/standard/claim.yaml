@@ -5,40 +5,40 @@ metadata:
   namespace: env-namespace
 spec:
   parameters:
-    envName: "example-env"
+    envName: "env-infra3"
     organizationIdSecretRef:
-      name: zitadel-admin-creds
-      namespace: crossplane-system
-      key: org_id
+      key: zitadel_org_id
+      name: zitadel-post-config-init-output
+      namespace: zitadel
     zitadelAdminHumanUserIdRef:
-      name: zitadel-admin-creds
-      namespace: crossplane-system
-      key: human_user_id
+      key: zitadel_admin_human_user_id
+      name: post-config-output
+      namespace: zitadel
 
     # App Configurations
-    grafanaFqdn: "grafana.example.com"
-    vaultFqdn: "vault.example.com"
-    argocdFqdn: "argocd.example.com"
-    addonsDomain: "addons.example.com"
+    grafanaFqdn: "grafana.int.env-infra3.drpp-onprem.global"
+    vaultFqdn: "vault.int.env-infra3.drpp-onprem.global"
+    argocdFqdn: "argocd.int.env-infra3.drpp-onprem.global"
+    addonsDomain: "drpp-onprem.global"
 
     # Vault Config
     vaultKvPath: "secret"
 
     # RBAC Groups
-    grafanaAdminRbacGroup: "grafana-admins"
-    grafanaUserRbacGroup: "grafana-users"
-    vaultAdminRbacGroup: "vault-admins"
-    vaultUserRbacGroup: "vault-users"
-    argocdAdminRbacGroup: "argocd-admins"
-    argocdUserRbacGroup: "argocd-users"
+    grafanaAdminRbacGroup: "grafana_administrators"
+    grafanaUserRbacGroup: "grafana_users"
+    vaultAdminRbacGroup: "vault_administrators"
+    vaultUserRbacGroup: "vault_users"
+    argocdAdminRbacGroup: "argocd_administrators"
+    argocdUserRbacGroup: "argocd_users"
     k8sAdminRbacGroup: "techops-admin"
     k8sUserRbacGroup: "techops-user"
 
     # Netbird Config
     netbirdProjectName: "netbird"
-    netbirdOperatorManagementUrl: "https://netbird-mgmt.example.com"
-    netbirdOperatorApiKeyVaultPath: "netbird/api-key"
-    netbirdSetupKeyVaultPath: "netbird/setup-key"
+    netbirdOperatorManagementUrl: "https://netbird.ccinfra05.drpp-onprem.global:443"
+    netbirdOperatorApiKeyVaultPath: "env-infra3/netbird_op_access_token"
+    netbirdSetupKeyVaultPath: "env-infra3/netbird_k8s_setup_key"
 
   providerConfigsRef:
     zitadelProviderName: zitadel-provider
