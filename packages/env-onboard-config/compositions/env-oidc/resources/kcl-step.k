@@ -379,13 +379,14 @@ if parameters.gitlabProjectId:
 
 # Roles and Grants
 _create_role = lambda role_key, display_name -> any {
+    _safe_name = role_key.replace("_", "-")
     {
         apiVersion = "project.zitadel.crossplane.io/v1alpha1"
         kind = "Role"
         metadata = {
-            name = "{}-role-{}".format(oxr.metadata.name, role_key)
+            name = "{}-role-{}".format(oxr.metadata.name, _safe_name)
             annotations = {
-                "krm.kcl.dev/composition-resource-name": "role-{}".format(role_key)
+                "krm.kcl.dev/composition-resource-name": "role-{}".format(_safe_name)
             }
         }
         spec = {
