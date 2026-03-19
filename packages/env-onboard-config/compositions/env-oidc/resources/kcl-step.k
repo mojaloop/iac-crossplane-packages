@@ -202,7 +202,7 @@ _observe_oidc_secret = lambda name -> any {
         apiVersion = "kubernetes.crossplane.io/v1alpha2"
         kind = "Object"
         metadata = {
-            name = "{}".format(name)
+            name = "{}-{}".format(oxr.metadata.name, name)
             annotations = {
                 "krm.kcl.dev/composition-resource-name": "{}-oidc-conn-observe".format(name)
             }
