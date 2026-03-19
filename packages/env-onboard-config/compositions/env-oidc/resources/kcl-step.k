@@ -184,7 +184,7 @@ _create_vault_kv_secret = lambda name, mount, path, secret_ref_name -> any {
                 dataJsonSecretRef = {
                     key = "value"
                     name = secret_ref_name
-                    namespace = parameters.organizationIdSecretRef?.namespace
+                    namespace = parameters.envName
                 }
                 deleteAllVersions = True
             }
@@ -204,7 +204,7 @@ _observe_oidc_secret = lambda name -> any {
         metadata = {
             name = "{}-{}-oidc-conn-observe".format(oxr.metadata.name, name)
             annotations = {
-                "krm.kcl.dev/composition-resource-name": "{}-{}-oidc-conn-observe".format(oxr.metadata.name, name)
+                "krm.kcl.dev/composition-resource-name": "{}-oidc-conn-observe".format(name)
             }
         }
         spec = {
@@ -225,7 +225,6 @@ _observe_oidc_secret = lambda name -> any {
         }
     }
 }
-
 _grafana_secret_obs = _observe_oidc_secret("grafana")
 _vault_secret_obs = _observe_oidc_secret("vault")
 _argocd_secret_obs = _observe_oidc_secret("argocd")
@@ -254,7 +253,7 @@ _create_k8s_secret = lambda name, data -> any {
                     kind = "Secret"
                     metadata = {
                         name = "{}-{}".format(oxr.metadata.name, name)
-                        namespace = parameters.organizationIdSecretRef?.namespace
+                        namespace = parameters.envName
                     }
                     stringData = {
                         value = data
