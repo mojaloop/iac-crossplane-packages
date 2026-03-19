@@ -204,7 +204,7 @@ _observe_oidc_secret = lambda name -> any {
         metadata = {
             name = "{}-{}-oidc-conn-observe".format(oxr.metadata.name, name)
             annotations = {
-                "krm.kcl.dev/composition-resource-name": "{}-oidc-conn-observe".format(name)
+                "krm.kcl.dev/composition-resource-name": "{}-{}-oidc-conn-observe".format(oxr.metadata.name, name)
             }
         }
         spec = {
@@ -232,8 +232,8 @@ _argocd_secret_obs = _observe_oidc_secret("argocd")
 _addons_secret_obs = _observe_oidc_secret("addons")
 _k8s_cli_secret_obs = _observe_oidc_secret("k8s-cli")
 
-_get_secret_data = lambda name, key -> str {
-    base64.decode(ocds["{}-oidc-conn-observe".format(name)]?.Resource?.status?.atProvider?.manifest?.data?[key]) or ""
+_get_secret_data = lambda xrname, name, key -> str {
+    base64.decode(ocds["{}-{}-oidc-conn-observe".format(xrname, name)]?.Resource?.status?.atProvider?.manifest?.data?[key]) or ""
 }
 
 # Create Kubernetes Secret to hold the sensitive data
@@ -269,15 +269,18 @@ _create_k8s_secret = lambda name, data -> any {
     }
 }
 
-_grafana_id = _get_secret_data("grafana", "attribute.client_id")
-_grafana_secret = _get_secret_data("grafana", "attribute.client_secret")
-_vault_id = _get_secret_data("vault", "attribute.client_id")
-_vault_secret = _get_secret_data("vault", "attribute.client_secret")
-_argocd_id = _get_secret_data("argocd", "attribute.client_id")
-_argocd_secret = _get_secret_data("argocd", "attribute.client_secret")
-_addons_id = _get_secret_data("addons", "attribute.client_id")
-_addons_secret = _get_secret_data("addons", "attribute.client_secret")
-_k8s_id = _get_secret_data("k8s-cli", "attribute.client_id")
+
+
+
+_grafana_id = _get_secret_data(oxr.metadata.name, "grafana", "attribute.client_id")
+_grafana_secret = _get_secret_data(oxr.metadata.name, "grafana", "attribute.client_secret")
+_vault_id = _get_secret_data(oxr.metadata.name, "vault", "attribute.client_id")
+_vault_secret = _get_secret_data(oxr.metadata.name, "vault", "attribute.client_secret")
+_argocd_id = _get_secret_data(oxr.metadata.name, "argocd", "attribute.client_id")
+_argocd_secret = _get_secret_data(oxr.metadata.name, "argocd", "attribute.client_secret")
+_addons_id = _get_secret_data(oxr.metadata.name, "addons", "attribute.client_id")
+_addons_secret = _get_secret_data(oxr.metadata.name, "addons", "attribute.client_secret")
+_k8s_id = _get_secret_data(oxr.metadata.name, "k8s-cli", "attribute.client_id")
 
 _k8s_secrets = []
 _vault_secrets = []
@@ -581,7 +584,7 @@ _items = [
     _observe_registry_mirror_readonly_password,
     _zitadel_ahuid_observe_secret,
     _admin_user_grant
-] + _roles + _vault_secrets + _k8s_secrets + _gitlab_variables
+] + _roles + _vault_secrets + _k8s_secrets + _registry_vault_secrets + _registry_k8s_secrets + _gitlab_variables
 
 # Return structure
 items = _items + [oxr]
