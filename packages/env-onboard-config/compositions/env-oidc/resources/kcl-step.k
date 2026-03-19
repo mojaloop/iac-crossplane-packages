@@ -361,20 +361,19 @@ _create_gitlab_variable = lambda name, key, value, env -> any {
 
 _gitlab_variables = []
 
-if parameters.gitlabProjectId:
-    _gitlab_variables = [
-        _create_gitlab_variable("k8s-oidc-admin-group", "KUBERNETES_OIDC_K8S_ADMIN_GROUP", "{}:{}".format(_projectId, parameters.k8sAdminRbacGroup), parameters.envName),
-        _create_gitlab_variable("k8s-oidc-user-group", "KUBERNETES_OIDC_K8S_USER_GROUP", "{}:{}".format(_projectId, parameters.k8sUserRbacGroup), parameters.envName)
-    ]
+_gitlab_variables = [
+    _create_gitlab_variable("k8s-oidc-admin-group", "KUBERNETES_OIDC_K8S_ADMIN_GROUP", "{}:{}".format(_projectId, parameters.k8sAdminRbacGroup), parameters.envName)
+    _create_gitlab_variable("k8s-oidc-user-group", "KUBERNETES_OIDC_K8S_USER_GROUP", "{}:{}".format(_projectId, parameters.k8sUserRbacGroup), parameters.envName)
+]
 
-    if parameters.netbirdOperatorManagementUrl:
-        _gitlab_variables += [_create_gitlab_variable("netbird-mgmt-url", "netbird_operator_management_url", parameters.netbirdOperatorManagementUrl, parameters.envName)]
+if parameters.netbirdOperatorManagementUrl:
+    _gitlab_variables += [_create_gitlab_variable("netbird-mgmt-url", "netbird_operator_management_url", parameters.netbirdOperatorManagementUrl, parameters.envName)]
 
-    if parameters.netbirdOperatorApiKeyVaultPath:
-        _gitlab_variables += [_create_gitlab_variable("netbird-api-key-path", "netbird_operator_api_key_vault_path", parameters.netbirdOperatorApiKeyVaultPath, parameters.envName)]
+if parameters.netbirdOperatorApiKeyVaultPath:
+    _gitlab_variables += [_create_gitlab_variable("netbird-api-key-path", "netbird_operator_api_key_vault_path", parameters.netbirdOperatorApiKeyVaultPath, parameters.envName)]
 
-    if parameters.netbirdSetupKeyVaultPath:
-        _gitlab_variables += [_create_gitlab_variable("netbird-setup-key-path", "netbird_setup_key_vault_path", parameters.netbirdSetupKeyVaultPath, parameters.envName)]
+if parameters.netbirdSetupKeyVaultPath:
+    _gitlab_variables += [_create_gitlab_variable("netbird-setup-key-path", "netbird_setup_key_vault_path", parameters.netbirdSetupKeyVaultPath, parameters.envName)]
 
 
 # Roles and Grants
@@ -476,6 +475,89 @@ _admin_user_grant = {
     }
 }
 
+# Observe Nexus Readonly Password Secret
+_observe_nexus_readonly_password = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-nexus-readonly-password-observe".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "nexus-readonly-password-observe"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = parameters.nexusReadonlyPasswordSecretName if parameters.nexusReadonlyPasswordSecretName else "external-docker-nexus-secret"
+                    namespace = parameters.nexusReadonlyPasswordSecretNamespace if parameters.nexusReadonlyPasswordSecretNamespace else "vault"
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
+    }
+}
+
+_nexusReadonlyPasswordData = ocds["nexus-readonly-password-observe"]?.Resource?.status?.atProvider?.manifest?.data or {}
+_nexusReadonlyPassword = base64.decode(_nexusReadonlyPasswordData["external-docker-nexus-password"]) if "external-docker-nexus-password" in _nexusReadonlyPasswordData else ""
+
+# Observe Registry Mirror Readonly Password Secret
+_observe_registry_mirror_readonly_password = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-registry-mirror-readonly-password-observe".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "registry-mirror-readonly-password-observe"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = parameters.registryMirrorReadonlyPasswordSecretName if parameters.registryMirrorReadonlyPasswordSecretName else "external-docker-harbor-secret"
+                    namespace = parameters.registryMirrorReadonlyPasswordSecretNamespace if parameters.registryMirrorReadonlyPasswordSecretNamespace else "vault"
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
+    }
+}
+
+_registryMirrorReadonlyPasswordData = ocds["registry-mirror-readonly-password-observe"]?.Resource?.status?.atProvider?.manifest?.data or {}
+_registryMirrorReadonlyPassword = base64.decode(_registryMirrorReadonlyPasswordData["external-docker-harbor-password"]) if "external-docker-harbor-password" in _registryMirrorReadonlyPasswordData else ""
+
+_registry_k8s_secrets = []
+_registry_vault_secrets = []
+
+if _nexusReadonlyPassword != "":
+    _registry_k8s_secrets += [_create_k8s_secret("nexus-readonly-password", '{"value": "' + _nexusReadonlyPassword + '"}')]
+    _registry_vault_secrets += [_create_vault_kv_secret(
+        "nexus-readonly-password",
+        parameters.vaultKvPath,
+        "{}/nexus_readonly_password".format(parameters.envName),
+        "{}-nexus-readonly-password".format(oxr.metadata.name)
+    )]
+
+if _registryMirrorReadonlyPassword != "":
+    _registry_k8s_secrets += [_create_k8s_secret("registry-mirror-readonly-password", '{"value": "' + _registryMirrorReadonlyPassword + '"}')]
+    _registry_vault_secrets += [_create_vault_kv_secret(
+        "registry-mirror-readonly-password",
+        parameters.vaultKvPath,
+        "{}/registry_mirror_readonly_password".format(parameters.envName),
+        "{}-registry-mirror-readonly-password".format(oxr.metadata.name)
+    )]
+
 # Items assembly
 # Netbird Project ID Observation (Assuming it's stored in a secret similar to Org ID)
 # If not, we might need to pass it as a parameter explicitly or skip it if unavailable.
@@ -495,6 +577,8 @@ _items = [
     _argocd_secret_obs,
     _addons_secret_obs,
     _k8s_cli_secret_obs,
+    _observe_nexus_readonly_password,
+    _observe_registry_mirror_readonly_password,
     _zitadel_ahuid_observe_secret,
     _admin_user_grant
 ] + _roles + _vault_secrets + _k8s_secrets + _gitlab_variables
