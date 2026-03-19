@@ -35,7 +35,6 @@ spec:
     k8sUserRbacGroup: "techops-user"
 
     # Netbird Config
-    netbirdProjectName: "netbird"
     netbirdOperatorManagementUrl: "https://netbird.ccinfra05.drpp-onprem.global:443"
     netbirdOperatorApiKeyVaultPath: "env-infra3/netbird_op_access_token"
     netbirdSetupKeyVaultPath: "env-infra3/netbird_k8s_setup_key"

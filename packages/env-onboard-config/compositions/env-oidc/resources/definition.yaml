@@ -81,9 +81,6 @@ spec:
                       type: string
 
                     # Netbird Config
-                    netbirdProjectName:
-                      type: string
-                      default: "netbird"
                     netbirdOperatorManagementUrl:
                       type: string
                     netbirdOperatorApiKeyVaultPath:
