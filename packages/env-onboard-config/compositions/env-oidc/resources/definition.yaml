@@ -21,6 +21,12 @@ spec:
             spec:
               type: object
               properties:
+                managementPolicies:
+                  type: array
+                  default: ["*"]
+                  items:
+                    type: string
+                    enum: ["Observe", "Create", "Update", "Delete", "LateInitialize", "*"]
                 parameters:
                   type: object
                   properties:
@@ -125,6 +131,7 @@ spec:
                     - zitadelProviderName
                     - kubernetesProviderName
                     - vaultProviderName
+                    - gitlabProviderName
               required:
                 - parameters
                 - providerConfigsRef
