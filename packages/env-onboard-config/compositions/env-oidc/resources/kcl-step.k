@@ -626,7 +626,25 @@ _vpn_user_role = {
     }
 } if _netbirdProjectId else None
 
+_bucket_types = {
+    "loki": "loki"
+    "tempo": "tempo"
+    "velero": "velero"
+    "percona": "percona"
+    "audit": "audit"
+    "report": "report"
+    "vault_backup": "vault-backup"
+}
 
+_bucket_gitlab_variables = [
+    _create_gitlab_variable(
+        "{}-bucket-var".format(_bucket_types[bucket_key]),
+        "{}_bucket".format(bucket_key),
+        "{}-{}-{}".format(_bucket_types[bucket_key], parameters.envName, parameters.hyphenatedDomain),
+        parameters.envName
+    )
+    for bucket_key in _bucket_types
+]
 
 _items = [
     _observe_org_id_secret,
@@ -646,7 +664,7 @@ _items = [
     _observe_registry_mirror_readonly_password,
     _zitadel_ahuid_observe_secret,
     _admin_user_grant
-] + _roles + ([_vpn_user_role] if _vpn_user_role else []) + _vault_secrets + _k8s_secrets + _registry_vault_secrets + _registry_k8s_secrets + _gitlab_variables
+] + _roles + ([_vpn_user_role] if _vpn_user_role else []) + _vault_secrets + _k8s_secrets + _registry_vault_secrets + _registry_k8s_secrets + _gitlab_variables + _bucket_gitlab_variables
 
 # Return structure
 items = _items + [oxr]

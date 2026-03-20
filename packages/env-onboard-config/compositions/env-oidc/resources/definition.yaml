@@ -32,6 +32,9 @@ spec:
                   properties:
                     envName:
                       type: string
+                    hyphenatedDomain:
+                      type: string
+                      description: Domain name with dots replaced by hyphens, used for resource naming
                     organizationIdSecretRef:
                       type: object
                       properties:
