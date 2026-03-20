@@ -366,6 +366,15 @@ _gitlab_variables = []
 _gitlab_variables = [
     _create_gitlab_variable("k8s-oidc-admin-group", "KUBERNETES_OIDC_K8S_ADMIN_GROUP", "{}:{}".format(_projectId, parameters.k8sAdminRbacGroup), parameters.envName)
     _create_gitlab_variable("k8s-oidc-user-group", "KUBERNETES_OIDC_K8S_USER_GROUP", "{}:{}".format(_projectId, parameters.k8sUserRbacGroup), parameters.envName)
+    _create_gitlab_variable("zitadel-project-id", "zitadel_project_id", _projectId, parameters.envName)
+    _create_gitlab_variable("grafana-admin-rbac", "grafana_admin_rbac_group", parameters.grafanaAdminRbacGroup, parameters.envName)
+    _create_gitlab_variable("grafana-user-rbac", "grafana_user_rbac_group", parameters.grafanaUserRbacGroup, parameters.envName)
+    _create_gitlab_variable("vault-admin-rbac", "vault_admin_rbac_group", parameters.vaultAdminRbacGroup, parameters.envName)
+    _create_gitlab_variable("vault-user-rbac", "vault_user_rbac_group", parameters.vaultUserRbacGroup, parameters.envName)
+    _create_gitlab_variable("argocd-admin-rbac", "argocd_admin_rbac_group", parameters.argocdAdminRbacGroup, parameters.envName)
+    _create_gitlab_variable("argocd-user-rbac", "argocd_user_rbac_group", parameters.argocdUserRbacGroup, parameters.envName)
+    _create_gitlab_variable("addons-admin-rbac", "addons_admin_rbac_group", "addons-administrators", parameters.envName)
+    _create_gitlab_variable("addons-user-rbac", "addons_user_rbac_group", "addons-users", parameters.envName)
 ]
 
 if parameters.netbirdOperatorManagementUrl:
@@ -560,14 +569,68 @@ if _registryMirrorReadonlyPassword != "":
         "{}-registry-mirror-readonly-password".format(oxr.metadata.name)
     )]
 
-# Items assembly
-# Netbird Project ID Observation (Assuming it's stored in a secret similar to Org ID)
-# If not, we might need to pass it as a parameter explicitly or skip it if unavailable.
-# For now, I'll add a placeholder comment or skip it as it requires external info not guaranteed in the current setup.
-# The user can enable it if they provide the Netbird Project ID secret reference.
+
+# Observe Netbird Project to get its ID for VPN role
+_observe_netbird_project_id = {
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-netbird-project-id-observe".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "netbird-project-id-observe"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "v1"
+                kind = "Secret"
+                metadata = {
+                    name = parameters.netbirdPreConfigOutputSecret?.name
+                    namespace = parameters.netbirdPreConfigOutputSecret?.namespace
+                }
+            }
+        }
+        managementPolicies = ["Observe"]
+        providerConfigRef = {
+            name = spec.providerConfigsRef.kubernetesProviderName
+        }
+    }
+}
+
+_netbirdProjectId = base64.decode(ocds["netbird-project-id-observe"]?.Resource?.status?.atProvider?.manifest?.data?["netbird_project_id"]) or ""
+
+# Netbird VPN User Role (uses netbird project, not env project)
+_vpn_role_key = "{}-vpn-users".format(parameters.envName)
+
+_vpn_user_role = {
+    apiVersion = "project.zitadel.crossplane.io/v1alpha1"
+    kind = "Role"
+    metadata = {
+        name = "{}-role-vpn-users".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "role-vpn-users"
+        }
+    }
+    spec = {
+        forProvider = {
+            projectId = _netbirdProjectId
+            orgId = _orgId
+            roleKey = _vpn_role_key
+            displayName = _vpn_role_key
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.zitadelProviderName
+        }
+    }
+} if _netbirdProjectId else None
+
+
 
 _items = [
     _observe_org_id_secret,
+    _observe_netbird_project_id,
     _project,
     _grafana_oidc,
     _vault_oidc,
@@ -583,7 +646,7 @@ _items = [
     _observe_registry_mirror_readonly_password,
     _zitadel_ahuid_observe_secret,
     _admin_user_grant
-] + _roles + _vault_secrets + _k8s_secrets + _registry_vault_secrets + _registry_k8s_secrets + _gitlab_variables
+] + _roles + ([_vpn_user_role] if _vpn_user_role else []) + _vault_secrets + _k8s_secrets + _registry_vault_secrets + _registry_k8s_secrets + _gitlab_variables
 
 # Return structure
 items = _items + [oxr]

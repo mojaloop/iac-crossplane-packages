@@ -53,6 +53,18 @@ spec:
                           type: string
                       required: ["name", "namespace", "key"]
 
+                    netbirdPreConfigOutputSecret:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Name of the Secret containing pre-config output values
+                          default: "netbird-management"
+                        namespace:
+                          type: string
+                          description: Namespace of the Secret containing pre-config output values
+                          default: "netbird"
+
                     # App Configurations
                     grafanaFqdn:
                       type: string
