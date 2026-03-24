@@ -1,0 +1,16 @@
+apiVersion: env.mojaloop.io/v1alpha1
+kind: XEnvAwsPreconfig
+metadata:
+  name: example-env-preconfig
+  namespace: env-test
+spec:
+  parameters:
+    envName: "env-infra3"
+    ccClusterName: "cc-infra3"
+    vaultKvPath: "secret"
+  providerConfigsRef:
+    awsProviderName: aws-provider
+    vaultProviderName: vault-provider
+    kubernetesProviderName: kubernetes-provider
+  managementPolicies:
+    - "*"
