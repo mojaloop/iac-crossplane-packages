@@ -1,0 +1,67 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xenvawspreconfigs.env.mojaloop.io
+spec:
+  group: env.mojaloop.io
+  names:
+    kind: XEnvAwsPreconfig
+    plural: xenvawspreconfigs
+  claimNames:
+    kind: EnvAwsPreconfig
+    plural: envawspreconfigs
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                managementPolicies:
+                  type: array
+                  default: ["*"]
+                  items:
+                    type: string
+                    enum: ["Observe", "Create", "Update", "Delete", "LateInitialize", "*"]
+                parameters:
+                  type: object
+                  properties:
+                    envName:
+                      type: string
+                      description: "Name of the environment"
+                    ccClusterName:
+                      type: string
+                      description: "Control center cluster name"
+                    vaultKvPath:
+                      type: string
+                      description: "Key value secret path in Vault"
+                    ebsCsiPolicyArn:
+                      type: string
+                      description: "ARN of the AmazonEBSCSIDriverPolicy"
+                      default: "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+                  required:
+                    - envName
+                    - ccClusterName
+                    - vaultKvPath
+                providerConfigsRef:
+                  type: object
+                  properties:
+                    awsProviderName:
+                      type: string
+                      default: aws-provider
+                    vaultProviderName:
+                      type: string
+                      default: vault-provider
+                    kubernetesProviderName:
+                      type: string
+                      default: kubernetes-provider
+                  required:
+                    - awsProviderName
+                    - vaultProviderName
+              required:
+                - parameters
+                - providerConfigsRef

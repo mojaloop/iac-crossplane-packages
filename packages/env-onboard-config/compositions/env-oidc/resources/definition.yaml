@@ -1,0 +1,152 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xenvoidcconfigs.env.mojaloop.io
+spec:
+  group: env.mojaloop.io
+  names:
+    kind: XEnvOidcConfig
+    plural: xenvoidcconfigs
+  claimNames:
+    kind: EnvOidcConfig
+    plural: envoidcconfigs
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                managementPolicies:
+                  type: array
+                  default: ["*"]
+                  items:
+                    type: string
+                    enum: ["Observe", "Create", "Update", "Delete", "LateInitialize", "*"]
+                parameters:
+                  type: object
+                  properties:
+                    envName:
+                      type: string
+                    hyphenatedDomain:
+                      type: string
+                      description: Domain name with dots replaced by hyphens, used for resource naming
+                    organizationIdSecretRef:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        namespace:
+                          type: string
+                        key:
+                          type: string
+                      required: ["name", "namespace", "key"]
+                    zitadelAdminHumanUserIdRef:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        namespace:
+                          type: string
+                        key:
+                          type: string
+                      required: ["name", "namespace", "key"]
+
+                    netbirdPreConfigOutputSecret:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Name of the Secret containing pre-config output values
+                          default: "netbird-management"
+                        namespace:
+                          type: string
+                          description: Namespace of the Secret containing pre-config output values
+                          default: "netbird"
+
+                    # App Configurations
+                    grafanaFqdn:
+                      type: string
+                    vaultFqdn:
+                      type: string
+                    argocdFqdn:
+                      type: string
+                    addonsDomain:
+                      type: string
+
+                    # Vault Config
+                    vaultKvPath:
+                      type: string
+                      description: "Path in Vault KV engine where secrets will be stored"
+
+                    # RBAC Groups
+                    grafanaAdminRbacGroup:
+                      type: string
+                    grafanaUserRbacGroup:
+                      type: string
+                    vaultAdminRbacGroup:
+                      type: string
+                    vaultUserRbacGroup:
+                      type: string
+                    argocdAdminRbacGroup:
+                      type: string
+                    argocdUserRbacGroup:
+                      type: string
+                    k8sAdminRbacGroup:
+                      type: string
+                    k8sUserRbacGroup:
+                      type: string
+
+                    # Netbird Config
+                    netbirdOperatorManagementUrl:
+                      type: string
+                    netbirdOperatorApiKeyVaultPath:
+                      type: string
+                    netbirdSetupKeyVaultPath:
+                      type: string
+
+                  required:
+                    - envName
+                    - organizationIdSecretRef
+                    - zitadelAdminHumanUserIdRef
+                    - grafanaFqdn
+                    - vaultFqdn
+                    - argocdFqdn
+                    - addonsDomain
+                    - vaultKvPath
+                    - grafanaAdminRbacGroup
+                    - grafanaUserRbacGroup
+                    - vaultAdminRbacGroup
+                    - vaultUserRbacGroup
+                    - argocdAdminRbacGroup
+                    - argocdUserRbacGroup
+                    - k8sAdminRbacGroup
+                    - k8sUserRbacGroup
+
+                providerConfigsRef:
+                  type: object
+                  properties:
+                    zitadelProviderName:
+                      type: string
+                      default: zitadel-provider
+                    kubernetesProviderName:
+                      type: string
+                      default: kubernetes-provider
+                    vaultProviderName:
+                      type: string
+                      default: vault-provider
+                    gitlabProviderName:
+                      type: string
+                      default: gitlab-provider
+                  required:
+                    - zitadelProviderName
+                    - kubernetesProviderName
+                    - vaultProviderName
+                    - gitlabProviderName
+              required:
+                - parameters
+                - providerConfigsRef

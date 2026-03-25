@@ -1,0 +1,46 @@
+apiVersion: env.mojaloop.io/v1alpha1
+kind: XEnvOidcConfig
+metadata:
+  name: example-env-oidc-config
+  namespace: env-namespace
+spec:
+  parameters:
+    envName: "env-infra3"
+    organizationIdSecretRef:
+      key: zitadel_org_id
+      name: zitadel-post-config-init-output
+      namespace: zitadel
+    zitadelAdminHumanUserIdRef:
+      key: zitadel_admin_human_user_id
+      name: post-config-output
+      namespace: zitadel
+
+    # App Configurations
+    grafanaFqdn: "grafana.int.env-infra3.drpp-onprem.global"
+    vaultFqdn: "vault.int.env-infra3.drpp-onprem.global"
+    argocdFqdn: "argocd.int.env-infra3.drpp-onprem.global"
+    addonsDomain: "drpp-onprem.global"
+
+    # Vault Config
+    vaultKvPath: "secret"
+
+    # RBAC Groups
+    grafanaAdminRbacGroup: "grafana_administrators"
+    grafanaUserRbacGroup: "grafana_users"
+    vaultAdminRbacGroup: "vault_administrators"
+    vaultUserRbacGroup: "vault_users"
+    argocdAdminRbacGroup: "argocd_administrators"
+    argocdUserRbacGroup: "argocd_users"
+    k8sAdminRbacGroup: "techops-admin"
+    k8sUserRbacGroup: "techops-user"
+
+    # Netbird Config
+    netbirdOperatorManagementUrl: "https://netbird.ccinfra05.drpp-onprem.global:443"
+    netbirdOperatorApiKeyVaultPath: "env-infra3/netbird_op_access_token"
+    netbirdSetupKeyVaultPath: "env-infra3/netbird_k8s_setup_key"
+
+  providerConfigsRef:
+    zitadelProviderName: zitadel-provider
+    kubernetesProviderName: kubernetes-provider
+    vaultProviderName: vault-provider
+    gitlabProviderName: gitlab-provider

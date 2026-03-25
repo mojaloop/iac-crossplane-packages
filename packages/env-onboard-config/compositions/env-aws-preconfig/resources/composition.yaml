@@ -1,0 +1,26 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: env-aws-preconfig
+  labels:
+    crossplane.io/xrd: xenvawspreconfigs.env.mojaloop.io
+spec:
+  compositeTypeRef:
+    apiVersion: env.mojaloop.io/v1alpha1
+    kind: XEnvAwsPreconfig
+  writeConnectionSecretsToNamespace: crossplane-system
+  mode: Pipeline
+  pipeline:
+    - step: kcl
+      functionRef:
+        name: function-kcl
+      input:
+        apiVersion: krm.kcl.dev/v1alpha1
+        kind: KCLInput
+        spec:
+          source: |
+            $KCL_FUNCTION_CODE
+
+    - step: automatically-detect-ready-composed-resources
+      functionRef:
+        name: function-auto-ready
