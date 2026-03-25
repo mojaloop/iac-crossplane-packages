@@ -382,6 +382,57 @@ _Rs0DnsRecord = [{
     }
 }] if _rs0_external_ip else []
 
+_rs0ExternalName = ocds["rs0-dns-record"]?.Resource?.status?.fqdn or ""
+
+
+_rs0ExternalService = [{
+    apiVersion = "kubernetes.crossplane.io/v1alpha2"
+    kind = "Object"
+    metadata = {
+        name = "{}-en-svc".format(oxr.metadata.name)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "percona-mongodb-rs0-svc"
+        }
+    }
+    spec = {
+        forProvider = {
+            manifest = {
+                apiVersion = "networking.istio.io/v1beta1"
+                kind = "ServiceEntry"
+                metadata = {
+                    name = "{}.{}".format("rs0-mongodb", parameters?.externalServiceName)
+                    namespace = parameters?.appNamespace
+                    labels = {
+                        "istio.io/use-waypoint": parameters?.waypointName
+                        "istio.io/use-waypoint-namespace": parameters?.waypointNamespace
+                    }
+                }
+                spec = {
+                    location = "MESH_EXTERNAL"
+                    resolution = "DNS"
+                    hosts = ["rs0-{}.{}.svc.cluster.local".format(parameters?.externalServiceName, parameters?.appNamespace)]
+                    endpoints = [
+                        {
+                            address = _rs0ExternalName
+                        }
+                    ]
+                    ports = [
+                        {
+                            number = 27017
+                            name = "mongodb"
+                            protocol = "TCP"
+                        }
+                    ]
+                }
+            }
+        }
+        managementPolicies = spec.managementPolicies
+        providerConfigRef = {
+            name = spec.providerConfigsRef.ccK8sProviderName
+        }
+    }
+}] if _rs0ExternalName else []
+
 _ns = parameters?.backup?.appNamespace if parameters?.backup?.appNamespace else parameters?.appNamespace
 
 if parameters?.backup?.enabled == True:
@@ -543,7 +594,7 @@ _ConsumerAppExternalServices = [
 ]
 
 
-_items += [_s3Bucket, _s3Secret, _MongodbCluster, _Secret, _clientsourceSecret, _DnsRecord, _ExternalService] + _MongodbServiceObservation + _Rs0DnsRecord + _ConsumerAppCASecrets + _ConsumerAppExternalServices
+_items += [_s3Bucket, _s3Secret, _MongodbCluster, _Secret, _clientsourceSecret, _DnsRecord, _ExternalService] + _MongodbServiceObservation + _Rs0DnsRecord + _rs0ExternalService + _ConsumerAppCASecrets + _ConsumerAppExternalServices
 dxr = {
     **oxr
 }
