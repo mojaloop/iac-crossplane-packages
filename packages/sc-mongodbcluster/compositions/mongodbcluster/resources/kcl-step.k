@@ -389,7 +389,7 @@ _rs0ExternalService = [{
     apiVersion = "kubernetes.crossplane.io/v1alpha2"
     kind = "Object"
     metadata = {
-        name = "{}-en-svc".format(oxr.metadata.name)
+        name = "{}-rs0-en-svc".format(oxr.metadata.name)
         annotations = {
             "krm.kcl.dev/composition-resource-name": "percona-mongodb-rs0-svc"
         }
