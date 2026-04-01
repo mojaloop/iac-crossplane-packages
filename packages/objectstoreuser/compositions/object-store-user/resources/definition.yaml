@@ -1,0 +1,120 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xobjectstoreuser.objectstore.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: objectstore.mojaloop.io
+  names:
+    kind: XObjectStoreUser
+    plural: xobjectstoreuser
+  claimNames:
+    kind: ObjectStoreUser
+    plural: objectstoreusers
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                description: |-
+                  A ManagementAction represents an action that the Crossplane controllers
+                  can take on an external resource.
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+                type: array
+              parameters:
+                type: object
+                properties:
+                  objectStoreProvider:
+                    type: string
+                    description: |-
+                      The type of object store provider to use (ceph or s3/aws).
+                    enum:
+                      - ceph
+                      - s3
+                      - aws
+                    default: "ceph"
+                  userName:
+                    type: string
+                    description: The username for the object store user
+                  displayName:
+                    type: string
+                    description: Display name for the user
+                  namespace:
+                    type: string
+                    description: Kubernetes namespace where to create the secret
+                  ccK8sProviderName:
+                    type: string
+                    description: The name of the provider config to use for the remote k8s provider (for control center)
+                    default: "kubernetes-provider"
+                  scK8sProviderName:
+                    type: string
+                    description: The name of the provider config to use for the local k8s provider (for storage cluster)
+                    default: "sc-kubernetes-provider"
+                  awsProviderName:
+                    type: string
+                    description: The name of the AWS IAM provider config to use
+                    default: "aws-cp-upbound-provider-config"
+                  ceph:
+                    type: object
+                    description: Ceph-specific user configuration
+                    properties:
+                      operationMask:
+                        type: array
+                        description: Operations allowed for the Ceph user
+                        items:
+                          type: string
+                          enum:
+                            - read
+                            - write
+                            - delete
+                        default:
+                          - read
+                          - write
+                          - delete
+                      rookNamespace:
+                        type: string
+                        description: Namespace where Rook Ceph is installed
+                        default: "rook-ceph"
+                      storeName:
+                        type: string
+                        description: Name of the Ceph ObjectStore
+                        default: "default"
+                  iam:
+                    type: object
+                    description: IAM-specific user configuration
+                    properties:
+                      tags:
+                        type: array
+                        description: AWS tags to apply to the IAM user
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                            value:
+                              type: string
+                required:
+                  - objectStoreProvider
+                  - userName
+                  - displayName
+                  - namespace

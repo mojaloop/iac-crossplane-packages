@@ -1,0 +1,63 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xcephbucketuser.objectstore.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: objectstore.mojaloop.io
+  names:
+    kind: XCephBucketUser
+    plural: xcephbucketuser
+  claimNames:
+    kind: CephBucketUser
+    plural: cephbucketusers
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                type: array
+                items:
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+              parameters:
+                type: object
+                properties:
+                  userName:
+                    type: string
+                  displayName:
+                    type: string
+                  namespaceRook:
+                    type: string
+                  storeName:
+                    type: string
+                  operationMask:
+                    type: array
+                    items:
+                      type: string
+                  namespaceCeph:
+                    type: string
+                  scK8sProviderName:
+                    type: string
+                  ccK8sProviderName:
+                    type: string
+                required:
+                  - userName
+                  - displayName
+                  - namespaceCeph
+                  - scK8sProviderName

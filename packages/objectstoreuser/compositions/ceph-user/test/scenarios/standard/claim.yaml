@@ -1,0 +1,31 @@
+---
+# Example XCephBucketUser Claim for Ceph
+# Creates a Ceph user suitable for private-cloud deployments
+apiVersion: objectstore.mojaloop.io/v1alpha1
+kind: XCephBucketUser
+metadata:
+  name: ceph-test-user
+  namespace: default
+spec:
+  parameters:
+    userName: "test-ceph-user"
+    displayName: "Test Ceph ObjectStore User"
+    namespaceRook: "rook-ceph"
+    storeName: "default"
+    operationMask:
+      - "read"
+      - "write"
+      - "delete"
+    namespaceCeph: "default"
+    scK8sProviderName: "sc-kubernetes-provider"
+    ccK8sProviderName: "kubernetes-provider"
+
+---
+# Expected resources created by composition:
+# 1. CephObjectStoreUser (rook-ceph namespace)
+# 2. Kubernetes Secret named: test-ceph-user-ceph-secret (default namespace)
+
+# Verification commands:
+# kubectl get xcephbucketuser ceph-test-user
+# kubectl get cephobjectstoreuser test-ceph-user -n rook-ceph
+# kubectl get secret test-ceph-user-ceph-secret -o yaml

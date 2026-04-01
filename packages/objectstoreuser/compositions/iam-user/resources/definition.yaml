@@ -1,0 +1,65 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xiamuser.objectstore.mojaloop.io
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: objectstore.mojaloop.io
+  names:
+    kind: XIAMUser
+    plural: xiamuser
+  claimNames:
+    kind: IAMUser
+    plural: iamusers
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              managementPolicies:
+                default:
+                  - "*"
+                type: array
+                items:
+                  enum:
+                    - Observe
+                    - Create
+                    - Update
+                    - Delete
+                    - LateInitialize
+                    - "*"
+                  type: string
+              parameters:
+                type: object
+                properties:
+                  userName:
+                    type: string
+                  displayName:
+                    type: string
+                  namespace:
+                    type: string
+                  awsProviderName:
+                    type: string
+                  k8sProviderName:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        value:
+                          type: string
+                required:
+                  - userName
+                  - displayName
+                  - namespace
+                  - awsProviderName
+                  - k8sProviderName

@@ -1,0 +1,33 @@
+---
+# Example XIAMUser Claim for AWS IAM
+# Creates an IAM user suitable for cloud deployments (AWS S3)
+apiVersion: objectstore.mojaloop.io/v1alpha1
+kind: XIAMUser
+metadata:
+  name: iam-test-user
+  namespace: default
+spec:
+  parameters:
+    userName: "test-iam-user"
+    displayName: "Test IAM ObjectStore User"
+    namespace: "default"
+    awsProviderName: "aws-cp-upbound-provider-config"
+    k8sProviderName: "kubernetes-provider"
+    tags:
+      - key: "Application"
+        value: "test"
+      - key: "Environment"
+        value: "dev"
+
+---
+# Expected resources created by composition:
+# 1. IAM User (AWS account)
+# 2. Access Key (AWS account, for programmatic access)
+# 3. Kubernetes Secret named: test-iam-user-iam-secret (default namespace)
+#    Contains: accesskeyid, secretaccesskey
+
+# Verification commands:
+# kubectl get xiamuser iam-test-user
+# kubectl get user test-iam-user -o yaml (via Upbound AWS provider)
+# kubectl get secret test-iam-user-iam-secret -o yaml
+# aws iam get-user --user-name test-iam-user (AWS CLI)

@@ -1,0 +1,21 @@
+apiVersion: objectstore.mojaloop.io/v1alpha1
+kind: XObjectStoreUser
+metadata:
+  name: gitlab-s3-user
+  namespace: default
+spec:
+  parameters:
+    objectStoreProvider: "s3"
+    userName: "gitlab-s3-backup-user"
+    displayName: "GitLab S3 Backup Service User"
+    namespace: "gitlab"
+    ccK8sProviderName: "kubernetes-provider"
+    awsProviderName: "aws-cp-upbound-provider-config"
+    iam:
+      tags:
+        - key: "Application"
+          value: "gitlab"
+        - key: "Function"
+          value: "backup"
+        - key: "Environment"
+          value: "production"

@@ -1,0 +1,20 @@
+apiVersion: objectstore.mojaloop.io/v1alpha1
+kind: XObjectStoreUser
+metadata:
+  name: gitlab-backup-user
+  namespace: default
+spec:
+  parameters:
+    objectStoreProvider: "ceph"
+    userName: "gitlab-backup-user"
+    displayName: "GitLab Backup Service User"
+    namespace: "gitlab"
+    scK8sProviderName: "sc-kubernetes-provider"
+    ccK8sProviderName: "kubernetes-provider"
+    ceph:
+      operationMask:
+        - "read"
+        - "write"
+        - "delete"
+      rookNamespace: "rook-ceph"
+      storeName: "default"
