@@ -53,8 +53,9 @@ jobs:
 
       - name: 🛠️ Setup Crossplane CLI
         run: |
-          curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh
+          XP_VERSION=v1.19.0 curl -sL https://raw.githubusercontent.com/crossplane/crossplane/v1.19.0/install.sh | sh
           sudo mv crossplane /usr/local/bin/
+          crossplane version --client
 
       - name: ✅ Validate and Prepare
         working-directory: ${{ inputs.CROSSPLANE_PACKAGES_DIR }}
