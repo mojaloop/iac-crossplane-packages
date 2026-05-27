@@ -185,6 +185,43 @@ _bucketPolicy = {
     }
 }
 
+_bucketLifecycleRules = parameters?.bucket?.lifecycleRules or []
+_bucketLifecycleConfiguration = {
+    apiVersion = "s3.aws.upbound.io/v1beta1"
+    kind = "BucketLifecycleConfiguration"
+    metadata = {
+        name = "{}-lifecycle".format(parameters?.bucket?.bucketName)
+        annotations = {
+            "krm.kcl.dev/composition-resource-name": "bucket-lifecycle"
+        }
+    }
+    spec = {
+        forProvider = {
+            region = parameters?.bucket?.bucketRegion
+            bucket = parameters?.bucket?.bucketName
+            rule = [
+                {
+                    id = rule.id
+                    status = rule?.status or "Enabled"
+                    "filter" = [
+                        {
+                            prefix = rule.prefix
+                        }
+                    ]
+                    expiration = [
+                        {
+                            days = rule.expirationDays
+                        }
+                    ]
+                } for rule in _bucketLifecycleRules
+            ]
+        }
+        providerConfigRef = {
+            name = spec.providerConfigsRef.awsProviderName
+        }
+    }
+}
+
 # IAM User
 _iamUser = {
     apiVersion = "iam.aws.upbound.io/v1beta1"
@@ -303,6 +340,9 @@ _items += [
     _iamAccessKey,
     _pushSecret
 ]
+
+if len(_bucketLifecycleRules) > 0:
+    _items += [_bucketLifecycleConfiguration]
 
 # Update the XR with status fields
 dxr = {
