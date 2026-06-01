@@ -19,10 +19,10 @@ if parameters?.backup?.enabled == True:
         {
             name =  parameters?.backup?.scheduleName
             schedule =  parameters?.backup?.cronScheduleExpression
-            if not _pitrEnabled: retention =  {
+            retention =  {
                 type = "count"
                 count = parameters?.backup?.backupRetention
-                deleteFromStorage = True
+                deleteFromStorage = not _pitrEnabled
             }
             storageName =  "s3-backup-storage"
         }
