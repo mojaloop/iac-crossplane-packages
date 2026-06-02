@@ -8,6 +8,11 @@ parameters = spec.parameters
 # Initialize the items list
 _items = []
 
+_pitrEnabled = parameters?.backup?.enabled == True and parameters?.backup?.pitr?.enabled == True
+_backupBucket = parameters?.backup?.bucket
+_backupStorageBucket = "{}/backups".format(_backupBucket) if _pitrEnabled else _backupBucket
+_binlogStorageBucket = "{}/binlogs".format(_backupBucket)
+
 _backupScheduleSnippet = []
 if parameters?.backup?.enabled == True:
     _backupScheduleSnippet =  [
@@ -17,11 +22,50 @@ if parameters?.backup?.enabled == True:
             retention =  {
                 type = "count"
                 count = parameters?.backup?.backupRetention
-                deleteFromStorage = True
+                deleteFromStorage = not _pitrEnabled
             }
             storageName =  "s3-backup-storage"
         }
     ]
+
+_backupStorages = {
+    "s3-backup-storage" = {
+        type = "s3"
+        verifyTLS = parameters?.backup?.verifyTLS
+        s3 = {
+            bucket = _backupStorageBucket
+            credentialsSecret = parameters?.backup?.credentialsSecret
+            region = parameters?.backup?.bucketRegion
+            endpointUrl = parameters?.backup?.endpointUrl
+        }
+    }
+    if _pitrEnabled: "s3-binlog-storage" = {
+        type = "s3"
+        verifyTLS = parameters?.backup?.verifyTLS
+        s3 = {
+            bucket = _binlogStorageBucket
+            credentialsSecret = parameters?.backup?.credentialsSecret
+            region = parameters?.backup?.bucketRegion
+            endpointUrl = parameters?.backup?.endpointUrl
+        }
+    }
+    if parameters?.backup?.pvc: "fs-pvc" = parameters?.backup?.pvc
+}
+
+_bucketLifecycleRules = [
+    {
+        id = "expire-pitr-backups"
+        prefix = "backups/"
+        expirationDays = parameters?.backup?.pitr?.backupRetentionDays
+        status = "Enabled"
+    },
+    {
+        id = "expire-pitr-binlogs"
+        prefix = "binlogs/"
+        expirationDays = parameters?.backup?.pitr?.binlogRetentionDays
+        status = "Enabled"
+    }
+] if _pitrEnabled else []
 
 
 ## Adding resources
@@ -168,24 +212,18 @@ _MysqlCluster = {
 
                         }
                     }
-                    backup = {
-                    image = parameters?.backup?.image
-                    imagePullPolicy = parameters?.backup?.imagePullPolicy
-                    storages = {
-                        "s3-backup-storage" = {
-                            type = "s3"
-                            verifyTLS = parameters?.backup?.verifyTLS
-                            s3 = {
-                                bucket = parameters?.backup?.bucket
-                                credentialsSecret = parameters?.backup?.credentialsSecret
-                                region = parameters?.backup?.bucketRegion
-                                endpointUrl = parameters?.backup?.endpointUrl
-                            }
+                    if parameters?.backup?.enabled == True: backup = {
+                        image = parameters?.backup?.image
+                        imagePullPolicy = parameters?.backup?.imagePullPolicy
+                        storages = _backupStorages
+                        schedule = _backupScheduleSnippet
+                        if _pitrEnabled: pitr = {
+                            enabled = True
+                            storageName = "s3-binlog-storage"
+                            timeBetweenUploads = parameters?.backup?.pitr?.timeBetweenUploads
+                            timeoutSeconds = parameters?.backup?.pitr?.timeoutSeconds
                         }
-                        if parameters?.backup?.pvc : "fs-pvc" = parameters?.backup?.pvc
                     }
-                    schedule = _backupScheduleSnippet
-                   }
                 }
             }
         }
@@ -399,6 +437,7 @@ if parameters?.backup?.enabled == True:
                     bucketRegion = parameters?.backup?.bucketRegion
                     forceDestroy = parameters?.backup?.forceDestroy
                     deletionPolicy = parameters?.backup?.deletionPolicy
+                    if len(_bucketLifecycleRules) > 0: lifecycleRules = _bucketLifecycleRules
                 }
                 secret = {
                     name = parameters?.backup?.bucket

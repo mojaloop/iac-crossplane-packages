@@ -24,6 +24,7 @@ TESTSCENARIO ?=
 CLAIM_FILE ?=
 
 CROSSPLANE_RENDER_CMD := $(shell if crossplane render --help > /dev/null 2>&1; then echo "crossplane render"; else echo "crossplane beta render"; fi)
+CROSSPLANE_VALIDATE_CMD := $(shell if crossplane resource validate --help > /dev/null 2>&1; then echo "crossplane resource validate"; else echo "crossplane beta validate"; fi)
 
 EXTRA_RENDER_ARGS ?=
 EXTRA_VALIDATE_ARGS ?=
@@ -227,7 +228,7 @@ validate: render
 # -----------------------------------------------------------------------------
 define validate_file
 	echo "🧪 Analyzing: $(1)"; \
-	crossplane beta validate $(EXTENSIONS_DIR) "$(1)" --cache-dir="$(COMPOSITION_DIR)/$(COMPOSITION_NAME)/.crossplane/cache" $(EXTRA_VALIDATE_ARGS) | \
+	$(CROSSPLANE_VALIDATE_CMD) $(EXTENSIONS_DIR) "$(1)" --cache-dir="$(COMPOSITION_DIR)/$(COMPOSITION_NAME)/.crossplane/cache" $(EXTRA_VALIDATE_ARGS) | \
 		sed -e 's/\[✓\]/\x1b[32m[✓]\x1b[0m/g' \
 			-e 's/\[×\]/\x1b[31m[×]\x1b[0m/g' \
 			-e 's/\[!\]/\x1b[33m[!]\x1b[0m/g' \

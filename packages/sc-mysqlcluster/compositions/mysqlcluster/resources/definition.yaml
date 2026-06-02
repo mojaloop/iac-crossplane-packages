@@ -466,6 +466,30 @@ spec:
                       backupRetention:
                         type: integer
                         description: Number of backups to retain.
+                      pitr:
+                        type: object
+                        description: Point-in-time recovery configuration.
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Enable point-in-time recovery.
+                            default: false
+                          timeBetweenUploads:
+                            type: integer
+                            description: Number of seconds between binary log uploads.
+                            default: 60
+                          timeoutSeconds:
+                            type: integer
+                            description: Timeout in seconds for PITR uploads.
+                            default: 3600
+                          binlogRetentionDays:
+                            type: integer
+                            description: Number of days to retain PITR binary logs in object storage.
+                            default: 7
+                          backupRetentionDays:
+                            type: integer
+                            description: Number of days to retain full backups in object storage when PITR is enabled.
+                            default: 14
                       pvc:
                         type: object
                         description: fs-pvc backup storage.

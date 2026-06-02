@@ -85,6 +85,25 @@ spec:
                       deletionPolicy:
                         type: string
                         default: "Delete"
+                      lifecycleRules:
+                        type: array
+                        description: Optional S3 lifecycle rules for expiring objects by prefix.
+                        items:
+                          type: object
+                          required:
+                            - id
+                            - prefix
+                            - expirationDays
+                          properties:
+                            id:
+                              type: string
+                            prefix:
+                              type: string
+                            expirationDays:
+                              type: integer
+                            status:
+                              type: string
+                              default: "Enabled"
                   secret:
                     type: object
                     description: |-
