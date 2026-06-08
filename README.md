@@ -114,6 +114,10 @@ Release process:
 
 This project is licensed under [LICENSE](LICENSE.md) - see the LICENSE file for details.
 
+### Third-party Mirrored Artifacts
+
+The `hostport-allocator` package published from this repository mirrors the upstream [`rmb938/hostport-allocator`](https://github.com/rmb938/hostport-allocator) project and release artifacts. The upstream project is licensed under the MIT License; retain the upstream copyright and license notices when redistributing or modifying mirrored artifacts.
+
 ### Debugging and Troubleshooting
 
 #### Debugging KCL Functions
