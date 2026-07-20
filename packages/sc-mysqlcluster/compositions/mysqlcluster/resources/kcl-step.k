@@ -8,6 +8,10 @@ parameters = spec.parameters
 # Initialize the items list
 _items = []
 
+_pxcConfiguration = parameters?.pxc?.configuration
+if parameters?.pxc?.binlogRetentionDays:
+    _pxcConfiguration = (_pxcConfiguration or "") + "\n[mysqld]\nbinlog_expire_logs_seconds={}\n".format(parameters?.pxc?.binlogRetentionDays * 86400)
+
 _pitrEnabled = parameters?.backup?.enabled == True and parameters?.backup?.pitr?.enabled == True
 _backupBucket = parameters?.backup?.bucket
 _backupStorageBucket = "{}/backups".format(_backupBucket) if _pitrEnabled else _backupBucket
@@ -153,7 +157,7 @@ _MysqlCluster = {
                                 }
                             }
 
-                            configuration = parameters?.pxc?.configuration
+                            configuration = _pxcConfiguration
 
                             priorityClassName = parameters?.pxc?.priorityClassName
 

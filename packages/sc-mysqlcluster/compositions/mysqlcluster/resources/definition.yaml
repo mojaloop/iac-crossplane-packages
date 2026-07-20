@@ -236,6 +236,11 @@ spec:
                       configuration:
                         type: string
                         description: Configuration for PXC
+                      binlogRetentionDays:
+                        type: integer
+                        minimum: 1
+                        maximum: 49710
+                        description: Number of days to retain binary logs locally on each PXC node.
                       priorityClassName:
                         type: string
                         description: Priority class name for PXC
@@ -484,7 +489,7 @@ spec:
                             default: 3600
                           binlogRetentionDays:
                             type: integer
-                            description: Number of days to retain PITR binary logs in object storage.
+                            description: Number of days to retain uploaded PITR binary log objects under the object storage binlogs/ prefix. This does not control binary logs on PXC nodes.
                             default: 7
                           backupRetentionDays:
                             type: integer
