@@ -67,7 +67,7 @@ _sc_argocd_operator_app_install = {
                   ingress = {
                     enabled = True
                     router = {
-                      enabled = True
+                      enabled = False
                     }
                     kubernetesAPI = {
                       enabled = False
