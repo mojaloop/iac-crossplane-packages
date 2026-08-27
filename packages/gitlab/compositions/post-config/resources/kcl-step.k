@@ -5,8 +5,8 @@ ocds = option("params").ocds
 spec = oxr.spec
 p = spec.parameters
 
-_ciTokenRenewalPeriodDays = p?.ciTokenRenewalPeriodDays if p?.ciTokenRenewalPeriodDays != None else 90
-_ciTokenRenewBeforeDays = p?.ciTokenRenewBeforeDays if p?.ciTokenRenewBeforeDays != None else 7
+_ciTokenRenewalPeriodDays = p?.ciTokenRenewalPeriodDays or 90
+_ciTokenRenewBeforeDays = p?.ciTokenRenewBeforeDays or 7
 
 _items = []
 _groupIAC = {
