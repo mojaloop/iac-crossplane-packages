@@ -82,6 +82,7 @@ spec:
                       the token before expiration.
                     default: 90
                     minimum: 2
+                    maximum: 365
                   ciTokenRenewBeforeDays:
                     type: integer
                     description: |-
@@ -89,6 +90,7 @@ spec:
                       rotate the GitLab CI PAT.
                     default: 7
                     minimum: 1
+                    maximum: 364
                   tenancyGroupName:
                     type: string
                     description: |-
@@ -124,6 +126,9 @@ spec:
                     description: |-
                       Repo location for private iac.
                     default: platform
+                x-kubernetes-validations:
+                  - rule: "self.ciTokenRenewalPeriodDays > self.ciTokenRenewBeforeDays"
+                    message: "ciTokenRenewalPeriodDays must be greater than ciTokenRenewBeforeDays"
           status:
             type: object
             properties:

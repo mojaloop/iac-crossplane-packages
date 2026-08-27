@@ -7,6 +7,8 @@ spec:
   dependsOn:
     - provider: xpkg.upbound.io/crossplane-contrib/provider-kubernetes
       version: ">=v0.14.1"
+    - provider: xpkg.upbound.io/crossplane-contrib/provider-gitlab
+      version: ">=v0.18.1"
     - provider: ghcr.io/infitx-org/zitadel-crossplane-provider
       version: ">=v0.0.1"
     ## Functions
