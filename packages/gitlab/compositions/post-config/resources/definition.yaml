@@ -74,6 +74,21 @@ spec:
                     description: |-
                       The path in vault where to push the gitlab ci token.
                     default: gitlab/gitlab_ci_pat
+                  ciTokenRenewalPeriodDays:
+                    type: integer
+                    description: |-
+                      Number of days each generated GitLab CI PAT should remain valid.
+                      The GitLab provider uses this with ciTokenRenewBeforeDays to rotate
+                      the token before expiration.
+                    default: 90
+                    minimum: 2
+                  ciTokenRenewBeforeDays:
+                    type: integer
+                    description: |-
+                      Number of days before expiration at which the GitLab provider should
+                      rotate the GitLab CI PAT.
+                    default: 7
+                    minimum: 1
                   tenancyGroupName:
                     type: string
                     description: |-
@@ -114,3 +129,6 @@ spec:
             properties:
               tokenExpireAt:
                 type: string
+                description: |-
+                  Deprecated. Previously stored the fixed GitLab CI PAT expiration date.
+                  New reconciliation uses provider-managed renewal fields instead.
