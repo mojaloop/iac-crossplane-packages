@@ -5,6 +5,9 @@ ocds = option("params").ocds
 spec = oxr.spec
 p = spec.parameters
 
+_ciTokenRenewalPeriodDays = p?.ciTokenRenewalPeriodDays if p?.ciTokenRenewalPeriodDays != None else 90
+_ciTokenRenewBeforeDays = p?.ciTokenRenewBeforeDays if p?.ciTokenRenewBeforeDays != None else 7
+
 _items = []
 _groupIAC = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
@@ -80,8 +83,8 @@ _groupAccessToken = {
             groupId = ocds[p?.iacGroupName]?.Resource?.status?.atProvider?.id
             name = "gitlab ci pat"
             accessLevel = 50
-            renewalPeriodDays = p?.ciTokenRenewalPeriodDays
-            renewBeforeDays = p?.ciTokenRenewBeforeDays
+            renewalPeriodDays = _ciTokenRenewalPeriodDays
+            renewBeforeDays = _ciTokenRenewBeforeDays
             scopes = ["api"]
         }
         managementPolicies = spec.managementPolicies

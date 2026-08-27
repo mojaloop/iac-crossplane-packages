@@ -127,7 +127,7 @@ spec:
                       Repo location for private iac.
                     default: platform
                 x-kubernetes-validations:
-                  - rule: "self.ciTokenRenewalPeriodDays > self.ciTokenRenewBeforeDays"
+                  - rule: "!has(self.ciTokenRenewalPeriodDays) || !has(self.ciTokenRenewBeforeDays) || self.ciTokenRenewalPeriodDays > self.ciTokenRenewBeforeDays"
                     message: "ciTokenRenewalPeriodDays must be greater than ciTokenRenewBeforeDays"
           status:
             type: object
