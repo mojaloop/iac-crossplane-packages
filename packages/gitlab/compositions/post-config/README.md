@@ -24,6 +24,6 @@ rotate token values.
 ## Provider Configuration
 
 Requires provider-gitlab `>=v0.18.1` for provider-managed token renewal.
-The test schema fixture uses the upstream `xpkg.upbound.io` image. Runtime
-deployment may use the Mojaloop GHCR mirror only after the same provider version
-has been published there.
+The validation fixture and runtime deployment use the Mojaloop GHCR mirror, so
+`ghcr.io/mojaloop/infra/crossplane-contrib/provider-gitlab:v0.18.1` must exist
+before deploying this composition.
