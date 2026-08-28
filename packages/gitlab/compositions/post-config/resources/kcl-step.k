@@ -1,27 +1,12 @@
-import datetime
-import regex
-
 # Read the XR
 oxr = option("params").oxr
 ocds = option("params").ocds
 
 spec = oxr.spec
-status = oxr.status
 p = spec.parameters
 
-calculateExpireAt = lambda -> str {
-    now = datetime.today()
-    date = regex.split(now, " ")[0]
-
-    _y = regex.split(date, "-")[0]
-    _m = regex.split(date, "-")[1]
-    _d = regex.split(date, "-")[2]
-
-    y = int(_y) + 1
-    m = int(_m) - 1 if int(_m) > 1 else 1
-
-    "{}-{:02d}-01T00:00:00Z".format(y, m)
-}
+_ciTokenRenewalPeriodDays = p?.ciTokenRenewalPeriodDays or 90
+_ciTokenRenewBeforeDays = p?.ciTokenRenewBeforeDays or 7
 
 _items = []
 _groupIAC = {
@@ -84,13 +69,6 @@ _groupIACIdConfigMap = {
     }
 }
 
-
-_statusExpireAt = status?.tokenExpireAt
-_expireAt = None
-
-if _statusExpireAt == None:
-    _expireAt = calculateExpireAt()
-
 _groupAccessToken = {
     apiVersion = "groups.gitlab.crossplane.io/v1alpha1"
     kind = "AccessToken"
@@ -105,7 +83,8 @@ _groupAccessToken = {
             groupId = ocds[p?.iacGroupName]?.Resource?.status?.atProvider?.id
             name = "gitlab ci pat"
             accessLevel = 50
-            expiresAt = _statusExpireAt if _statusExpireAt != None else _expireAt
+            renewalPeriodDays = _ciTokenRenewalPeriodDays
+            renewBeforeDays = _ciTokenRenewBeforeDays
             scopes = ["api"]
         }
         managementPolicies = spec.managementPolicies
@@ -490,9 +469,4 @@ dxr = {
     **oxr
 }
 
-finalDxr = {
-    **dxr
-    status.tokenExpireAt = _expireAt
-} if _statusExpireAt == None else dxr
-
-items = _items + [finalDxr]
+items = _items + [dxr]

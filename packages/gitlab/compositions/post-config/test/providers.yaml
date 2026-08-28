@@ -11,7 +11,7 @@ kind: Provider
 metadata:
   name: provider-gitlab
 spec:
-  package: ghcr.io/mojaloop/infra/crossplane-contrib/provider-gitlab:v0.10.3
+  package: ghcr.io/mojaloop/infra/crossplane-contrib/provider-gitlab:v0.18.1
 ---
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
