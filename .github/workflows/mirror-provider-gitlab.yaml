@@ -1,0 +1,46 @@
+name: Mirror provider-gitlab
+
+on:
+  push:
+    branches:
+      - fix/pat-rotation
+  workflow_dispatch:
+    inputs:
+      provider_version:
+        description: Provider GitLab version to mirror
+        required: true
+        default: v0.18.1
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  PROVIDER_VERSION: ${{ inputs.provider_version || 'v0.18.1' }}
+  SOURCE_IMAGE: xpkg.upbound.io/crossplane-contrib/provider-gitlab
+  TARGET_IMAGE: ghcr.io/mojaloop/infra/crossplane-contrib/provider-gitlab
+
+jobs:
+  mirror-provider-gitlab:
+    name: Mirror provider-gitlab package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install crane
+        uses: imjasonh/setup-crane@v0.4
+
+      - name: Login to GHCR
+        run: |
+          crane auth login ghcr.io \
+            --username "${{ secrets.GHCR_USERNAME || github.actor }}" \
+            --password "${{ secrets.GHCR_TOKEN || github.token }}"
+
+      - name: Mirror provider package
+        run: |
+          crane copy \
+            "${SOURCE_IMAGE}:${PROVIDER_VERSION}" \
+            "${TARGET_IMAGE}:${PROVIDER_VERSION}"
+
+      - name: Verify mirrored package
+        run: |
+          crane digest "${TARGET_IMAGE}:${PROVIDER_VERSION}"
