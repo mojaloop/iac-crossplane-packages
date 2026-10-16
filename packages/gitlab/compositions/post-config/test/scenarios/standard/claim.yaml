@@ -10,6 +10,7 @@ spec:
     iacGroupName: iac
     gitlabRunnerRoleName: gitlab-runner-role
     gitlabFqdn: gitlab.cluster.mojaloop.io
+    esoRefreshInterval: 10m
   providerConfigsRef:
     gitlabProvider: gitlab-provider
     kubernetesProvider: kubernetes-provider

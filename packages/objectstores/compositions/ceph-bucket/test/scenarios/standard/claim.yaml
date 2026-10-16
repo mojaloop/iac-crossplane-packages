@@ -17,5 +17,6 @@ spec:
       name: "my-example-bucket"
       ccNamespace: "temp"
       esoPushSecret: true
+      esoRefreshInterval: 10m
       vaultSecretStore: "vault-backend"
       vaultSecretPath: "mutai/my_example_bucket2"

@@ -21,6 +21,7 @@ spec:
       vaultSecretPath: "test/path"
     pushSecret:
       esoPushSecret: true
+      esoRefreshInterval: 10m
   providerConfigsRef:
     ccK8sProviderName: "cc-kubernetes-provider"
     netbirdProviderConfigName: "netbird-provider-config"
