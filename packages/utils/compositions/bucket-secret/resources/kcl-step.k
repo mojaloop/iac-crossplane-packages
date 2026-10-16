@@ -191,7 +191,7 @@ _bucketExternalSecret = {
           namespace = _appNS
         }
         spec = {
-          refreshInterval = "1m"
+          refreshInterval = parameters?.esoRefreshInterval
           secretStoreRef = {
             kind = "SecretStore"
             name = "{}-secret-store".format(oxr.metadata.name)

@@ -91,7 +91,7 @@ spec:
                           type: string
                           description: |-
                             Interval to refresh the secret on vault.
-                          default: "1m"
+                          default: "15m"
                         vaultSecretStore:
                           type: string
                           description: |-

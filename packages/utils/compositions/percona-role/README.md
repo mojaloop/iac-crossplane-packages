@@ -22,7 +22,7 @@ spec:
     esoPushSecret: true
     esoUpdatePolicy: Replace
     esoDeletePolicy: Delete
-    esoRefreshInterval: 1m
+    esoRefreshInterval: 15m
     vaultSecretStore: vault-secret-store
     vaultSecretPath: percona/sa-token-secret
   providerConfigsRef:
