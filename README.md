@@ -28,6 +28,25 @@ This project provides a collection of Crossplane composition packages designed t
 - Crossplane installed and configured
 - Required provider and functions installed and configured
 
+### ESO refresh intervals
+
+Compositions that create ExternalSecret or PushSecret resources expose an
+`esoRefreshInterval` parameter. The default is `15m` for ObjectStore (including
+Ceph and S3), GitLab, EBS CSI, bucket-secret, Percona, and NetBird resources.
+The parent ObjectStore passes the value to both generated bucket types.
+
+Set `esoRefreshInterval` in the relevant claim parameters to override the
+default. ObjectStore uses `spec.parameters.esoRefreshInterval`; nested secret or
+push-secret compositions retain their existing parameter nesting. Explicit
+values are preserved, but values below `15m` should be reviewed for their ESO
+reconciliation and Vault authentication impact.
+
+Run the refresh-interval policy checks with:
+
+```bash
+python3 packages/test_eso_refresh_intervals.py
+```
+
 ### Installation
 
 Installation is described in each package
