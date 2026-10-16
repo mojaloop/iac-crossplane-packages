@@ -77,7 +77,7 @@ spec:
                   esoRefreshInterval:
                     type: string
                     description: Interval to refresh the secret on vault.
-                    default: "1h"
+                    default: "15m"
                   vaultSecretStore:
                     type: string
                     description: Name of the secretstore on cluster for vault.

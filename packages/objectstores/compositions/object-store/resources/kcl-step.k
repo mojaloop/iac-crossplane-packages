@@ -32,9 +32,13 @@ if parameters?.objectStoreProvider == "ceph":
           secret = {
             name              = parameters?.bucketName
             esoPushSecret     = parameters?.esoPushSecret
+            esoUpdatePolicy   = parameters?.esoUpdatePolicy
+            esoDeletePolicy   = parameters?.esoDeletePolicy
+            esoRefreshInterval = parameters?.esoRefreshInterval
             scNamespace       = parameters?.clusterName
             ccNamespace       = parameters?.namespace
             vaultSecretStore  = parameters?.vaultSecretStore
+            vaultSecretStoreKind = parameters?.vaultSecretStoreKind
             vaultSecretPath   = parameters?.vaultSecretPath
           }
         }
@@ -62,7 +66,11 @@ if parameters?.objectStoreProvider == "s3":
           name             = parameters?.bucketName
           namespace        = parameters?.namespace
           esoPushSecret    = parameters?.esoPushSecret
+          esoUpdatePolicy  = parameters?.esoUpdatePolicy
+          esoDeletePolicy  = parameters?.esoDeletePolicy
+          esoRefreshInterval = parameters?.esoRefreshInterval
           vaultSecretStore = parameters?.vaultSecretStore
+          vaultSecretStoreKind = parameters?.vaultSecretStoreKind
           vaultSecretPath  = parameters?.vaultSecretPath
           }
         }
