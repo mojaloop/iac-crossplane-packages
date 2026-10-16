@@ -39,7 +39,7 @@ KCL_PROPAGATION = {
         1,
     ),
     "gitlab/compositions/post-config/resources/kcl-step.k": (
-        "refreshInterval = parameters.esoRefreshInterval",
+        "refreshInterval = p?.esoRefreshInterval",
         1,
     ),
     "utils/compositions/bucket-secret/resources/kcl-step.k": (

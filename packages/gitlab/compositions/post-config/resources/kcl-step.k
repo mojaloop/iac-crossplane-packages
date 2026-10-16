@@ -121,7 +121,7 @@ _pushSecret = {
                 spec = {
                     updatePolicy = "Replace"
                     deletionPolicy = "Delete"
-                    refreshInterval = parameters.esoRefreshInterval
+                    refreshInterval = p?.esoRefreshInterval
                     secretStoreRefs = [
                         {
                             name = "vault-secret-store"
