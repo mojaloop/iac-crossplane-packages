@@ -8,6 +8,7 @@ spec:
     envName: "env-infra3"
     ccClusterName: "cc-infra3"
     vaultKvPath: "secret"
+    esoRefreshInterval: 10m
   providerConfigsRef:
     awsProviderName: aws-provider
     vaultProviderName: vault-provider

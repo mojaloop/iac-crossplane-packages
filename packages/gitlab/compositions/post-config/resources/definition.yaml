@@ -74,6 +74,11 @@ spec:
                     description: |-
                       The path in vault where to push the gitlab ci token.
                     default: gitlab/gitlab_ci_pat
+                  esoRefreshInterval:
+                    type: string
+                    description: |-
+                      Interval for refreshing the GitLab CI token PushSecret.
+                    default: "15m"
                   ciTokenRenewalPeriodDays:
                     type: integer
                     description: |-

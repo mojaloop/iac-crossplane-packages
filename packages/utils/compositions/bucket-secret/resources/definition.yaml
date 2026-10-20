@@ -99,6 +99,11 @@ spec:
                     description: |-
                       Whether to sync bucket secrets.
                     default: true
+                  esoRefreshInterval:
+                    type: string
+                    description: |-
+                      Interval for refreshing the bucket ExternalSecret.
+                    default: "15m"
                   secretType:
                     type: string
                     description: |-

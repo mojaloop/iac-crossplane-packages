@@ -43,6 +43,10 @@ spec:
                       type: string
                       description: "ARN of the AmazonEBSCSIDriverPolicy"
                       default: "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+                    esoRefreshInterval:
+                      type: string
+                      description: "Interval for refreshing the EBS CSI PushSecret"
+                      default: "15m"
                   required:
                     - envName
                     - ccClusterName

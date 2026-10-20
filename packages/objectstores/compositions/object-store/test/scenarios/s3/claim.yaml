@@ -9,6 +9,7 @@ spec:
     bucketName: "example-mojaloopxyz-object-store"
     ccK8sProviderName: "kubernetes-provider"
     esoPushSecret: true
+    esoRefreshInterval: 10m
     vaultSecretStore: "vault-backend"
     vaultSecretPath: "objectstore/my_example_bucket"
     namespace: "default"
