@@ -2,8 +2,8 @@
 oxr = option("params").oxr
 ocds = option("params").ocds
 
-spec = oxr.spec
-parameters = spec.parameters
+oxr_spec = oxr.spec
+parameters = oxr_spec.parameters
 # Initialize the items list
 _items = []
 
@@ -14,48 +14,9 @@ readyBasedOnConditions = lambda o: any -> bool {
     len(conditions) > 0 and all_true([c.status == "True" for c in conditions])
 }
 
-# _network_resource_group = {
-#     apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-#     kind = "NbGroup"
-#     metadata = {
-#         name = "{}-network-resource-group".format(oxr.metadata.name)
-#         annotations = {
-#             "krm.kcl.dev/composition-resource-name": "network-resource-group"
-#             "crossplane.io/external-name": parameters.groupNames.networkResourceGroup
-#         }
-#     }
-#     spec = {
-#         forProvider = {
-#             name = parameters.groupNames.networkResourceGroup
-#         }
-#         providerConfigRef = {
-#             name = spec?.providerConfigsRef?.netbirdProviderConfigName
-#         }
-#         managementPolicies = spec?.managementPolicies
-#     }
-# }
-
-
-# _nb_network = {
-#   apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
-#   kind = "NbNetwork"
-#   metadata = {
-#     name = "{}-nb-network".format(oxr.metadata.name)
-#     annotations = {
-#       "krm.kcl.dev/composition-resource-name": "nb-network"
-#       "crossplane.io/external-name": parameters.networkResource.networkName
-#     }
-#   }
-#   spec = {
-#     forProvider = {
-#       name = parameters.networkResource.networkName
-#     }
-#     providerConfigRef = {
-#       name = spec?.providerConfigsRef?.netbirdProviderConfigName
-#     }
-#     managementPolicies = ["Observe"]
-#   }
-# }
+# Get provider config references from the XR spec
+_netbird_provider_config = oxr_spec?.providerConfigsRef?.netbirdProviderConfigName
+_management_policies = oxr_spec?.managementPolicies
 
 _nb_network_resource = {
   apiVersion = "vpn.netbird.crossplane.io/v1alpha1"
@@ -80,19 +41,13 @@ _nb_network_resource = {
       network_name: parameters.networkResource.networkName
     }
     providerConfigRef = {
-      name = spec?.providerConfigsRef?.netbirdProviderConfigName
+        name = _netbird_provider_config
     }
-    managementPolicies = spec?.managementPolicies
+    managementPolicies = _management_policies
   }
 }
 
-
-
-# Add the resources to the items list
-_items += [
-  _nb_network_resource
-]
-
+_items += [_nb_network_resource]
 
 dxr = {
   **oxr
